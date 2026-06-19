@@ -1,0 +1,497 @@
+\chapter{Technologies and Tools Used}
+\label{chap:tecno-ferra}
+
+\section{Introduction}
+\label{chap3:sec:intro}
+
+This chapter describes the concrete set of technologies and tools on
+which the work reported in this document is built. The set was not
+chosen in a single decision, but converged over the course of the
+project through a mixture of constraints (what the production
+\ac{API} already uses, what the laboratory's network allows, what the
+proposal explicitly mandates), comparisons (between equivalent
+alternatives) and pragmatic preference. The chapter is structured by
+layer of the stack: \ac{API} contracts and serialization formats in
+Section~\ref{sec:apis}, the Java/Jakarta ecosystem in
+Section~\ref{sec:java}, persistence and \ac{SQL} databases in
+Section~\ref{sec:sql}, application and \ac{CI} servers in
+Section~\ref{sec:servers}, version control in
+Section~\ref{sec:gitsec}, containerization in Section~\ref{sec:docker}
+and network access in Section~\ref{sec:vpn}.
+
+\section{APIs, Serialization Formats and Specification}
+\label{sec:apis}
+
+\subsection{REST and the Multi-format Response}
+
+All endpoints exposed by the applications discussed in this report
+follow the \ac{REST} architectural style as described by
+Fielding~\cite{fielding2000rest}: resources are identified by stable
+\acp{URL}, manipulated through a small set of \ac{HTTP} verbs (with
+\texttt{GET} dominating for read-only \ac{GNSS} metadata), and the
+\ac{API} is stateless on the server side. There is no session
+affinity, which is a property that the differential test harness
+described in Chapter~\ref{chap:caso-epos} relies on heavily: the same
+request can be replayed against two independent server processes and
+the responses can be compared directly.
+
+The production \ac{API} (\texttt{api\_v4.0}) is unusual in that it
+serves the \emph{same} resource in several serialization formats,
+selected by a path parameter at the end of the \ac{URL}. The supported
+formats are \ac{JSON} (default), \ac{XML} (produced through Jackson's
+XML data format module), \ac{CSV} (produced through a custom writer)
+and, for the file metadata endpoints, an executable shell
+\emph{script} that downloads the corresponding files. This multi-format
+output was inherited from the legacy \ac{API}, many of its clients
+are scientific scripts that consume \ac{CSV} or \ac{JSON} directly,
+and was preserved in the refactor; it is also the reason the
+\ac{HTTP}-level differential harness has to compare not only headers
+and status codes but also the body, format by format.
+Figure~\ref{fig:multiformat} sketches the content negotiation pattern
+that turns a single resource method into four wire formats.
+
+\begin{figure}[h]
+  \centering
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}[
+      every node/.style={font=\small},
+      box/.style={draw, rounded corners=2pt, align=center, thick,
+                  minimum height=9mm, minimum width=22mm},
+      writer/.style={box, fill=dkgreen!10, minimum width=20mm},
+      arrow/.style={-{Stealth[length=2mm]}, thick}
+    ]
+    \node[box, fill=dkblue!10] (req) {\texttt{GET /api/stations/.../\{format\}}};
+    \node[box, fill=mauve!10, below=8mm of req, minimum width=46mm]
+      (resource) {\textbf{StationEndpoints}\\[2pt]\footnotesize same Java method, regardless of format};
+    \node[box, below=8mm of resource, minimum width=46mm, fill=lgray]
+      (negot) {Content negotiation \\\footnotesize (path parameter \texttt{\{format\}})};
+
+    \node[writer, below=10mm of negot, xshift=-36mm] (json)   {\textbf{JSON} \\\footnotesize Jackson};
+    \node[writer, right=4mm of json]                 (xml)    {\textbf{XML}  \\\footnotesize jackson-xml};
+    \node[writer, right=4mm of xml]                  (csv)    {\textbf{CSV}  \\\footnotesize custom writer};
+    \node[writer, right=4mm of csv]                  (script) {\textbf{Script}\\\footnotesize files only};
+
+    \node[box, below=10mm of csv, fill=dark!10, minimum width=66mm]
+      (resp) {HTTP response body};
+
+    \draw[arrow] (req)       -- (resource);
+    \draw[arrow] (resource)  -- (negot);
+    \draw[arrow] (negot)     -- (json);
+    \draw[arrow] (negot)     -- (xml);
+    \draw[arrow] (negot)     -- (csv);
+    \draw[arrow] (negot)     -- (script);
+    \draw[arrow] (json)      -- (resp);
+    \draw[arrow] (xml)       -- (resp);
+    \draw[arrow] (csv)       -- (resp);
+    \draw[arrow] (script)    -- (resp);
+  \end{tikzpicture}%
+  }
+  \caption{Multi-format content negotiation in \texttt{api\_v4.0}. The
+  same Java resource method is reused across four serializations,
+  selected by a path parameter, and the differential harness must
+  compare the body of each format separately.}
+  \label{fig:multiformat}
+\end{figure}
+
+\subsection{\ac{JSON} and \ac{XML}}
+
+\ac{JSON} is the default serialization and the format on which most
+of the test fixtures of this project rely. The Jakarta \ac{REST}
+implementation provided by Payara takes care of object serialization
+through Jackson, with negligible per-request overhead. \ac{XML} is
+provided by the \texttt{jackson-dataformat-xml} module, configured to
+preserve the same Java models that produce \ac{JSON}. This dual
+configuration is valuable because it removes a whole class of
+\emph{schema drift} bugs: as long as the Java model is correct, both
+\ac{JSON} and \ac{XML} outputs are consistent with each other.
+
+\subsection{\ac{CSV}}
+
+\ac{CSV} is the format favoured by historical clients of the \ac{API}
+and is produced through a small set of writer classes that flatten
+the entity tree into rows. The differential harness handles \ac{CSV}
+exactly the same way it handles \ac{JSON} and \ac{XML}: the textual
+body of the response is treated as an opaque blob that must match,
+byte for byte, against the baseline.
+
+\subsection{\ac{OpenAPI} and Swagger \ac{UI}}
+
+The contract of the production \ac{API} is described in an
+\ac{OpenAPI} 3.1.0~\cite{openapi} document
+(\texttt{openapi.json}) that ships inside the \ac{WAR}. The same
+document is served to a Swagger \ac{UI}~\cite{swaggerui} instance
+hosted at \texttt{/swagger.html}, which provides an interactive,
+in-browser playground for the endpoints. Two practical benefits arise
+from this setup. First, the document is the single source of truth
+shared with downstream consumers of the \ac{API}, in particular the
+\ac{EPOS} portal. Second, the same document can be used to drive
+contract tests: a future evolution of the test framework, briefly
+discussed in Chapter~\ref{chap:conc-trab-futuro}, is to derive the
+\ac{HTTP} differential test cases automatically from the \ac{OpenAPI}
+specification instead of maintaining them in a separate \ac{JSON} file.
+
+\section{Java and Jakarta EE}
+\label{sec:java}
+
+\subsection{The Java Platform}
+
+All applications discussed in this report run on the Java Platform.
+The production \ac{API} and the second prototype target Java SE
+21~\cite{javaSE21}, the long-term support release at the time of the
+project, while the first prototype is built against Java SE 17,
+the version against which its base \ac{CI} image (\texttt{maven:3.9.6-eclipse-temurin-21})
+remains backwards-compatible. The choice of Java was effectively
+imposed by the existing code base, but is independently justified by
+the maturity of the platform, the strength of its enterprise
+ecosystem and the very wide set of tools (\acp{IDE}, build systems,
+test frameworks) that target it.
+
+The Java records introduced in recent versions of the language were
+used liberally in the prototypes for immutable request and response
+\acp{POJO}, and the new \texttt{switch} expression syntax is used in
+several places where the refactored validation logic replaced long
+\texttt{if/else} chains from the legacy \ac{API}.
+
+\subsection{Jakarta EE and the Move from Java EE}
+
+Java EE was renamed to Jakarta EE in 2018, when its stewardship moved
+from Oracle to the Eclipse Foundation~\cite{jakartaee}. The most
+visible technical consequence of the move was the change of the root
+package from \texttt{javax.*} to \texttt{jakarta.*}, starting with
+Jakarta EE 9. For an application of the size of the production
+\ac{API}, this was not a trivial change, but it had already been
+absorbed by the time this project started; the current code base
+targets Jakarta EE 11.
+
+The specific Jakarta specifications used in this work are
+summarised in Table~\ref{tab:jakarta-specs}.
+
+\begin{table}[h]
+  \centering
+  \small
+  \begin{tabular}{l p{6.5cm} l}
+    \toprule
+    \textbf{Specification} & \textbf{Purpose} & \textbf{Version} \\
+    \midrule
+    Jakarta \ac{REST} (\ac{JAX-RS}) & HTTP endpoints, content negotiation
+       & 4.0 \\
+    Jakarta \ac{CDI} & Dependency injection, bean lifecycle
+       & 4.1 \\
+    Jakarta Persistence (\ac{JPA}) & Object-relational mapping
+       & 3.2 \\
+    Jakarta Bean Validation & Declarative constraint checking
+       & 3.1 \\
+    Jakarta JSON Binding (JSON-B) & POJO $\leftrightarrow$ \ac{JSON}
+       & 3.0 \\
+    Eclipse MicroProfile JWT & JSON Web Token authentication
+       & 2.1 \\
+    Eclipse MicroProfile Health & Liveness/readiness probes
+       & 4.0 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Jakarta EE and MicroProfile specifications used across the
+  three applications.}
+  \label{tab:jakarta-specs}
+\end{table}
+
+\subsection{Why Jakarta EE rather than Spring Boot}
+
+A common alternative to Jakarta EE for a green-field Java \ac{API} is
+Spring Boot~\cite{springBoot}. The two are largely equivalent at the
+level of features, but they differ in philosophy: Spring Boot bundles
+an embedded servlet container and a curated, opinionated
+\ac{BOM}; Jakarta EE relies on an external application server, in
+this case Payara, which provides the runtime contracts that the
+application targets.
+
+For the prototypes, Spring Boot would have been a perfectly viable
+choice. For the production \ac{API}, however, the existing code base
+is already on Jakarta EE and is deployed onto an existing Payara
+server inside the laboratory's network. Migrating to Spring Boot
+would have meant a second, parallel refactor on top of the one already
+in progress, with no proportional benefit. Sticking with Jakarta EE
+was therefore the lower-risk option.
+
+\section{\ac{SQL} and the Database Layer}
+\label{sec:sql}
+
+\subsection{\ac{SQL} as a Lingua Franca}
+
+The persistence model of the production \ac{API} is heavily relational
+and the queries themselves are non-trivial: \ac{GNSS} stations,
+networks, agencies, countries, file types, observation summaries and
+embargo windows are all linked through foreign keys, and most
+endpoints execute several joins per request. \ac{SQL}~\cite{postgresql}
+is therefore the natural query language for this domain; even where
+the application code uses \ac{JPA}'s object-oriented abstractions
+(Section~\ref{sec:jpa-hibernate}), what reaches the database is plain
+\ac{SQL}.
+
+\subsection{PostgreSQL and MySQL}
+
+The laboratory standardised on \textbf{PostgreSQL}~\cite{postgresql}
+for the \ac{EPOS} production database. PostgreSQL was preferred over
+\textbf{MySQL}~\cite{mysql} for two main reasons. First, PostgreSQL's
+adherence to the \ac{SQL} standard, in particular for advanced
+\texttt{JOIN} types, common table expressions, the \texttt{numeric}
+type used for the high-precision station coordinates, and the rich
+set of available index types (B-tree, BRIN, GiST and others),
+made the rewrite of the legacy queries simpler. Second, PostgreSQL
+leaves the door open to the PostGIS extension for the bounding-box
+queries that the \ac{GNSS} domain naturally invites; that extension
+is not in use today (see Section~\ref{sec:epos-db}) but is a
+realistic future addition. MySQL was nevertheless used in the
+docker-compose configuration of the second prototype
+(Section~\ref{sec:syncspace}) to validate that the application-level
+code is not tied to a specific dialect.
+
+\subsection{\ac{JPA}, Hibernate and the Persistence Unit}
+\label{sec:jpa-hibernate}
+
+\ac{JPA}~\cite{jpa} is the Jakarta specification for object-relational
+mapping in Java. The production \ac{API} uses
+Hibernate~\cite{hibernate} as the \ac{JPA} provider, configured
+through a \texttt{persistence.xml} file. The persistence unit is
+named \texttt{MeuPU} and is declared as
+\texttt{RESOURCE\_LOCAL}, which means that transactions are managed
+explicitly by application code rather than by the container, a
+deliberate choice that keeps the differential test harness in full
+control of when transactions begin and end.
+
+Database connections are pooled through \textbf{HikariCP}~\cite{hikaricp}
+with a small, conservative pool (2--15 connections, 20-second connect
+timeout, 30-second idle, 5-second validation), tuned for the
+read-mostly workload of the \ac{API} and for the relatively low
+concurrency observed in production.
+
+\subsection{The \ac{EPOS} Database in Practice}
+\label{sec:epos-db}
+
+A closer look at the production database is useful at this point,
+because most of the discussion in the following chapters takes its
+shape and its peculiarities for granted. The schema lives in the
+\texttt{public} schema of a PostgreSQL 16 instance and is shared by
+two database fixtures, both reachable from the laboratory's internal
+network on port 5432 of \texttt{192.168.168.30}:
+\texttt{DB\_3.0\_J} hosts a small but representative production
+subset; \texttt{DB\_3.0\_F} hosts the full dataset and is reserved
+for volume-oriented and performance experiments.
+
+\paragraph{Schema shape.}
+The current schema contains forty-two tables and roughly fifty
+foreign-key constraints; the model is highly normalised, with no
+table currently exceeding thirty columns. The tables fall into four
+broad families:
+
+\begin{itemize}
+  \item \emph{Core domain}, \texttt{station}, \texttt{network},
+        \texttt{agency}, \texttt{country}, \texttt{rinex\_file} and
+        \texttt{highrate\_rinex\_file}. These hold the entities that
+        appear in the public \ac{API} payloads.
+  \item \emph{Junction tables}, \texttt{agency\_network},
+        \texttt{station\_network}, \texttt{station\_agency\_role},
+        \texttt{node\_station} and \texttt{node\_data\_center}.
+        These materialise the many-to-many relationships that the
+        domain calls for (a station belongs to one or more networks,
+        an agency operates one or more networks, and so on).
+  \item \emph{Quality-control summaries}, a family of seven tables
+        (\texttt{qc\_report\_summary}, \texttt{qc\_constellation\_\-summary},
+        \texttt{qc\_header\_observations}, \texttt{qc\_navigation\_msg}
+        and four typed \texttt{qc\_observation\_summary\_\{c,d,l,s\}}
+        variants for code, Doppler, phase-locked and signal-strength
+        observations). These store the post-processing of each
+        \ac{RINEX} file.
+  \item \emph{Auxiliary}, embargoes, documents, licenses, logs,
+        and the node/data-centre infrastructure tables; together with
+        a small \texttt{authentication} table used by the legacy
+        admin endpoints.
+\end{itemize}
+
+\paragraph{One small but instructive design choice.}
+The \texttt{country} table uses the ISO three-letter code
+(\texttt{iso\_code}) as its natural primary key instead of a surrogate
+\texttt{id}, and \texttt{station.country\_code} is a direct
+\texttt{character(3)} foreign key onto it. This single decision
+removes the most common ``which agency are you talking about'' join
+ambiguity from station queries and is a representative example of the
+small simplifications the schema makes possible.
+
+\paragraph{Spatial data: today and tomorrow.}
+Station coordinates are stored as plain \texttt{numeric(12,3)} for
+the Cartesian \texttt{x/y/z} components and as \texttt{numeric(6,4)}
+/ \texttt{numeric(7,4)} for the geodetic \texttt{lat}/\texttt{lon}.
+The PostGIS extension is \emph{not} currently installed, the only
+non-default extension is \texttt{plpgsql}. Bounding-box and polygon
+checks are implemented in Java by the helpers of the \texttt{Geometry}
+package (Section~\ref{sec:apiv4-arch}), which is sufficient for
+present needs and keeps the database side neutral. Migrating those
+checks to PostGIS is one of the items in the project's future-work
+list (Chapter~\ref{chap:conc-trab-futuro}), but is expected to make
+little difference to correctness; the motivation, when it comes, will
+be query plan quality on large datasets.
+
+\paragraph{Indexing today and indexing tomorrow.}
+The schema today carries about twenty-five explicit indexes, almost
+all of them B-tree indexes on foreign-key columns
+(\texttt{idx\_file} on \texttt{rinex\_file(id\_station)},
+\texttt{idx\_qc\_filesum} on \texttt{qc\_report\_summary(id\_rinexfile)}
+with \texttt{fillfactor=90} to favour reads over writes, and so on).
+This handles the common access patterns of the \ac{API}, where every
+endpoint joins from the \texttt{station} or \texttt{rinex\_file} side
+through a chain of foreign keys.
+
+The natural next step, and the main reason the larger
+\texttt{DB\_3.0\_F} fixture was provisioned, is to validate the
+introduction of \textbf{BRIN} (Block Range Index) indexes on the
+date columns of \texttt{rinex\_file} (\texttt{reference\_date},
+\texttt{published\_date}, \texttt{release\_date}) and of the
+\texttt{highrate} variant. BRIN indexes are appropriate here because
+\ac{RINEX} files are inserted in approximate date order, so the
+on-disk row layout already correlates with the indexed column, which
+is the precondition under which a BRIN index is small and fast. The
+differential test framework introduced in Chapter~\ref{chap:caso-epos}
+plays a role in this evaluation: by running the same diff cases
+against the \texttt{DB\_3.0\_F} fixture before and after the BRIN
+addition, the framework gives a concrete behavioural signal in
+addition to whatever \texttt{EXPLAIN ANALYZE} would say in isolation.
+
+\section{Application and \ac{CI} Servers}
+\label{sec:servers}
+
+\subsection{Payara Server}
+
+\textbf{Payara Server}~\cite{payara} is a derivative of the GlassFish
+reference implementation of Jakarta EE, maintained as a commercial
+distribution by Payara Services Ltd. The laboratory adopted Payara
+several years ago and the production \ac{API} is deployed onto an
+existing Payara installation; this project did not change that
+choice. Two specific properties of Payara matter for the work
+reported here. First, Payara Server packages a full Jakarta EE
+runtime, which is what the production \ac{WAR} is built against.
+Second, Payara distributes a companion product, \textbf{Payara
+Micro}, which is a single, self-contained \ac{JAR} that can be
+launched from the command line with a \ac{WAR} on its argument list:
+\begin{verbatim}
+java -jar payara-micro.jar --port 8081 target/ROOT.war
+\end{verbatim}
+Payara Micro is the engine on which the \ac{HTTP}-level differential
+harness relies: the harness boots two instances of Payara Micro on
+two different ports, one serving the baseline \ac{WAR} and the other
+the \ac{HEAD} \ac{WAR}, and replays the same requests against both.
+
+\subsection{Apache Tomcat as an Alternative}
+
+\textbf{Apache Tomcat}~\cite{apacheTomcat} is the most widely used
+servlet container in the Java world, and is sometimes used as a
+lightweight alternative to a full Jakarta EE server. It was
+considered for the second prototype but ruled out because, unlike
+Payara, Tomcat does not ship a full Jakarta EE 11 runtime,
+\ac{CDI}, \ac{JPA} and Bean Validation would have had to be wired
+in by hand. Standardising on Payara across the three projects
+eliminated that overhead.
+
+\subsection{Maven as Build Tool}
+
+All three applications are built with \textbf{Apache Maven}.
+The \texttt{pom.xml} of the production \ac{API} configures three
+plugins worth highlighting: \texttt{maven-war-plugin}, which produces
+the deployable \texttt{ROOT.war}; \texttt{maven-failsafe-plugin},
+which runs integration tests (named \texttt{*IT.java}) during the
+\texttt{verify} phase and emits \ac{JUnit} XML reports; and
+\texttt{maven-dependency-plugin}, which downloads the Payara Micro
+\ac{JAR} into \texttt{target/payara-micro/} during the build so that
+the \ac{HTTP} harness can later spawn it as a subprocess.
+
+\subsection{GitLab and GitLab Runner}
+
+\textbf{GitLab}~\cite{gitlabci} was already discussed in
+Chapter~\ref{chap:estado-da-arte} as the \ac{CI}/\ac{CD} platform
+adopted by the laboratory. From the point of view of the technology
+stack, two components are relevant. The \emph{GitLab server} is a
+self-managed installation~\cite{gitlabSelfManaged} running on a
+\ac{VM} inside the laboratory; it hosts the repository, the issues,
+the pipeline definitions and the merge requests. The \emph{GitLab
+Runner}~\cite{gitlabRunner} is a separate process, hosted on another
+\ac{VM} (tagged \texttt{ubi-runner-.31}), that polls the GitLab
+server for pending jobs and executes them inside a Docker container.
+That separation is significant: it means the runner machine is the
+one that needs network access to the laboratory's database, not the
+GitLab server itself.
+
+\section{Version Control: Git and GitLab}
+\label{sec:gitsec}
+
+\textbf{Git}~\cite{chacon2014pro} is the version control system used
+across all three applications. Beyond the obvious use as a source
+code repository, Git is used in two non-trivial ways in this project.
+First, the \ac{CI} pipeline of the production \ac{API} uses
+\texttt{git worktree} to materialise an additional copy of the
+repository pinned to a baseline commit, on the runner's local file
+system; this is the mechanism by which the differential harness
+obtains the ``previous version'' against which the current build is
+compared. Second, the harness identifies the baseline as the first
+parent of \texttt{HEAD} (\texttt{HEAD\textasciitilde 1}), which makes
+the comparison meaningful even on long-running refactor branches in
+which the developer commits frequently. The exact pattern is
+discussed in detail in Section~\ref{sec:pipeline}.
+
+GitLab itself plays the role of the centralised Git server. All three
+repositories are hosted under \texttt{gitlab.com}: the production
+\ac{API} under the \texttt{segalubi} group, and the two prototypes
+under the personal namespace of the author.
+
+\section{Containerization: Docker and docker-compose}
+\label{sec:docker}
+
+\textbf{Docker}~\cite{docker} is used in two distinct roles in this
+project. The first role is as a runtime for the \ac{CI} jobs: each
+GitLab \ac{CI} job declared in this project runs inside a Docker
+container based on the official \texttt{maven:3.9.6-eclipse-temurin-21}
+image, which guarantees a clean and reproducible build environment
+regardless of what is installed on the runner host. The second role
+is as a local development aid: the two prototypes ship a
+\texttt{docker-compose.yaml}~\cite{composeSpec} that stands up a
+PostgreSQL instance, and, in the case of the first prototype, a
+pair of Payara Server containers for the dual-node Arquillian tests
+described in Section~\ref{sec:javaeeapp}.
+
+For the production \ac{API}, Docker is intentionally \emph{not} used
+to package the application: the laboratory's deployment model is to
+copy the \ac{WAR} onto an existing Payara installation, and a
+container image would not bring any benefit while adding an
+additional moving part. This is briefly revisited as a possible
+future evolution in Chapter~\ref{chap:conc-trab-futuro}.
+
+\section{Network Access: The Laboratory \ac{VPN}}
+\label{sec:vpn}
+
+The production database of the laboratory is reachable on the
+internal network address \texttt{192.168.168.30:5432} and is not
+exposed to the public Internet. Two consequences follow. First, the
+GitLab Runner that executes the differential tests against the real
+database must itself be inside the laboratory's network, this is
+why the runner is tagged \texttt{ubi-runner-.31} and pinned to a
+specific machine. Second, developers working from outside the
+laboratory have to connect to the network through a \ac{VPN}
+configuration maintained by the laboratory staff (Luís Carvalho).
+
+The technical choice of \ac{VPN} technology is outside the scope of
+this project, the laboratory uses an existing solution, but
+modern alternatives such as WireGuard~\cite{wireguard} were
+considered briefly as a lighter-weight option for one-off remote
+testing sessions.
+
+\section{Conclusion}
+\label{chap3:sec:concs}
+
+The technology stack on which this project is built is in large part
+imposed by its environment: Jakarta EE on Payara, PostgreSQL on the
+internal network, GitLab as the self-managed \ac{CI} platform. Where
+there was room for choice, between Jakarta EE and Spring Boot,
+between Payara Server and Apache Tomcat, between PostgreSQL and
+MySQL, between JUnit 5 and TestNG, the decisions documented in
+this chapter were guided by a preference for fewer moving parts, by
+the alignment with what the laboratory already runs in production
+and by the desire to keep the differential testing harness as simple
+as possible. The next chapter describes the iterative methodology by
+which these technologies were combined into a working solution.

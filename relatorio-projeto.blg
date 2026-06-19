@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99e (TeX Live 2026/Arch Linux)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: relatorio-projeto.aux
+A level-1 auxiliary file: capa.aux
+A level-1 auxiliary file: agradecimentos.aux
+A level-1 auxiliary file: acronimos.aux
+A level-1 auxiliary file: introducao.aux
+A level-1 auxiliary file: capitulo-2.aux
+A level-1 auxiliary file: capitulo-3.aux
+A level-1 auxiliary file: capitulo-4.aux
+A level-1 auxiliary file: capitulo-5.aux
+A level-1 auxiliary file: conc-trab-futuro.aux
+The style file: unsrt.bst
+Database file #1: bibliografia.bib
+You've used 36 entries,
+            1791 wiz_defined-function locations,
+            611 strings with 8537 characters,
+and the built_in function-call counts, 4774 in all, are:
+= -- 378
+> -- 156
+< -- 0
++ -- 75
+- -- 39
+* -- 55
+:= -- 728
+add.period$ -- 111
+call.type$ -- 36
+change.case$ -- 34
+chr.to.int$ -- 0
+cite$ -- 36
+duplicate$ -- 202
+empty$ -- 659
+format.name$ -- 39
+if$ -- 1125
+int.to.chr$ -- 0
+int.to.str$ -- 36
+missing$ -- 7
+newline$ -- 186
+num.names$ -- 36
+pop$ -- 248
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 107
+stack$ -- 0
+substring$ -- 0
+swap$ -- 37
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 36
+width$ -- 38
+write$ -- 369

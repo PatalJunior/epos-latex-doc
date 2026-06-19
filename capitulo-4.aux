@@ -1,0 +1,169 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\@writefile{lof}{\addvspace {10pt}}
+\@writefile{lot}{\addvspace {10pt}}
+\@writefile{toc}{\contentsline {chapter}{\chapternumberline {4}Methodology and Architecture}{23}{chapter.4}\protected@file@percent }
+\newlabel{chap:metodo-arq}{{4}{23}{Methodology and Architecture}{chapter.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Introduction}{23}{section.4.1}\protected@file@percent }
+\newlabel{chap4:sec:intro}{{4.1}{23}{Introduction}{section.4.1}{}}
+\acronymused{API}
+\acronymused{API}
+\acronymused{API}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}The Legacy \ac {API} and the Need for a Safety Net}{23}{section.4.2}\protected@file@percent }
+\newlabel{sec:legacy}{{4.2}{23}{The Legacy \ac {API} and the Need for a Safety Net}{section.4.2}{}}
+\acronymused{EPOS}
+\acronymused{API}
+\acronymused{API}
+\acronymused{API}
+\acronymused{JAX-RS}
+\acronymused{CI}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Iterative Methodology}{24}{section.4.3}\protected@file@percent }
+\newlabel{sec:methodology}{{4.3}{24}{Iterative Methodology}{section.4.3}{}}
+\acronymused{CI}
+\acronymused{CI}
+\acronymused{API}
+\acronymused{CI}
+\acronymused{CD}
+\acronymused{CDI}
+\acronymused{JAX-RS}
+\acronymused{JPA}
+\acronymused{API}
+\acronymused{HTTP}
+\acronymused{VPN}
+\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces The three iterations of the project and their respective focus.}}{24}{table.4.1}\protected@file@percent }
+\newlabel{tab:iterations}{{4.1}{24}{The three iterations of the project and their respective focus}{table.4.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Prototype 1: \texttt  {java-ee-app}}{25}{section.4.4}\protected@file@percent }
+\newlabel{sec:javaeeapp}{{4.4}{25}{Prototype 1: \texttt {java-ee-app}}{section.4.4}{}}
+\acronymused{CI}
+\acronymused{CD}
+\acronymused{JAX-RS}
+\acronymused{POJO}
+\acronymused{JSON}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.1}Layout and Stack}{25}{subsection.4.4.1}\protected@file@percent }
+\acronymused{WAR}
+\acronymused{API}
+\acronymused{HTTP}
+\acronymused{CI}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.2}The \ac {CI} Pipeline}{25}{subsection.4.4.2}\protected@file@percent }
+\acronymused{WAR}
+\newlabel{lst:javaeeapp-ci}{{4.1}{25}{\texttt {.gitlab-ci.yml} of the first prototype, two-stage pipeline with dual Payara services}{lstlisting.4.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.1}\texttt  {.gitlab-ci.yml} of the first prototype, two-stage pipeline with dual Payara services.}{25}{lstlisting.4.1}\protected@file@percent }
+\citation{microprofile}
+\citation{jaxrs}
+\citation{jpa}
+\@writefile{toc}{\contentsline {section}{\numberline {4.5}Prototype 2: \texttt  {syncspace-jakarta-app}}{27}{section.4.5}\protected@file@percent }
+\newlabel{sec:syncspace}{{4.5}{27}{Prototype 2: \texttt {syncspace-jakarta-app}}{section.4.5}{}}
+\acronymused{CI}
+\acronymused{CI}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.1}The Domain}{27}{subsection.4.5.1}\protected@file@percent }
+\AC@undonewlabel{acro:JWT}
+\newlabel{acro:JWT}{{4.5.1}{27}{The Domain}{section*.64}{}}
+\acronymused{JWT}
+\acronymused{JWT}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.2}Jakarta Specifications Exercised}{27}{subsection.4.5.2}\protected@file@percent }
+\acronymused{JAX-RS}
+\acronymused{JAX-RS}
+\acronymused{CDI}
+\acronymused{CDI}
+\acronymused{JAX-RS}
+\acronymused{JPA}
+\acronymused{JSON}
+\acronymused{API}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.3}What was Carried Over}{28}{subsection.4.5.3}\protected@file@percent }
+\acronymused{API}
+\acronymused{JAX-RS}
+\acronymused{JAX-RS}
+\acronymused{HTTP}
+\acronymused{POJO}
+\acronymused{JWT}
+\@writefile{toc}{\contentsline {section}{\numberline {4.6}Architecture of the Differential Testing Framework}{28}{section.4.6}\protected@file@percent }
+\newlabel{sec:arch}{{4.6}{28}{Architecture of the Differential Testing Framework}{section.4.6}{}}
+\acronymused{API}
+\acronymused{HEAD}
+\acronymused{WAR}
+\acronymused{WAR}
+\acronymused{WAR}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces The \ac {CDI} + \ac {JAX-RS} exception-handling flow used by \texttt  {syncspace-jakarta-app} and partly inherited by \texttt  {api\_v4.0}. Any exception thrown inside a resource or service bean is intercepted by the most specific registered \texttt  {ExceptionMapper}, which produces a stable \ac {JSON} error body.}}{29}{figure.4.1}\protected@file@percent }
+\acronymused{CDI}
+\acronymused{JAX-RS}
+\acronymused{JSON}
+\newlabel{fig:errormapper}{{4.1}{29}{The \ac {CDI} + \ac {JAX-RS} exception-handling flow used by \texttt {syncspace-jakarta-app} and partly inherited by \texttt {api\_v4.0}. Any exception thrown inside a resource or service bean is intercepted by the most specific registered \texttt {ExceptionMapper}, which produces a stable \ac {JSON} error body}{figure.4.1}{}}
+\acronymused{WAR}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Overall architecture of the differential testing framework. Solid arrows denote control flow inside the pipeline; dashed arrows denote artifact or data access. Both diff jobs run a three-way comparison between the \ac {HEAD} build and two baselines, the immediate parent commit and a fixed reference commit, all pointed at the same database fixture.}}{30}{figure.4.2}\protected@file@percent }
+\acronymused{HEAD}
+\newlabel{fig:arch}{{4.2}{30}{Overall architecture of the differential testing framework. Solid arrows denote control flow inside the pipeline; dashed arrows denote artifact or data access. Both diff jobs run a three-way comparison between the \ac {HEAD} build and two baselines, the immediate parent commit and a fixed reference commit, all pointed at the same database fixture}{figure.4.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.7}Conclusion}{30}{section.4.7}\protected@file@percent }
+\newlabel{chap4:sec:concs}{{4.7}{30}{Conclusion}{section.4.7}{}}
+\acronymused{CI}
+\acronymused{CD}
+\acronymused{API}
+\acronymused{CI}
+\@setckpt{capitulo-4}{
+\setcounter{page}{32}
+\setcounter{equation}{0}
+\setcounter{enumi}{3}
+\setcounter{enumii}{0}
+\setcounter{enumiii}{0}
+\setcounter{enumiv}{0}
+\setcounter{footnote}{0}
+\setcounter{mpfootnote}{0}
+\setcounter{@memmarkcntra}{0}
+\setcounter{storedpagenumber}{1}
+\setcounter{book}{0}
+\setcounter{part}{0}
+\setcounter{chapter}{4}
+\setcounter{section}{7}
+\setcounter{subsection}{0}
+\setcounter{subsubsection}{0}
+\setcounter{paragraph}{0}
+\setcounter{subparagraph}{0}
+\setcounter{@ppsavesec}{0}
+\setcounter{@ppsaveapp}{0}
+\setcounter{vslineno}{0}
+\setcounter{poemline}{0}
+\setcounter{modulo@vs}{0}
+\setcounter{memfvsline}{0}
+\setcounter{verse}{0}
+\setcounter{chrsinstr}{0}
+\setcounter{poem}{0}
+\setcounter{newflo@tctr}{4}
+\setcounter{@contsubnum}{0}
+\setcounter{section@level}{0}
+\setcounter{maxsecnumdepth}{3}
+\setcounter{sidefootnote}{0}
+\setcounter{pagenote}{0}
+\setcounter{pagenoteshadow}{0}
+\setcounter{memfbvline}{0}
+\setcounter{bvlinectr}{0}
+\setcounter{cp@cntr}{0}
+\setcounter{ism@mctr}{0}
+\setcounter{xsm@mctr}{0}
+\setcounter{csm@mctr}{0}
+\setcounter{ksm@mctr}{0}
+\setcounter{xksm@mctr}{0}
+\setcounter{cksm@mctr}{0}
+\setcounter{msm@mctr}{0}
+\setcounter{xmsm@mctr}{0}
+\setcounter{cmsm@mctr}{0}
+\setcounter{bsm@mctr}{0}
+\setcounter{workm@mctr}{0}
+\setcounter{sheetsequence}{48}
+\setcounter{lastsheet}{69}
+\setcounter{lastpage}{53}
+\setcounter{figure}{2}
+\setcounter{lofdepth}{1}
+\setcounter{table}{1}
+\setcounter{lotdepth}{1}
+\setcounter{parentequation}{0}
+\setcounter{float@type}{8}
+\setcounter{lstnumber}{45}
+\setcounter{NAT@ctr}{0}
+\setcounter{Item}{8}
+\setcounter{Hfootnote}{1}
+\setcounter{bookmark@seq@number}{60}
+\setcounter{memhycontfloat}{0}
+\setcounter{mem@Hpagenote}{0}
+\setcounter{LT@tables}{0}
+\setcounter{LT@chunks}{0}
+\setcounter{lstlisting}{1}
+}

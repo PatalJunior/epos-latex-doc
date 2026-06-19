@@ -1,0 +1,200 @@
+\documentclass[12pt,a4paper]{memoir}
+% \documentclass[titlepage,12pt,a4paper]{book}
+
+% Switched to English; original template was Portuguese.
+\usepackage[english]{babel}
+
+% \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{makeidx}
+\usepackage{xspace}
+\usepackage{graphicx,color,times}
+\usepackage{fancyhdr}
+% \usepackage{pxfonts}
+% \usepackage{times}
+% \usepackage{mathptm}
+% \usepackage{amssymb}
+% \usepackage{amsfonts}
+
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage[printonlyused]{acronym}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{tocbibind}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,shapes.multipart,arrows.meta,positioning,fit,calc,decorations.pathreplacing,backgrounds}
+
+% \usepackage{glossaries}
+% \makeglossaries
+
+% \renewcommand{\ttdefault}{phv}
+
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{} \fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{15.6pt}
+\setlength{\marginparsep}{0cm}
+\setlength{\marginparwidth}{0cm}
+\setlength{\marginparpush}{0cm}
+\addtolength{\hoffset}{-1.0cm}
+\addtolength{\oddsidemargin}{\evensidemargin}
+\addtolength{\oddsidemargin}{0.5cm}
+\addtolength{\evensidemargin}{-0.5cm}
+
+
+\usepackage{fix-cm}
+\usepackage{fourier}
+\usepackage[scaled=.92]{helvet}
+\definecolor{ChapGrey}{rgb}{0.6,0.6,0.6}
+\newcommand{\LargeFont}{
+  \usefont{\encodingdefault}{\rmdefault}{b}{n}
+  \fontsize{60}{80}\selectfont\color{ChapGrey}
+  }
+\makeatletter
+\makechapterstyle{GreyNum}{
+  \renewcommand{\chapnamefont}{\large\sffamily\bfseries\itshape}
+  \renewcommand{\chapnumfont}{\LargeFont}
+  \renewcommand{\chaptitlefont}{\Huge\sffamily\bfseries\itshape}
+  \setlength{\beforechapskip}{0pt}
+  \setlength{\midchapskip}{40pt}
+  \setlength{\afterchapskip}{60pt}
+  \renewcommand\chapterheadstart{\vspace*{\beforechapskip}}
+  \renewcommand\printchaptername{
+  \begin{tabular}{@{}c@{}}
+    \chapnamefont \@chapapp\\}
+    \renewcommand\chapternamenum{\noalign{\vskip 2ex}}
+    \renewcommand\printchapternum{\chapnumfont\thechapter\par}
+    \renewcommand\afterchapternum{
+  \end{tabular}
+  \par\nobreak\vskip\midchapskip}
+  \renewcommand\printchapternonum{}
+  \renewcommand\printchaptertitle[1]{
+  {\chaptitlefont{##1}\par}}
+  \renewcommand\afterchaptertitle{\par\nobreak\vskip \afterchapskip}
+}
+\makeatother
+\chapterstyle{GreyNum}
+
+\setcounter{tocdepth}{3}
+\setsecnumdepth{subsubsection}
+
+\renewcommand{\ttdefault}{lmtt}
+
+
+% NEW COLORS
+\definecolor{dark}{gray}{0.25}
+\definecolor{lgray}{gray}{0.9}
+\definecolor{dkblue}{rgb}{0,0.13,0.4}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  numbers=none,                  numberstyle=\tiny\color{gray},
+  stepnumber=1,                  numbersep=5pt,
+  backgroundcolor=\color{white}, showspaces=false,
+  showstringspaces=false,        showtabs=false,
+  frame=single,                  rulecolor=\color{black},
+  tabsize=2,                     captionpos=b,
+  breaklines=true,               breakatwhitespace=false,
+  title=\lstname,                keywordstyle=\color{dkblue},
+  commentstyle=\color{dkgreen},  stringstyle=\color{mauve},
+  escapeinside={\%*}{*)},        morekeywords={*},
+  belowskip=0cm
+}
+
+\lstdefinelanguage{yaml}{
+  keywords={true,false,null,y,n,stages,script,image,variables,artifacts,reports,paths,tags,cache,key,default,services,name,alias,when,expire_in,needs,job,stage,extends},
+  keywordstyle=\color{dkblue}\bfseries,
+  basicstyle=\footnotesize\ttfamily,
+  sensitive=false,
+  comment=[l]{\#},
+  commentstyle=\color{dkgreen}\itshape,
+  stringstyle=\color{mauve},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\renewcommand{\lstlistingname}{Code Listing}
+\renewcommand{\lstlistlistingname}{List of Code Listings}
+
+% Give the paragraph builder some slack so that long monospace tokens
+% (file paths, Docker image names, etc.) do not produce hard overfulls.
+\setlength{\emergencystretch}{3em}
+\hbadness=2000
+
+
+\begin{document}
+
+\include{capa}
+
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+
+\frontmatter
+
+\include{agradecimentos}
+
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+
+
+\tableofcontents
+
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+
+\listoffigures
+
+% Comment out the next two lines if no tables exist.
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\listoftables
+
+% Uncomment if code listings should be indexed.
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\lstlistoflistings
+
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\include{acronimos}
+
+% \clearpage{\pagestyle{empty}\cleardoublepage}
+% \include{glossario}
+
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+
+\mainmatter
+\acresetall
+\include{introducao}
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\include{capitulo-2}
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\include{capitulo-3}
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\include{capitulo-4}
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\include{capitulo-5}
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+\include{conc-trab-futuro}
+\clearpage{\thispagestyle{empty}\cleardoublepage}
+
+% Uncomment if appendices are added.
+% \appendix
+% \include{apendice1}
+% \clearpage{\pagestyle{empty}\cleardoublepage}
+
+\backmatter
+
+\bibliographystyle{unsrt}
+\bibliography{bibliografia}
+
+\end{document}
