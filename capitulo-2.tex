@@ -22,142 +22,51 @@ chapter.
 \section{Test Frameworks for the Java Ecosystem}
 \label{sec:soa-tests}
 
-The Java test landscape can be roughly partitioned into four layers:
-unit testing, integration testing, container testing and \ac{API}/
-\ac{HTTP} testing. Each layer answers a different question about the
-system under test, and modern projects typically combine several of
-them.
-
-\subsection{Unit Testing: JUnit and TestNG}
-\label{sec:junit}
-
-\textbf{JUnit 5}~\cite{junit5} is the de facto standard for unit testing
-in Java. Its modular architecture, \emph{Jupiter} as the
-programming/extension model, \emph{Vintage} for backward compatibility
-with JUnit 4, and the \emph{Platform} as the runner, allows it to
-host a wide variety of test engines and to integrate with virtually
-every build tool and \ac{IDE}. The \texttt{@Test}, \texttt{@ParameterizedTest}
-and \texttt{@Nested} annotations, together with a rich set of
-\emph{lifecycle} and \emph{extension} hooks, cover the vast majority of
-unit testing needs.
-
-\textbf{TestNG}~\cite{testng} is the historical alternative. While its
-adoption has declined in greenfield projects since the release of JUnit
-5, it still has advantages in scenarios that require sophisticated test
-ordering and parallel execution out of the box, and remains common in
-large enterprise code bases.
-
-For this project, JUnit 5 was chosen because of its first-class support
-in Maven Surefire/Failsafe, its native integration with the Arquillian
-Jupiter container and the simplicity of running it inside a GitLab
-pipeline, which natively understands the JUnit XML reporting format.
-
-\subsection{Integration Testing: Maven Failsafe and Testcontainers}
-\label{sec:failsafe}
-
-Unit tests answer the question ``does this class behave correctly in
-isolation''. Integration tests answer the question ``do these classes
-behave correctly when wired together with their real collaborators''.
-In a Maven-based Jakarta EE project, integration tests are conventionally
-named \texttt{*IT.java} and executed by the \emph{Failsafe} plugin
-during the \texttt{verify} phase, which is distinct from the
-\texttt{test} phase used by Surefire for unit tests.
-
-\textbf{Testcontainers}~\cite{testcontainers} is the most widely adopted
-solution for spinning up real infrastructure, databases, message
-brokers, browsers, application servers, inside Docker containers
-purely for the duration of a test run. It is increasingly used as a
-replacement for in-memory fakes (such as H2 acting as PostgreSQL),
-because the parity between test and production environments is much
-higher. Testcontainers was considered for the prototypes described in
-Chapter~\ref{chap:metodo-arq} but ultimately not adopted, because the
-production database fixture is hosted inside the laboratory's network
-and is already reachable from the GitLab Runner via the \ac{VPN}; a
-second, containerised copy would only complicate the picture.
-
-\subsection{Container Testing: Arquillian}
-\label{sec:arquillian}
-
-\textbf{Arquillian}~\cite{arquillian} is a container testing framework
-that started in the Java EE world and has since followed the rename to
-Jakarta EE. Its key idea is the \emph{micro-deployment}: each test
-method ships its own small \ac{WAR}/\ac{JAR}, packaged in code through
-\emph{ShrinkWrap}, that is deployed into a real container (managed,
-embedded or remote) just before the test runs and undeployed
-immediately after. This allows \ac{JAX-RS} resources, \ac{CDI} beans
-and \ac{JPA} entities to be tested with the same lifecycle and the
-same configuration as in production, while avoiding the cost of
-maintaining a fully populated server.
-
-Arquillian was used in the first prototype (Section~\ref{sec:javaeeapp})
-to validate the \ac{CI}/\ac{CD} pipeline, but was deliberately
-\emph{not} adopted for the production \ac{API}. Two reasons motivated
-this choice: first, the production application is far too large to
-benefit from per-test micro-deployments; and second, the laboratory's
-real need was not to test a single deployment in isolation, but to
-compare \emph{two} deployments of slightly different code at the same
-time, which is more naturally expressed by spawning two Payara Micro
-processes in parallel.
-
-\subsection{\ac{API}-level Testing: REST Assured, Postman/Newman}
-\label{sec:apitests}
-
-\textbf{REST Assured}~\cite{restassured} is a Java \ac{DSL} for testing
-\ac{REST} services, with a fluent
-``\texttt{given().\textellipsis when().\textellipsis then()}'' syntax
-heavily inspired by behaviour-driven development. It is the most
-common choice for \ac{HTTP}-level tests written in the same language
-as the system under test, and it integrates with JUnit 5 transparently.
-It was considered as an alternative to writing a custom \ac{HTTP}
-harness with \texttt{java.net.http.HttpClient}, but in the end the
-\emph{differential} nature of the tests, the same request, sent to
-two endpoints, with two responses to be diffed, mapped more
-naturally onto plain \texttt{HttpClient} calls.
-
-\textbf{Postman}~\cite{postman} is a graphical \ac{API} client widely
-used by developers and \ac{QA} teams to manually exercise endpoints.
-Its companion command-line runner \textbf{Newman}~\cite{newman} can
-replay Postman \emph{collections} (JSON files describing a set of
-requests and assertions) inside a \ac{CI} pipeline. This is an
-attractive solution for teams in which the \ac{API} clients are
-maintained by non-developers, but its assertion model
-(JavaScript-based, embedded in the collection) makes diffing two
-responses against each other awkward.
+The Java test landscape spans four layers, each combined by modern
+projects: unit testing
+(\textbf{JUnit 5}~\cite{junit5}, the de facto standard, chosen here
+for its first-class Maven Surefire/Failsafe support and native JUnit
+XML output understood by GitLab; \textbf{TestNG}~\cite{testng}
+remains a legacy alternative), integration testing (Maven Failsafe
+runs \texttt{*IT.java} during the \texttt{verify}
+phase; \textbf{Testcontainers}~\cite{testcontainers} stands up real
+infrastructure in Docker containers per test run, but was not
+adopted because the production database fixture is already reachable
+over the laboratory \ac{VPN}), container testing
+(\textbf{Arquillian}~\cite{arquillian}, used in the first prototype
+to validate the \ac{CI}/\ac{CD} pipeline through its
+\emph{micro-deployment} pattern, but rejected for the production
+\ac{API} which is too large for per-test redeployments and needs
+side-by-side comparison rather than isolated deployment), and
+\ac{API}-level testing
+(\textbf{REST Assured}~\cite{restassured} provides a fluent Java
+\ac{DSL}; \textbf{Postman} with \textbf{Newman}~\cite{postman,newman}
+can replay JSON collections in \ac{CI}). For the present project,
+both were ultimately rejected in favour of plain
+\texttt{java.net.http.HttpClient}, which maps more naturally onto a
+differential workflow where the same request is sent to multiple
+ports and the responses are diffed pairwise.
 
 \subsection{Differential Testing}
 \label{sec:soa-diff}
 
-A specific family of testing approaches that directly inspired the
-work described later in this report is \emph{differential testing}.
-Rather than asserting that the system under test produces a specific
-expected response, differential testing relies on the existence of a
-``reference'' implementation (or version) and asserts only that the
-two implementations agree on a shared set of inputs.
-
-The canonical published example in the service world is
-\textbf{Diffy}~\cite{diffyTwitter}, a proxy released by Twitter
-Engineering that sits in front of a candidate service and a primary
-service and replays each incoming request against both, reporting any
-divergence in the responses. Diffy and its descendants are designed
-for the case in which a new version of a service must be validated by
-comparing its behaviour against the version it is about to replace,
-exactly the case faced by the \ac{SEGAL} laboratory during the
-refactor of its \ac{API}.
-
-A second family of approaches is so-called \emph{snapshot testing},
-popularised in the JavaScript world by Jest and now common in other
-ecosystems. Snapshot testing serialises the output of a piece of code
-to a file the first time the test runs, and on every subsequent run
-asserts that the new output matches the stored snapshot. It scales
-poorly when the output of the system depends on a live database or
-when the legitimate response can vary slightly between runs, both of
-which are true for the \ac{EPOS} \ac{API}.
-
-The approach taken in this project is closer to Diffy in spirit than
-to snapshot testing: rather than freezing a single reference, the
-reference is always the parent commit of the build currently under
-test, which keeps the comparison meaningful across long refactor
-branches without requiring a human to update fixtures.
+The directly relevant family of approaches is \emph{differential
+testing}: instead of asserting a specific expected response, the
+candidate is compared against a reference implementation (or
+version) on a shared input grid. The canonical example in the
+service world is \textbf{Diffy}~\cite{diffyTwitter}, a proxy released
+by Twitter Engineering that sits in front of a candidate and a
+primary service and replays each incoming request against both. This
+is exactly the situation faced by the \ac{SEGAL} laboratory during
+the refactor of its \ac{API}. \emph{Snapshot testing}, popularised
+in the JavaScript world by Jest, was also considered but scales
+poorly when the output depends on a live database, as is the case
+here. The approach taken in this project is therefore closer to
+Diffy in spirit: rather than freezing a single reference, the
+baseline is always the parent commit of the build under test (plus
+an optional long-term fixed reference), which keeps the comparison
+meaningful across long refactor branches without requiring a human
+to maintain fixtures.
 
 \section{Continuous Integration and Continuous Delivery}
 \label{sec:soa-cicd}

@@ -1,102 +1,47 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{Contents}{iii}{chapter*.3}%
-\contentsline {chapter}{List of Figures}{vii}{chapter*.17}%
-\contentsline {chapter}{List of Tables}{ix}{chapter*.22}%
+\contentsline {chapter}{List of Figures}{v}{chapter*.16}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Framing}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Motivation}{2}{section.1.2}%
 \contentsline {section}{\numberline {1.3}Objectives}{3}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Main Contributions}{3}{section.1.4}%
-\contentsline {section}{\numberline {1.5}Organization of the Document}{4}{section.1.5}%
-\contentsline {section}{\numberline {1.6}Repository Access}{5}{section.1.6}%
-\contentsline {chapter}{\chapternumberline {2}State of the Art}{7}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Introduction}{7}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Test Frameworks for the Java Ecosystem}{7}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Unit Testing: JUnit and TestNG}{7}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Integration Testing: Maven Failsafe and Testcontainers}{8}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}Container Testing: Arquillian}{8}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.2.4}\ac {API}-level Testing: REST Assured, Postman/Newman}{9}{subsection.2.2.4}%
-\contentsline {subsection}{\numberline {2.2.5}Differential Testing}{9}{subsection.2.2.5}%
-\contentsline {section}{\numberline {2.3}Continuous Integration and Continuous Delivery}{10}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Foundations}{10}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Platforms}{11}{subsection.2.3.2}%
-\contentsline {section}{\numberline {2.4}Conclusion}{11}{section.2.4}%
-\contentsline {chapter}{\chapternumberline {3}Technologies and Tools Used}{13}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Introduction}{13}{section.3.1}%
-\contentsline {section}{\numberline {3.2}APIs, Serialization Formats and Specification}{13}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}REST and the Multi-format Response}{13}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}\ac {JSON} and \ac {XML}}{14}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}\ac {CSV}}{14}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}\ac {OpenAPI} and Swagger \ac {UI}}{14}{subsection.3.2.4}%
-\contentsline {section}{\numberline {3.3}Java and Jakarta EE}{16}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}The Java Platform}{16}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Jakarta EE and the Move from Java EE}{16}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}Why Jakarta EE rather than Spring Boot}{17}{subsection.3.3.3}%
-\contentsline {section}{\numberline {3.4}\ac {SQL} and the Database Layer}{17}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}\ac {SQL} as a Lingua Franca}{17}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}PostgreSQL and MySQL}{17}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}\ac {JPA}, Hibernate and the Persistence Unit}{18}{subsection.3.4.3}%
-\contentsline {subsection}{\numberline {3.4.4}The \ac {EPOS} Database in Practice}{18}{subsection.3.4.4}%
-\contentsline {paragraph}{Schema shape.}{18}{section*.58}%
-\contentsline {paragraph}{One small but instructive design choice.}{19}{section*.59}%
-\contentsline {paragraph}{Spatial data: today and tomorrow.}{19}{section*.60}%
-\contentsline {paragraph}{Indexing today and indexing tomorrow.}{19}{section*.61}%
-\contentsline {section}{\numberline {3.5}Application and \ac {CI} Servers}{20}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Payara Server}{20}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}Apache Tomcat as an Alternative}{20}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}Maven as Build Tool}{20}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3.5.4}GitLab and GitLab Runner}{21}{subsection.3.5.4}%
-\contentsline {section}{\numberline {3.6}Version Control: Git and GitLab}{21}{section.3.6}%
-\contentsline {section}{\numberline {3.7}Containerization: Docker and docker-compose}{21}{section.3.7}%
-\contentsline {section}{\numberline {3.8}Network Access: The Laboratory \ac {VPN}}{22}{section.3.8}%
-\contentsline {section}{\numberline {3.9}Conclusion}{22}{section.3.9}%
-\contentsline {chapter}{\chapternumberline {4}Methodology and Architecture}{23}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Introduction}{23}{section.4.1}%
-\contentsline {section}{\numberline {4.2}The Legacy \ac {API} and the Need for a Safety Net}{23}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Iterative Methodology}{24}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Prototype 1: \texttt {java-ee-app}}{25}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Layout and Stack}{25}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}The \ac {CI} Pipeline}{25}{subsection.4.4.2}%
-\contentsline {section}{\numberline {4.5}Prototype 2: \texttt {syncspace-jakarta-app}}{27}{section.4.5}%
-\contentsline {subsection}{\numberline {4.5.1}The Domain}{27}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4.5.2}Jakarta Specifications Exercised}{27}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4.5.3}What was Carried Over}{28}{subsection.4.5.3}%
-\contentsline {section}{\numberline {4.6}Architecture of the Differential Testing Framework}{28}{section.4.6}%
-\contentsline {section}{\numberline {4.7}Conclusion}{30}{section.4.7}%
-\contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{33}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Introduction}{33}{section.5.1}%
-\contentsline {section}{\numberline {5.2}The \ac {EPOS} Context}{33}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Architecture of \texttt {api\_v4.0}}{34}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Source Layout}{34}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Endpoints and Output Formats}{35}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}Persistence}{35}{subsection.5.3.3}%
-\contentsline {section}{\numberline {5.4}The \ac {CI}/\ac {CD} Pipeline}{37}{section.5.4}%
-\contentsline {paragraph}{Two baselines, one job.}{40}{section*.65}%
-\contentsline {paragraph}{Worktree-based baseline build.}{40}{section*.66}%
-\contentsline {paragraph}{Defensive skip per baseline.}{40}{section*.67}%
-\contentsline {paragraph}{Job dependencies.}{41}{section*.68}%
-\contentsline {section}{\numberline {5.5}The Code-Level Diff: \texttt {DiffHarness.java}}{41}{section.5.5}%
-\contentsline {section}{\numberline {5.6}The \ac {HTTP}-Level Diff: \texttt {HttpDiff.java}}{42}{section.5.6}%
-\contentsline {paragraph}{Phase 1, Boot.}{42}{section*.69}%
-\contentsline {paragraph}{Phase 2, Deploy verification.}{42}{section*.71}%
-\contentsline {paragraph}{Phase 3, Test replay.}{42}{section*.72}%
-\contentsline {paragraph}{Phase 4, Tear-down and reporting.}{43}{section*.73}%
-\contentsline {section}{\numberline {5.7}Reports, Operations and Findings}{43}{section.5.7}%
-\contentsline {section}{\numberline {5.8}Conclusion}{44}{section.5.8}%
-\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{47}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Main Conclusions}{47}{section.6.1}%
-\contentsline {paragraph}{Differential testing fits a refactor naturally.}{47}{section*.74}%
-\contentsline {paragraph}{Two layers of comparison are better than one.}{47}{section*.75}%
-\contentsline {paragraph}{A self-hosted pipeline is not optional in this context.}{48}{section*.76}%
-\contentsline {paragraph}{The two prototypes paid for themselves.}{48}{section*.77}%
-\contentsline {paragraph}{The framework reveals what a human review would miss.}{48}{section*.78}%
-\contentsline {section}{\numberline {6.2}Future Work}{48}{section.6.2}%
-\contentsline {paragraph}{\ac {OpenAPI}-driven test case generation.}{49}{section*.79}%
-\contentsline {paragraph}{Schema diffing for the \ac {OpenAPI} document itself.}{49}{section*.80}%
-\contentsline {paragraph}{Containerization of the production \ac {API}.}{49}{section*.81}%
-\contentsline {paragraph}{Performance regression testing and BRIN indexing.}{49}{section*.82}%
-\contentsline {paragraph}{PostGIS migration for spatial queries.}{49}{section*.83}%
-\contentsline {paragraph}{Snapshot testing of representative responses.}{50}{section*.84}%
-\contentsline {paragraph}{Generalisation to other laboratory services.}{50}{section*.85}%
-\contentsline {paragraph}{Hardening of operational aspects.}{50}{section*.86}%
-\contentsline {chapter}{Bibliography}{51}{chapter*.88}%
+\contentsline {section}{\numberline {1.4}Organization of the Document}{3}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Repository Access}{3}{section.1.5}%
+\contentsline {chapter}{\chapternumberline {2}State of the Art}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Test Frameworks for the Java Ecosystem}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Differential Testing}{6}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}Continuous Integration and Continuous Delivery}{6}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Foundations}{6}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Platforms}{7}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Conclusion}{8}{section.2.4}%
+\contentsline {chapter}{\chapternumberline {3}Technologies and Tools Used}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction}{9}{section.3.1}%
+\contentsline {section}{\numberline {3.2}APIs, Serialization Formats and Specification}{9}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}REST and the Multi-format Response}{9}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}\ac {JSON} and \ac {XML}}{10}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}\ac {CSV}}{10}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}\ac {OpenAPI} and Swagger \ac {UI}}{10}{subsection.3.2.4}%
+\contentsline {section}{\numberline {3.3}Java and Jakarta EE}{11}{section.3.3}%
+\contentsline {section}{\numberline {3.4}\ac {SQL} and the Database Layer}{12}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}\ac {JPA}, Hibernate and the Persistence Unit}{12}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}The \ac {EPOS} Database in Practice}{13}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Servers, Tooling and Network}{13}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Conclusion}{14}{section.3.6}%
+\contentsline {chapter}{\chapternumberline {4}Methodology and Architecture}{17}{chapter.4}%
+\contentsline {section}{\numberline {4.1}The Legacy \ac {API} and the Need for a Safety Net}{17}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Iterative Methodology}{17}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Prototype Applications}{18}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Architecture of the Differential Testing Framework}{18}{section.4.4}%
+\contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{21}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Architecture of \texttt {api\_v4.0}}{21}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Endpoints and Output Formats}{22}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Persistence}{22}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}The \ac {CI}/\ac {CD} Pipeline}{24}{section.5.2}%
+\contentsline {section}{\numberline {5.3}The Code-Level Diff: \texttt {DiffHarness.java}}{26}{section.5.3}%
+\contentsline {section}{\numberline {5.4}The \ac {HTTP}-Level Diff: \texttt {HttpDiff.java}}{27}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Reports and Findings}{28}{section.5.5}%
+\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{29}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Main Conclusions}{29}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{30}{section.6.2}%
+\contentsline {chapter}{Bibliography}{31}{chapter*.57}%

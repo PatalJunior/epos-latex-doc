@@ -1,97 +1,39 @@
 \chapter{Use Case: EPOS API}
 \label{chap:caso-epos}
 
-\section{Introduction}
-\label{chap5:sec:intro}
-
-This chapter describes the application of the framework introduced
-in Chapter~\ref{chap:metodo-arq} to the production \ac{API} of the
-laboratory, \texttt{api\_v4.0}. Section~\ref{sec:epos-context}
-explains briefly the \ac{EPOS} context that the \ac{API} serves.
-Section~\ref{sec:apiv4-arch} walks through the structure of the
-application itself, with emphasis on the elements that the testing
-framework has to be aware of (resource classes, output formats,
-persistence). Section~\ref{sec:pipeline} dissects the
-\texttt{.gitlab-ci.yml} file, job by job. Sections~\ref{sec:diffharness}
-and~\ref{sec:httpdiff} document the two diff harnesses, code-level
-and \ac{HTTP}-level, including their inputs, outputs and reporting
-contract. Section~\ref{sec:reports} discusses how the reports are
-consumed and the kinds of issues the harnesses have surfaced in
-practice. Section~\ref{chap5:sec:concs} concludes.
-
-\section{The \ac{EPOS} Context}
-\label{sec:epos-context}
-
-The \ac{EPOS}~\cite{epos} is a pan-European research infrastructure
-in solid Earth science, organised into Thematic Core Services for
-seismology, near-fault observatories, volcano observations,
-geomagnetic observations, anthropogenic hazards and \ac{GNSS} data
-and products~\cite{eposGnss}, among others. The \ac{SEGAL}
-laboratory of \ac{UBI} contributes to the \ac{GNSS} Thematic Core
-Service by operating a service node that hosts station metadata and
-\ac{RINEX}~\cite{rinex} observation files. The production \ac{API}
-described in this chapter is the public interface of that service
-node.
-
-From the point of view of the test framework, the salient properties
-of this domain are three. First, the entities are relatively static
-(new stations are added rarely, file metadata grows over time but
-in well-defined ways), which makes a snapshot of the database a
-stable baseline against which to compare. Second, the typical client
-request returns a long list of records, which means that any
-behavioural divergence produces a long diff and the comparison
-algorithm must avoid being overwhelmed by it. Third, the same
-information is offered in multiple serialization formats, which
-multiplies the surface area to be tested but does not change the
-underlying logic.
+This chapter applies the framework of Chapter~\ref{chap:metodo-arq}
+to the production \ac{API}, \texttt{api\_v4.0}. The \ac{EPOS}
+itself~\cite{epos} is a pan-European research infrastructure in
+solid Earth science, organised into Thematic Core Services for
+seismology, geomagnetic observations, \ac{GNSS} data and
+products~\cite{eposGnss}, and so on; the \ac{SEGAL} laboratory of
+\ac{UBI} contributes to the \ac{GNSS} service by operating a node
+that hosts station metadata and \ac{RINEX}~\cite{rinex} observation
+files, and \texttt{api\_v4.0} is the public interface of that node.
+Three properties of the domain shape the test framework: the
+entities are relatively static (stable baselines are easy to obtain),
+the typical client request returns a long list of records (the
+comparison algorithm must scale to long diffs), and the same
+information is exposed in several serialization formats (the surface
+area to test multiplies but the underlying logic does not).
 
 \section{Architecture of \texttt{api\_v4.0}}
 \label{sec:apiv4-arch}
 
-\subsection{Source Layout}
-
 The application is a Maven \ac{WAR} project targeting Java SE 21 and
 Jakarta EE 11, deployed onto Payara Server 6 with
-\texttt{finalName=ROOT} (so that it is reachable at the root context
-\texttt{/}). Its source tree is organised into four top-level
-packages, summarised in Table~\ref{tab:apiv4-packages}.
-
-\begin{table}[h]
-  \centering
-  \small
-  \begin{tabular}{l p{8.5cm}}
-    \toprule
-    \textbf{Package} & \textbf{Purpose} \\
-    \midrule
-    \texttt{Config}    & Database connection bootstrap
-                         (\texttt{Loader.java}, persistence-unit
-                         factory). \\
-    \texttt{DB\_Tables} & The forty \ac{JPA} entity classes that
-                         model the relational schema (stations,
-                         networks, agencies, file types, observation
-                         summaries, embargos, \ldots). \\
-    \texttt{Geometry}  & Geometric validation, in particular the
-                         native polygon checks used by the
-                         bounding-box queries. \\
-    \texttt{Glass}     & The \ac{REST} layer proper: \ac{JAX-RS}
-                         resources (\texttt{StationEndpoints},
-                         \texttt{FilesEndpoints}, \texttt{ListEndpoints},
-                         \texttt{Start}), parsers, format writers
-                         (\ac{JSON}/\ac{XML}/\ac{CSV}/script) and
-                         the validation/shape helpers
-                         (\texttt{Validate.java},
-                         \texttt{Shape.java}). \\
-    \bottomrule
-  \end{tabular}
-  \caption{Top-level packages of the production \ac{API}.}
-  \label{tab:apiv4-packages}
-\end{table}
-
-The four packages cooperate as a classical layered architecture
-(Figure~\ref{fig:apiv4-layers}): the \texttt{Glass} layer exposes the
-\ac{HTTP} surface, the validation and geometry helpers form a thin
-business layer, the \ac{JPA} entities of \texttt{DB\_Tables} act as
-the persistence layer, and \texttt{Config} is a cross-cutting concern
+\texttt{finalName=ROOT} so that it serves the root context. Its
+source tree is organised into four top-level packages that form a
+classical layered architecture (Figure~\ref{fig:apiv4-layers}):
+\texttt{Glass} provides the \ac{REST} layer (\ac{JAX-RS} resources
+\texttt{StationEndpoints}, \texttt{FilesEndpoints},
+\texttt{ListEndpoints} and \texttt{Start}, plus parsers, format
+writers and the validation/shape helpers); \texttt{Geometry} and the
+helper classes \texttt{Validate.java} and \texttt{Shape.java} form a
+thin business layer; \texttt{DB\_Tables} holds the forty \ac{JPA}
+entities that model the relational schema (stations, networks,
+agencies, file types, observation summaries, embargoes); and
+\texttt{Config} (\texttt{Loader.java}) is the cross-cutting concern
 that handles bootstrap.
 
 \begin{figure}[h]
@@ -144,102 +86,25 @@ The \ac{REST} surface is declared in four classes inside the
 \texttt{Glass} package. \texttt{Start.java} carries the
 \texttt{@ApplicationPath("/api")} annotation and registers a
 \texttt{PingResource} for the trivial \texttt{/api/ping} liveness
-check used by both the diff harness and the deploy verification of
-\texttt{http-diff-job}. The three substantive resources are listed
-in Table~\ref{tab:endpoints}.
-
-\begin{table}[h]
-  \centering
-  \small
-  \begin{tabular}{l l p{4.5cm}}
-    \toprule
-    \textbf{Resource} & \textbf{Base path} & \textbf{Approximate scope} \\
-    \midrule
-    \texttt{StationEndpoints} & \texttt{/api/stations}
-       & Seven endpoints for station metadata, indexed by station
-         identifier, location, agency, network, equipment and
-         coordinates. \\
-    \texttt{FilesEndpoints}   & \texttt{/api/files}
-       & Four endpoints for \ac{RINEX} file metadata, by agency,
-         antenna, bounding box and date; by marker; high-rate;
-         and an aggregated combination. \\
-    \texttt{ListEndpoints}    & \texttt{/api/list}
-       & A parametric endpoint that returns the valid values of a
-         given filter (agencies, networks, countries, equipment
-         types, file types). \\
-    \bottomrule
-  \end{tabular}
-  \caption{The three substantive \ac{JAX-RS} resources of
-  \texttt{api\_v4.0}.}
-  \label{tab:endpoints}
-\end{table}
-
-Every endpoint accepts a \texttt{\{format\}} path parameter and
-emits the response in \ac{JSON}, \ac{XML}, \ac{CSV} or, for the
-file endpoints, a downloadable shell script. The same \ac{OpenAPI}
-3.1.0 document is served at \texttt{/swagger.html} through a Swagger
-\ac{UI} hosted inside the \ac{WAR}.
-
-Figure~\ref{fig:reqlifecycle} traces the end-to-end path of a single
-request through the Payara process, from the \ac{HTTP} listener down
-to the database and back, calling out the Jakarta specifications
-involved at each step.
-
-\begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      every node/.style={font=\footnotesize},
-      node distance=4mm,
-      flowstep/.style={draw, rounded corners=2pt, align=center, thick,
-                   minimum width=70mm, minimum height=9mm},
-      spec/.style={font=\scriptsize\itshape, text=dkblue},
-      arrow/.style={-{Stealth[length=2mm]}, thick}
-    ]
-    \node[flowstep, fill=lgray]      (client)  {\textbf{HTTP client} \\ \texttt{GET /api/stations/agency/IGS/json}};
-    \node[flowstep, fill=dkblue!10, below=of client]   (grizzly) {\textbf{Grizzly HTTP listener (Payara)}};
-    \node[flowstep, fill=dkblue!10, below=of grizzly]  (servlet) {\textbf{Servlet container}};
-    \node[flowstep, fill=mauve!10, below=of servlet]   (dispatch){\textbf{JAX-RS dispatcher}, matches \texttt{@Path} and verb};
-    \node[flowstep, fill=mauve!10, below=of dispatch]  (cdi)     {\textbf{Resource bean}\ \texttt{StationEndpoints} \\ \texttt{@Inject} resolved by CDI container};
-    \node[flowstep, fill=mauve!10, below=of cdi]       (valid)   {\textbf{Validate.java}, parses and checks query parameters};
-    \node[flowstep, fill=dkgreen!10, below=of valid]   (em)      {\textbf{EntityManager} (Hibernate, persistence unit \texttt{MeuPU})};
-    \node[flowstep, fill=dkgreen!10, below=of em]      (jdbc)    {\textbf{HikariCP} pool \(\rightarrow\) JDBC};
-    \node[flowstep, fill=dark!10,   below=of jdbc]     (db)      {\textbf{PostgreSQL} returns rows};
-    \node[flowstep, fill=dkgreen!10, below=of db]      (pojo)    {Rows hydrated into \textbf{JPA entities}};
-    \node[flowstep, fill=mauve!10, below=of pojo]      (writer)  {\textbf{Format writer} chosen by \texttt{\{format\}} (JSON / XML / CSV / script)};
-    \node[flowstep, fill=dkblue!10, below=of writer]   (resp)    {Response serialized and returned to the listener};
-    \node[flowstep, fill=lgray, below=of resp]         (cli2)    {\textbf{HTTP client} receives \texttt{200 OK} body};
-
-    \draw[arrow] (client)   -- (grizzly);
-    \draw[arrow] (grizzly)  -- (servlet);
-    \draw[arrow] (servlet)  -- (dispatch);
-    \draw[arrow] (dispatch) -- (cdi);
-    \draw[arrow] (cdi)      -- (valid);
-    \draw[arrow] (valid)    -- (em);
-    \draw[arrow] (em)       -- (jdbc);
-    \draw[arrow] (jdbc)     -- (db);
-    \draw[arrow] (db)       -- (pojo);
-    \draw[arrow] (pojo)     -- (writer);
-    \draw[arrow] (writer)   -- (resp);
-    \draw[arrow] (resp)     -- (cli2);
-
-    \node[spec, right=2mm of grizzly]  {Jakarta Servlet};
-    \node[spec, right=2mm of dispatch] {Jakarta REST (JAX-RS)};
-    \node[spec, right=2mm of cdi]      {Jakarta CDI};
-    \node[spec, right=2mm of em]       {Jakarta Persistence (JPA)};
-    \node[spec, right=2mm of writer]   {Jackson / JSON-B};
-  \end{tikzpicture}%
-  }
-  \caption{End-to-end request lifecycle of a \ac{JAX-RS} call to
-  \texttt{api\_v4.0} on Payara. The right column names the Jakarta
-  specification active at each step.}
-  \label{fig:reqlifecycle}
-\end{figure}
+check. The three substantive resources are
+\texttt{StationEndpoints} (\texttt{/api/stations}, seven endpoints
+for station metadata indexed by identifier, location, agency,
+network, equipment or coordinates), \texttt{FilesEndpoints}
+(\texttt{/api/files}, four endpoints for \ac{RINEX} file metadata
+filtered by agency/antenna/bounding box/date, by marker, the
+high-rate variant, and an aggregated combination), and
+\texttt{ListEndpoints} (\texttt{/api/list}, a parametric endpoint
+returning the valid values of a given filter). Every endpoint
+accepts a \texttt{\{format\}} path parameter and emits \ac{JSON},
+\ac{XML}, \ac{CSV} or (for the file endpoints) a downloadable shell
+script; the same \ac{OpenAPI} 3.1.0 document is served at
+\texttt{/swagger.html} through a Swagger \ac{UI} hosted inside the
+\ac{WAR}.
 
 \subsection{Persistence}
 
 The persistence unit, declared in
-\texttt{src/main/resources/META-INF/persistence.xml}, is named
+\texttt{src/\allowbreak main/\allowbreak resources/\allowbreak META-INF/\allowbreak persistence.xml}, is named
 \texttt{MeuPU} (inherited from the legacy code). It is configured as
 \texttt{RESOURCE\_LOCAL}, with Hibernate as the \ac{JPA} provider
 and a connection pool managed by HikariCP\@. Database connection
@@ -275,23 +140,9 @@ fixtures without rebuilding the artifact: the job sets the
 appropriate environment variables in its \texttt{variables:} block
 and the application picks them up at boot.
 
-The full schema, as introspected from the running database, contains
-forty-two tables in the \texttt{public} schema and around fifty
-foreign-key constraints, organised into a few clear groups: core
-domain (\texttt{station}, \texttt{network}, \texttt{agency},
-\texttt{country}, \texttt{rinex\_file}, \texttt{highrate\_rinex\_file},
-\texttt{file\_type}), junction tables (\texttt{agency\_network},
-\texttt{station\_network}, \texttt{station\_agency\_role},
-\texttt{node\_station}, \texttt{node\_data\_center}), quality-control
-summaries (\texttt{qc\_report\_summary},
-\texttt{qc\_constellation\_summary},
-\texttt{qc\_header\_observations}, \texttt{qc\_navigation\_msg} and
-four \texttt{qc\_observation\_summary\_\{c,d,l,s\}} variants), and
-auxiliary tables for embargoes, documents, logs, licenses and
-infrastructure. A simplified view of the central entities is given
-in Figure~\ref{fig:datamodel}; the chapter on technologies
-(Section~\ref{sec:epos-db}) discusses the design of the database
-itself in more detail.
+The shape of the schema is discussed in
+Section~\ref{sec:epos-db}; a simplified view of the central entities
+is given in Figure~\ref{fig:datamodel}.
 
 \begin{figure}[h]
   \centering
@@ -355,126 +206,70 @@ regressions introduced by the commit currently being pushed) and a
 \emph{fixed} reference commit identified by a SHA stored in the
 \texttt{DIFF\_FIXED\_BASELINE} GitLab \ac{CI}/\ac{CD} variable
 (which catches the slow drift that accumulates over many commits
-along a long-running refactor branch). The full file is shown in
-Listing~\ref{lst:apiv4-ci-1} and Listing~\ref{lst:apiv4-ci-2}.
+along a long-running refactor branch). The key parts of the
+\texttt{.gitlab-ci.yml} are shown, condensed, in
+Listing~\ref{lst:apiv4-ci}.
 
-\begin{lstlisting}[language=yaml,caption={Header, build and integration test jobs of the production pipeline.},label=lst:apiv4-ci-1]
+\begin{lstlisting}[language=yaml,caption={Condensed view of the production \texttt{.gitlab-ci.yml}, three stages and four jobs.},label=lst:apiv4-ci]
 default:
   image: maven:3.9.6-eclipse-temurin-21
-  tags:
-    - ubi-runner-.31
-
-cache:
-  key: global-maven-cache
-  paths:
-    - .m2/repository
-
+  tags: [ ubi-runner-.31 ]
+cache: { key: global-maven-cache, paths: [ .m2/repository ] }
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   GIT_DEPTH: "20"
-
-stages:
-  - build
-  - test
-  - diff
+stages: [ build, test, diff ]
 
 build-job:
   stage: build
-  script:
-    - mvn clean package -DskipTests
-  artifacts:
-    paths:
-      - target/*.war
+  script: [ mvn clean package -DskipTests ]
+  artifacts: { paths: [ target/*.war ] }
 
 integration-test-job:
   stage: test
-  script:
-    - mvn verify
+  script: [ mvn verify ]
   artifacts:
     when: always
-    reports:
-      junit:
-        - "target/failsafe-reports/failsafe-summary.xml"
-        - "target/failsafe-reports/TEST-*.xml"
-    paths:
-      - target/failsafe-reports/
-    expire_in: 1 week
-\end{lstlisting}
+    reports: { junit: [ "target/failsafe-reports/TEST-*.xml" ] }
 
-The pinned runner tag, the cached Maven repository and the
-\texttt{maven:\allowbreak 3.9.6-eclipse-\allowbreak temurin-21} base image are direct
-descendants of the first prototype. Two additions are worth
-calling out. The \texttt{GIT\_DEPTH: "20"} variable bumps the
-default shallow-clone depth from one to twenty commits, which is
-the minimum required for the diff jobs to be able to inspect
-\texttt{HEAD\textasciitilde 1} without an additional
-\texttt{git fetch}. The third stage, \texttt{diff}, hosts the two
-new jobs.
-
-\begin{lstlisting}[language=yaml,caption={\texttt{validate-diff-job} and \texttt{http-diff-job}, the three-way differential testing jobs.},label=lst:apiv4-ci-2]
 validate-diff-job:
   stage: diff
-  needs:
-    - job: build-job
-      artifacts: false
-  variables:
-    DIFF_FIXED_BASELINE: ""   # commit SHA, set in GitLab CI/CD Variables
+  needs: [ { job: build-job, artifacts: false } ]
+  variables: { DIFF_FIXED_BASELINE: "" }   # commit SHA, CI/CD var
   script:
     - |
-      run_against_baseline() {
-        local LABEL="$1"; local BASELINE_SHA="$2"
-        if [ -z "$BASELINE_SHA" ]; then
-          echo "No $LABEL baseline available - skipping"
-          return 0
-        fi
-        local WORK="/tmp/${LABEL}-baseline-build"
-        git worktree remove --force "$WORK" 2>/dev/null || true
-        git worktree prune
-        rm -rf "$WORK"
-        git worktree add "$WORK" "$BASELINE_SHA"
+      run() { # $1=label, $2=sha
+        [ -z "$2" ] && return 0
+        WORK=/tmp/$1-baseline-build
+        git worktree add "$WORK" "$2"
         ( cd "$WORK" && mvn -q -o package -DskipTests )
-        export BASELINE_WAR="$WORK/target/ROOT.war"
-        export DIFF_REPORT_DIR="target/diff-report/$LABEL"
-        export DIFF_LABEL="$LABEL"
+        export BASELINE_WAR="$WORK/target/ROOT.war" DIFF_LABEL="$1"
+        export DIFF_REPORT_DIR="target/diff-report/$1"
         mkdir -p "$DIFF_REPORT_DIR"
         mvn test -Dtest=DiffHarness -DfailIfNoTests=false
       }
-      RECENT_SHA=$(git rev-parse --verify HEAD~1 2>/dev/null || echo "")
-      run_against_baseline recent "$RECENT_SHA"
-      run_against_baseline fixed  "$DIFF_FIXED_BASELINE"
+      run recent "$(git rev-parse --verify HEAD~1 2>/dev/null)"
+      run fixed  "$DIFF_FIXED_BASELINE"
   artifacts:
     when: always
-    paths:
-      - target/diff-report/
-    reports:
-      junit:
-        - "target/surefire-reports/TEST-Diff.DiffHarness.xml"
-    expire_in: 4 weeks
+    paths: [ target/diff-report/ ]
+    reports: { junit: [ "target/surefire-reports/TEST-Diff.DiffHarness.xml" ] }
 
 http-diff-job:
   stage: diff
-  needs:
-    - job: build-job
-      artifacts: true
+  needs: [ { job: build-job, artifacts: true } ]
   variables:
     DATABASE_URL: "postgres://postgres:postgres@192.168.168.30:5432/DB_3.0_J"
     JAKARTA_SCHEMA_ACTION: "none"
     DIFF_FIXED_BASELINE: ""
   script:
     - |
-      build_baseline() {
-        local LABEL="$1"; local BASELINE_SHA="$2"
-        local WORK="/tmp/${LABEL}-http-baseline-build"
-        git worktree remove --force "$WORK" 2>/dev/null || true
-        git worktree prune
-        rm -rf "$WORK"
-        git worktree add "$WORK" "$BASELINE_SHA"
-        ( cd "$WORK" && mvn -q -o package -DskipTests )
-        echo "$WORK/target/ROOT.war"
-      }
-      RECENT_SHA=$(git rev-parse --verify HEAD~1 2>/dev/null || echo "")
-      [ -n "$RECENT_SHA" ]            && export BASELINE_RECENT_WAR=$(build_baseline recent "$RECENT_SHA")
-      [ -n "$DIFF_FIXED_BASELINE" ]   && export BASELINE_FIXED_WAR=$(build_baseline fixed  "$DIFF_FIXED_BASELINE")
+      # build baselines if available, then let HttpDiff orchestrate
+      # spawning Payara Micros on ports 8080/8081/8082.
+      [ -n "$(git rev-parse --verify HEAD~1 2>/dev/null)" ] && \
+          export BASELINE_RECENT_WAR=$(build recent HEAD~1)
+      [ -n "$DIFF_FIXED_BASELINE" ] && \
+          export BASELINE_FIXED_WAR=$(build fixed "$DIFF_FIXED_BASELINE")
       mvn test -Dtest=HttpDiff -DfailIfNoTests=false
   artifacts:
     when: always
@@ -486,59 +281,30 @@ http-diff-job:
     expire_in: 4 weeks
 \end{lstlisting}
 
-A few design decisions visible in the two listings deserve a comment.
-
-\paragraph{Two baselines, one job.}
-Each diff job runs the harness twice, once per baseline, with the
-report written into a separate subdirectory of
-\texttt{target/diff-report/} (or \texttt{target/http-diff-report/}).
-The \emph{recent} baseline is the immediate parent of \texttt{HEAD},
-which keeps the per-commit comparison focused on the change just
-introduced and avoids the avalanche of diffs that would otherwise
-occur on long-running refactor branches. The \emph{fixed} baseline
-is a commit \ac{ID} stored in the GitLab variable
-\texttt{DIFF\_FIXED\_BASELINE}: it acts as a long-term reference
-against which the cumulative drift of the branch is measured, and is
-typically pointed at the last commit known to have shipped to the
-\ac{EPOS} portal. The two baselines surface different classes of
-regressions (one immediate, one accumulated) without doubling the
-maintenance cost of test fixtures.
-
-\paragraph{Worktree-based baseline build.}
-The baseline \ac{WAR} is built by checking out the baseline commit
-into a separate Git worktree (\texttt{/tmp/baseline-build}) and
-invoking \texttt{mvn -q -o package -DskipTests} there. Worktrees
-were chosen over the more obvious \texttt{git checkout} because they
-preserve the current working directory untouched: the harness can
-freely compare files from both checkouts without having to alternate
-between branches.
-
-\paragraph{Defensive skip per baseline.}
-Each baseline is treated independently. If \texttt{HEAD\textasciitilde 1}
-does not exist (the trivial case of the first commit of the
-repository), the \emph{recent} comparison is skipped. If
-\texttt{DIFF\_FIXED\_BASELINE} is unset, which is the expected
-state at the very start of a refactor branch, before a fixed
-reference has been chosen, the \emph{fixed} comparison is
-skipped. A pipeline can therefore have zero, one or two diff sub-runs
-depending on the situation, and never fails simply because a
-baseline is unavailable.
-
-\paragraph{Job dependencies.}
-\texttt{validate-diff-job} does not need the artifact of
-\texttt{build-job}, it rebuilds the current \ac{WAR} as a side
-effect of \texttt{mvn test}, and is therefore declared with
-\texttt{needs: artifacts: false} to avoid an unnecessary artifact
-download. \texttt{http-diff-job}, on the other hand, requires the
-current \ac{WAR} to spawn Payara Micro and so declares
-\texttt{artifacts: true}.
+Three details of the listing are worth highlighting. The
+\emph{recent} baseline is \texttt{HEAD\textasciitilde 1}, which keeps
+the per-commit comparison focused on the change just introduced; the
+\emph{fixed} baseline is a commit \ac{ID} stored in
+\texttt{DIFF\_FIXED\_BASELINE} (typically pointing at the last commit
+known to have shipped to the \ac{EPOS} portal) and acts as a
+long-term reference against which the cumulative drift of the branch
+is measured. Each baseline build is materialised through
+\texttt{git worktree} rather than \texttt{git checkout}, so the
+working copy is never disturbed and the harness can freely compare
+files from both checkouts in parallel. Finally, each baseline is
+optional and treated independently: if \texttt{HEAD\textasciitilde 1}
+does not exist (first commit of the repository) or
+\texttt{DIFF\_FIXED\_BASELINE} is unset (start of a refactor branch),
+the corresponding sub-run is skipped. A pipeline can therefore have
+zero, one or two diff sub-runs depending on the situation, and never
+fails because a baseline is simply unavailable.
 
 \section{The Code-Level Diff: \texttt{DiffHarness.java}}
 \label{sec:diffharness}
 
 \texttt{DiffHarness.java} is a JUnit~5 test that compares two
 versions of a specific Java class on a shared input grid, in
-process. Its core idea is to load the baseline and the \ac{HEAD}
+process. Its core idea is to load the baseline and the \texttt{HEAD}
 \acp{WAR} through two independent \texttt{URLClassLoader} instances,
 to reflect into the class under test on both sides and to invoke
 each method of interest with the same arguments. Any difference
@@ -549,7 +315,7 @@ The pipeline invokes the harness once per baseline (recent and
 fixed; see Section~\ref{sec:pipeline}). The exported environment
 variables \texttt{BASELINE\_WAR}, \texttt{DIFF\_REPORT\_DIR} and
 \texttt{DIFF\_LABEL} tell the harness which \ac{WAR} to load against
-\ac{HEAD} and where to write its outputs. The on-disk layout is
+\texttt{HEAD} and where to write its outputs. The on-disk layout is
 \texttt{target/diff-report/recent/} and
 \texttt{target/diff-report/fixed/}, so a glance at the artifact tree
 of a finished pipeline immediately distinguishes a per-commit
@@ -570,7 +336,7 @@ appearing as a test-suite property) integrates with GitLab so that
 divergences appear as failed assertions on the pipeline page. In
 parallel, a richer \ac{CSV}/\ac{JSON} report under the per-baseline
 subdirectory records every input row, the value returned by the
-baseline, the value returned by \ac{HEAD} and an indicator of
+baseline, the value returned by \texttt{HEAD} and an indicator of
 whether the two match. The \ac{CSV} format makes the report easy
 to open in a spreadsheet for ad-hoc analysis.
 
@@ -582,7 +348,7 @@ exercises the \ac{API} end-to-end. Its execution proceeds in four
 phases, summarised graphically in Figure~\ref{fig:httpdiff-phases}.
 Unlike the code-level harness, which is invoked twice by the
 pipeline, the \ac{HTTP} harness runs once and internally boots
-\emph{all} the available \acp{WAR} in parallel (the \ac{HEAD}
+\emph{all} the available \acp{WAR} in parallel (the \texttt{HEAD}
 \ac{WAR}, the recent baseline if any, and the fixed baseline if
 any). It then issues every test case against every running instance
 and emits one diff report per baseline.
@@ -640,7 +406,7 @@ and emits one diff report per baseline.
   \end{tikzpicture}%
   }
   \caption{Phases of \texttt{HttpDiff.java}. The harness boots one
-  Payara Micro per available \ac{WAR}, the \ac{HEAD} build and
+  Payara Micro per available \ac{WAR}, the \texttt{HEAD} build and
   whichever of the recent/fixed baselines were provided, waits
   for all of them to be ready, fires every test case against every
   instance in parallel, then performs a three-way comparison and
@@ -649,111 +415,38 @@ and emits one diff report per baseline.
   \label{fig:httpdiff-phases}
 \end{figure}
 
-\paragraph{Phase 1, Boot.}
-The harness spawns up to three child \ac{JVM} processes from the
-Payara Micro \ac{JAR} that the Maven build had previously downloaded
-into \texttt{target/payara-micro/}. The current \ac{WAR}
-(\texttt{target/ROOT.war}) is deployed on port 8080. If the
-\texttt{BASELINE\_RECENT\_WAR} environment variable is set, the
-recent baseline is deployed on port 8081; if
-\texttt{BASELINE\_FIXED\_WAR} is set, the fixed baseline is deployed
-on port 8082. All processes read their database configuration from
-the environment variables injected by the \texttt{http-diff-job},
-which means they all point at the same fixture (typically
-\texttt{DB\_3.0\_J} for correctness runs).
+The figure already covers the gist; a few implementation details are
+worth recording. The test cases live in
+\texttt{src/\allowbreak test/\allowbreak resources/\allowbreak http-diff-cases.json}
+as a \ac{JSON} array of request descriptors (method, path, headers,
+optional body); the deploy-verification handshake added in commit
+\texttt{67a0da9} (``\emph{prove deploy actually happened before
+counting it as ready}'') guards against spurious failures from
+requests landing on still-deploying containers. Bodies are compared
+as normalised strings (sorted \ac{JSON} keys, trimmed whitespace)
+and the headers that vary by definition (\texttt{Date},
+\texttt{Server}, \texttt{Content-Length}) are ignored. The two
+comparisons (HEAD vs recent, HEAD vs fixed) are kept in separate
+report directories so that a per-commit regression and an
+accumulated drift remain distinguishable in the artifact tree.
 
-\paragraph{Phase 2, Deploy verification.}
-Before any test case is sent, the harness polls
-\texttt{GET /api/ping} on each active port until every running
-instance returns \texttt{200 OK}, with a generous time-out. This
-handshake was added in response to spurious early failures observed
-during development, where the first request of a test would happen
-to land on a still-deploying container; the corresponding commit
-message in the repository history is the literal sentence
-``\emph{ci: HttpDiff, prove deploy actually happened before
-counting it as ready}''.
-
-\paragraph{Phase 3, Test replay.}
-The list of test cases lives in
-\texttt{src/\allowbreak test/\allowbreak resources/\allowbreak http-diff-cases.json}, a small \ac{JSON}
-array in which each entry describes an \ac{HTTP} request (method,
-path, headers, optional body). Listing~\ref{lst:httpcases} shows the
-shape of the file.
-
-\begin{lstlisting}[caption={Excerpt from \texttt{http-diff-cases.json}, showing two of the test cases used by \texttt{HttpDiff}.},label=lst:httpcases]
-[
-  {
-    "name": "ping",
-    "method": "GET",
-    "path": "/api/ping",
-    "headers": { "Accept": "application/json" }
-  },
-  {
-    "name": "station-short-json",
-    "method": "GET",
-    "path": "/api/stations/station/short/json",
-    "headers": { "Accept": "application/json" }
-  }
-]
-\end{lstlisting}
-
-For each case, the harness fires the request against every active
-port in parallel, captures status code, response headers and body,
-and then performs a three-way comparison: \ac{HEAD} against the
-recent baseline (if present) and \ac{HEAD} against the fixed
-baseline (if present). The two comparisons are kept separate so that
-``a change my commit introduced'' and ``a change that has accumulated
-since the fixed reference'' remain distinguishable in the report.
-Headers irrelevant to behavioural equivalence
-(\texttt{Date}, \texttt{Server}, \texttt{Content-Length}) are
-explicitly ignored. The body is compared as a normalised string,
-sorted \ac{JSON} object keys, trimmed whitespace, in order to
-avoid spurious diffs that would mask the real ones.
-
-\paragraph{Phase 4, Tear-down and reporting.}
-After the last case, all child processes are killed and the harness
-emits two \ac{CSV}/\ac{JSON} reports, one per baseline, under
-\texttt{target/http-diff-report/recent/} and
-\texttt{target/http-diff-report/fixed/}. A combined JUnit XML report
-under \texttt{target/surefire-reports/} flags each diff as a failed
-test case, tagged with its baseline label, so that GitLab
-shows the regressions both on the merge-request page and on the
-pipeline page.
-
-\section{Reports, Operations and Findings}
+\section{Reports and Findings}
 \label{sec:reports}
 
-Each pipeline run publishes four artifact paths that survive for
-between one and four weeks: the integration-test reports, the
-validate-diff report, the \ac{HTTP}-diff report, and the JUnit XML
-files consumed by GitLab itself. The retention windows are
-deliberately asymmetric: integration test results expire faster
-because they are cheap to reproduce, while diff reports are kept
-longer because they are the historical record of behavioural change
-during the refactor.
-
-During the development of the framework the harnesses surfaced a
-handful of real regressions that had been introduced by what looked
-like cosmetic refactors. The most representative example is the
-extraction of latitude and longitude range bounds to named
-constants, which was reverted after the diff harness reported a
-silent behavioural change in the boundary handling, the
-corresponding commits in the repository history are
-\texttt{7c8ff37 (refactor: extract lat/lon range bounds to named
-constants)} and \texttt{cc223ba (Revert "refactor: extract lat/lon
-range bounds to named constants")}. From the point of view of this
-project, those two commits are the best validation that the
-framework does the job it was designed for: it caught a regression
-that no human reading of the diff was likely to catch by eye.
-
-\section{Conclusion}
-\label{chap5:sec:concs}
-
-The application of the framework to \texttt{api\_v4.0} demonstrates
-that a small, focused set of \ac{CI} jobs is sufficient to provide a
-useful safety net during a long-running refactor of a Jakarta EE
-\ac{API}, provided that the harnesses are designed around the
-specifics of the system: a moving baseline, multiple response
-formats, an internal database. The next chapter draws the main
-conclusions of the project and outlines the items that, by choice
-or by constraint, were left out of its scope.
+Each pipeline run publishes the integration-test reports, the two
+diff reports (\texttt{recent/} and \texttt{fixed/} subdirectories of
+\texttt{target/\{diff,http-diff\}-report/}) and the JUnit XML files
+consumed by GitLab. Integration test results expire after one week;
+the diff reports are kept for four because they are the historical
+record of behavioural change across the refactor. During development
+the harnesses surfaced a handful of real regressions hidden inside
+seemingly cosmetic refactors. The most representative example is
+the extraction of latitude and longitude range bounds to named
+constants (commits \texttt{7c8ff37} and the subsequent
+\texttt{cc223ba} revert): the diff harness reported a silent
+behavioural change at the boundary that no human review of the diff
+would have caught by eye. Those two commits, in the author's view,
+are the best validation that the framework does what it was designed
+for. The next chapter draws the main conclusions of the project and
+outlines the items that, by choice or by constraint, were left out
+of its scope.

@@ -4,174 +4,67 @@
 \section{Main Conclusions}
 \label{sec:conc-princ}
 
-The work described in this report set out to address a very concrete
-problem of the \ac{SEGAL} laboratory: how to refactor a large,
-several-years-old Jakarta EE \ac{API} without silently breaking the
-\ac{EPOS} clients that depend on it. The answer proposed and built
-in the course of this project takes the form of a three-stage,
-\ac{CI}/\ac{CD}-driven testing framework that for every commit
-produced by the refactor compares the resulting build against the
-immediately preceding one, both at the level of internal Java
-classes and at the level of the \ac{HTTP} responses produced by the
-\ac{API}.
+The work described in this report addresses a concrete problem of
+the \ac{SEGAL} laboratory: how to refactor a large, several-years-old
+Jakarta EE \ac{API} without silently breaking the \ac{EPOS} clients
+that depend on it. The answer is a three-stage \ac{CI}/\ac{CD}-driven
+testing framework that, for every commit, compares the new build
+against two baselines (the immediate parent commit and a fixed
+long-term reference) both at the level of internal Java classes and
+at the level of \ac{HTTP} responses.
 
-Several conclusions emerge from the work.
-
-\paragraph{Differential testing fits a refactor naturally.}
-Asserting that a given input produces a given output is a brittle
-contract during a refactor, because every legitimate cosmetic change
-to a response field requires updating dozens of fixtures. Asserting
-that the new build produces \emph{the same} output as the old one
-sidesteps the problem entirely: a legitimate cosmetic change appears
-once in the diff report, can be approved, and the next pipeline run
-treats it as the new baseline. This is the property that allowed
-the framework to be useful from the first commit it ran on, without
-a long ramp-up period of fixture creation.
-
-\paragraph{Two layers of comparison are better than one.}
-The code-level harness (\texttt{DiffHarness.java}) and the
-\ac{HTTP}-level harness (\texttt{HttpDiff.java}) catch different
-classes of regressions. The first catches behavioural changes in
-focused helper classes (\texttt{Validate}, \texttt{Shape}) before
-they propagate into endpoint responses, with very fast feedback and
-without the cost of booting an application server. The second
-catches integration-level regressions that only manifest once a
-real request hits a real database. Either one in isolation would
-have left blind spots; together they cover the spectrum that the
-laboratory cares about.
-
-\paragraph{A self-hosted pipeline is not optional in this context.}
-Because the production database lives on the internal network of
-the laboratory and is not exposed to the public Internet, only a
-runner that itself sits inside that network can exercise the
-\ac{API} end-to-end against it. The decision to self-manage both
-the GitLab control plane and the GitLab Runner host therefore
-followed from the data-locality constraint, not from a preference
-for self-hosting per se. The same architecture would not be
-appropriate for an open-source project served by gitlab.com's
-shared runners.
-
-\paragraph{The two prototypes paid for themselves.}
-In retrospect, having spent the first few weeks of the project on
-\texttt{java-ee-app}, a deliberately trivial application whose
-only purpose was to harden the pipeline, and then on
-\texttt{syncspace-jakarta-app}, a deliberately fuller application
-whose only purpose was to exercise Jakarta EE 11 features in
-isolation, saved significant time later, when the production
-\ac{API} had to be addressed. Each prototype answered a small,
-well-bounded set of questions in an environment in which mistakes
-were cheap. Without them, every one of those questions would have
-had to be answered against the production code base, where mistakes
-are not.
-
-\paragraph{The framework reveals what a human review would miss.}
-The clearest evidence of value, beyond any abstract argument, is the
-list of commits in the repository in which a refactor was proposed,
-the diff harness flagged a behavioural change, the change was
-investigated, and the refactor was reverted. The most representative
-example, discussed in Section~\ref{sec:reports}, is the named-constants
-refactor of the latitude/longitude bounds: a textbook clean-up that
-introduced a subtle off-by-one in the boundary check and that no
-reasonable amount of code review would have caught at the rate the
-laboratory commits. That alone is, in the author's view, the
-justification for the framework.
+A few conclusions stand out. \emph{Differential testing fits a
+refactor naturally}: asserting that the new build produces the same
+output as a known-good one sidesteps the brittle fixture problem and
+made the framework useful from the very first commit it ran on.
+\emph{Two layers of comparison are better than one}: the code-level
+harness catches behavioural changes in focused helper classes with
+fast feedback, the \ac{HTTP}-level harness catches integration
+regressions visible only against a live database, and neither one
+alone covers the spectrum the laboratory cares about. \emph{A
+self-hosted pipeline is not optional here}: only a runner inside the
+laboratory's network can exercise the \ac{API} end-to-end against
+the production database, so self-managing both the GitLab control
+plane and the GitLab Runner host followed from the data-locality
+constraint, not from a preference. \emph{The two prototypes paid for
+themselves}: each answered a small, well-bounded set of questions in
+an environment where mistakes were cheap, sparing the production
+code base from them. \emph{The framework reveals what a human review
+would miss}: the most representative example, discussed in
+Section~\ref{sec:reports}, is the named-constants refactor of the
+latitude/longitude bounds that no amount of code review would
+plausibly have caught at the laboratory's commit rate.
 
 \section{Future Work}
 \label{sec:trab-futuro}
 
-A number of items were deliberately left out of the scope of this
-project, either because they were not strictly necessary to meet
-the objectives, or because they would have expanded the project
-beyond what could reasonably be addressed in the time available.
-
-\paragraph{\ac{OpenAPI}-driven test case generation.}
-The list of \ac{HTTP} cases exercised by \texttt{HttpDiff.java} is
-currently maintained by hand in \texttt{http-diff-cases.json}. The
-\ac{OpenAPI} 3.1.0 document shipped inside the \ac{WAR} already
-describes every endpoint and the shape of its parameters; a future
-evolution of the framework could derive the case list automatically
-from the specification, ensuring that newly added endpoints are
-exercised by the diff from the moment they are merged, with no need
-to update the test fixture.
-
-\paragraph{Schema diffing for the \ac{OpenAPI} document itself.}
-A different but adjacent use of the same document is to diff the
-\ac{OpenAPI} of the baseline against that of the \ac{HEAD}: any
-breaking change to the contract (a removed endpoint, a changed
-type, a tightened validation) would be reported as a separate kind
-of regression. This would complement the behavioural diff with a
-contract diff.
-
-\paragraph{Containerization of the production \ac{API}.}
-The production application is currently deployed by copying the
-\ac{WAR} onto an existing Payara installation. Packaging the
-application as a Docker image, with a Payara base image and a small
-amount of entry-point configuration, would simplify the migration
-to a containerised deployment platform if the laboratory ever
-chooses to move in that direction, and would also remove the
-ambiguity between ``the \ac{WAR} that was tested'' and ``the
-\ac{WAR} that was deployed'' that occasionally arises with the
-current model.
-
-\paragraph{Performance regression testing and BRIN indexing.}
-The current diff harnesses focus on behavioural equivalence and
-ignore response time. A natural extension is to record the wall-clock
-duration of each \ac{HTTP} case for both baselines and \ac{HEAD}
-across both database fixtures (\texttt{DB\_3.0\_J} and
-\texttt{DB\_3.0\_F}) and to flag cases in which the new version is
-significantly slower than the old one. The threshold would
-necessarily be statistical rather than absolute, because the runner
-shares resources with other jobs; a small benchmarking subsystem
-would be required. The first concrete consumer of such a subsystem
-is already lined up: the planned introduction of BRIN indexes on the
-date columns of \texttt{rinex\_file} and
-\texttt{highrate\_rinex\_file} (Section~\ref{sec:epos-db}) needs
-exactly this kind of empirical evidence to justify itself against
-the larger \texttt{F} fixture.
-
-\paragraph{PostGIS migration for spatial queries.}
-Bounding-box and polygon checks are currently performed in Java by
-the helpers of the \texttt{Geometry} package. Migrating those checks
-to native PostGIS operators would let the database planner reason
-about spatial selectivity and is the natural complement to the BRIN
-work above. The expectation is that correctness would not change
-significantly (the existing checks are already faithful to the
-specification) and that the main benefit would be query plan
-quality on the \texttt{DB\_3.0\_F} fixture, which makes this an
-ideal target for the same differential framework: the same diff
-cases should pass byte-for-byte against the PostGIS-enabled version,
-and only the timing distribution should change.
-
-\paragraph{Snapshot testing of representative responses.}
-Not every endpoint is amenable to a moving baseline; some responses
-should remain stable across many releases (for example, the
-\texttt{/api/ping} response, or the \ac{OpenAPI} document itself).
-A small set of snapshot tests, in addition to the differential ones,
-would protect those invariants and would explicitly mark them as
-``known stable'' rather than ``allowed to drift''.
-
-\paragraph{Generalisation to other laboratory services.}
-The framework has been designed against the specifics of
-\texttt{api\_v4.0} but its architecture is not specific to that
-\ac{API}: the dual-Payara-Micro approach, the worktree-based
-baseline, the \ac{JSON}-driven case list and the \ac{JUnit}/\ac{CSV}
-reporting could in principle be reused by any other Jakarta EE
-service of the laboratory. Reorganising the harness code into a
-small library, with the application-specific bits factored into
-a clean configuration interface, would make this reuse
-straightforward, and is a natural next step for a continuation of
-the work.
-
-\paragraph{Hardening of operational aspects.}
-Finally, several operational aspects of the framework deserve more
-work than was possible inside the scope of this project: failure
-recovery in the harness (retries on transient network errors,
-clean termination of orphan Payara Micro processes), more granular
-\ac{VPN} routing, automated provisioning of the GitLab Runner host
-through configuration management, and a richer dashboard on top of
-the diff reports collected over time. None of these are blocking
-for the day-to-day use of the framework, but each would make it
-more comfortable to live with for the years to come.
+Several extensions to the framework were deliberately left out of
+scope. The most immediate are the introduction of \textbf{BRIN}
+indexes on the date columns of \texttt{rinex\_file} (and the
+companion \emph{performance-regression subsystem} that would record
+wall-clock durations against the \texttt{F} fixture to justify them
+empirically), the \textbf{PostGIS migration} of the spatial helpers
+in the \texttt{Geometry} package (with the same differential
+framework used to verify byte-for-byte equivalence), and the
+\textbf{automatic generation of \ac{HTTP} test cases} from the
+\ac{OpenAPI} document shipped inside the \ac{WAR} (so newly added
+endpoints are exercised by the diff from the moment they are
+merged). The framework would also benefit from a \textbf{schema diff}
+of the \ac{OpenAPI} document itself across builds (to surface
+contract regressions distinct from behavioural ones), from a
+\textbf{snapshot test} layer for endpoints that should remain stable
+across releases (such as \texttt{/api/ping}), and from
+\textbf{containerization of the production deployment} to remove
+the residual gap between the \ac{WAR} that was tested and the
+\ac{WAR} that ships. Finally, the harness code itself could be
+\textbf{generalised into a small library} reusable by other Jakarta
+EE services of the laboratory, with the application-specific bits
+factored into a clean configuration interface; orthogonal to that,
+several \textbf{operational aspects} (transient-error retries, clean
+termination of orphan Payara Micro processes, automated provisioning
+of the runner host, a long-term dashboard on top of the diff
+reports) deserve more attention than the present project could
+afford.
 
 \bigskip
 

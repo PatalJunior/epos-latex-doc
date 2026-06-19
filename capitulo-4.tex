@@ -1,49 +1,26 @@
 \chapter{Methodology and Architecture}
 \label{chap:metodo-arq}
 
-\section{Introduction}
-\label{chap4:sec:intro}
-
-This chapter describes the methodology by which the testing
-infrastructure of the project was developed and then explains its
-overall architecture. The methodology is openly iterative: rather
-than building the final solution directly on top of the production
-\ac{API}, two intermediate prototype applications were written first,
-each addressing a separate concern in isolation, and the lessons
-learnt from them were carried over into the production application.
-Section~\ref{sec:legacy} situates the work against the legacy
-\ac{API} that motivated the refactor. Section~\ref{sec:methodology}
-describes the iterative methodology. Sections~\ref{sec:javaeeapp}
-and~\ref{sec:syncspace} discuss the two prototypes,
-\texttt{java-ee-app} and \texttt{syncspace-jakarta-app}. Finally,
-Section~\ref{sec:arch} gives a high-level view of the architecture
-of the differential testing framework that is detailed at the code
-level in Chapter~\ref{chap:caso-epos}.
-
 \section{The Legacy \ac{API} and the Need for a Safety Net}
 \label{sec:legacy}
 
-The starting point of the work is, to be blunt about it, a code base
-that had grown organically for several years and that nobody fully
-understood any more. The previous version of the \ac{EPOS} \ac{API}
-contained Java methods of more than five thousand lines, source files
-of more than thirty thousand lines, and many subtle behavioural
-quirks introduced as patches by successive developers in response to
-specific bug reports. The corollary was that no member of the
-laboratory could realistically guarantee, for an arbitrary change,
-that no client of the \ac{API} would be silently broken. Manual
-testing covered a few well-known requests and tacitly relied on the
-expectation that nobody would do anything too creative.
-
-The full rewrite of the \ac{API} on top of Jakarta EE 11 made the
-internal structure much cleaner, short methods, well-bounded
-\ac{JAX-RS} resource classes, clear separation between parsing,
-validation, query construction and serialization, but it also
-opened a window of risk: at any given commit during the refactor, an
-endpoint may produce subtly different output from the version
-deployed in production. The role of this project is to build the
-safety net that turns those subtle differences into a visible,
-investigable signal in the \ac{CI} pipeline.
+The starting point of the work is a code base that had grown
+organically for several years and that nobody fully understood any
+more: the previous version of the \ac{EPOS} \ac{API} contained Java
+methods of more than five thousand lines, source files of more than
+thirty thousand lines, and many subtle behavioural quirks introduced
+as patches by successive developers in response to specific bug
+reports. The corollary was that no member of the laboratory could
+realistically guarantee, for an arbitrary change, that no client of
+the \ac{API} would be silently broken. The full rewrite on top of
+Jakarta EE 11 made the internal structure much cleaner (short
+methods, well-bounded \ac{JAX-RS} resources, clear separation
+between parsing, validation, query construction and serialization)
+but opened a window of risk: at any given commit during the
+refactor, an endpoint may produce subtly different output from the
+version deployed in production. The role of this project is to build
+the safety net that turns those subtle differences into a visible
+signal in the \ac{CI} pipeline.
 
 \section{Iterative Methodology}
 \label{sec:methodology}
@@ -59,204 +36,36 @@ then brings the two strands back together. Second, the prototypes
 have value in their own right as didactic artifacts that future
 students of the laboratory can read and re-use.
 
-The three iterations are summarised in Table~\ref{tab:iterations}.
+\section{Prototype Applications}
+\label{sec:prototypes}
 
-\begin{table}[h]
-  \centering
-  \small
-  \begin{tabular}{p{3.0cm} p{4.5cm} p{4.5cm}}
-    \toprule
-    \textbf{Iteration} & \textbf{Focus} & \textbf{What was carried over} \\
-    \midrule
-    Prototype 1 \newline \texttt{java-ee-app}
-      & \ac{CI}/\ac{CD} pipeline patterns: dual Payara, Arquillian,
-        JUnit XML reporting.
-      & The shape of the \texttt{.gitlab-ci.yml}, the Maven cache
-        strategy and the choice of base Docker image. \\
-    \addlinespace
-    Prototype 2 \newline \texttt{syncspace-jakarta-app}
-      & Jakarta EE 11 features: \ac{CDI}, \ac{JAX-RS}, \ac{JPA},
-        Bean Validation, MicroProfile JWT, exception mappers.
-      & Validation patterns, exception mapper layout, record-based
-        DTOs, some of which were adopted by the refactor of the
-        production \ac{API}, some only used didactically. \\
-    \addlinespace
-    Production \newline \texttt{api\_v4.0}
-      & End-to-end integration: full pipeline, code-level diff,
-        \ac{HTTP}-level diff against real database via \ac{VPN}.
-      & Final artifact of the project. \\
-    \bottomrule
-  \end{tabular}
-  \caption{The three iterations of the project and their respective
-  focus.}
-  \label{tab:iterations}
-\end{table}
+The first prototype, \texttt{java-ee-app}, validated the
+\ac{CI}/\ac{CD} infrastructure end-to-end before any of the
+production code base was touched: it is a minimal Maven \ac{WAR}
+exposing two trivial \ac{JAX-RS} endpoints, with a
+\texttt{.gitlab-ci.yml} that builds the artifact and runs Arquillian
+integration tests against two managed Payara Server containers
+declared as \emph{services} in the job. Three patterns from that
+pipeline were carried over verbatim to the production one: the
+pinned base image with the \texttt{ubi-runner} tag, the global Maven
+repository cache, and the \texttt{reports: junit:} stanza that makes
+GitLab understand assertion failures as failed pipeline steps.
 
-\section{Prototype 1: \texttt{java-ee-app}}
-\label{sec:javaeeapp}
-
-The first prototype is a deliberately minimal Jakarta EE
-application whose role is to validate the \ac{CI}/\ac{CD} pipeline.
-It exposes a single \ac{JAX-RS} application class with two trivial
-endpoints, a \texttt{Hello World} text endpoint and a small
-\ac{POJO} serialised to \ac{JSON}, and a pair of Arquillian
-integration tests that exercise them against a managed Payara
-container.
-
-\subsection{Layout and Stack}
-
-The application is a Maven \ac{WAR} project targeting Java SE 17 and
-Jakarta EE 11. Its dependencies, beyond the Jakarta EE \acs{API}
-bundle (declared with \texttt{provided} scope), are JUnit 5
-Jupiter and the Arquillian \texttt{payara-server-managed} adapter.
-The \texttt{src/test} folder contains an \texttt{AbstractBaseIT.java}
-that prepares a ShrinkWrap deployment and a \texttt{JsonApplicationIT.java}
-that issues \ac{HTTP} requests against the deployed application.
-
-\subsection{The \ac{CI} Pipeline}
-
-The interesting part of this prototype is the \texttt{.gitlab-ci.yml},
-shown in Listing~\ref{lst:javaeeapp-ci}. The pipeline has two
-stages: \texttt{build}, which produces the \ac{WAR}, and
-\texttt{test}, which runs the integration tests against
-\emph{two} Payara Server containers, declared as
-\emph{services} in the job definition. The dual-server setup was
-useful as a stress test of the runner network: if the pipeline can
-boot two containers and run tests against them, it can certainly boot
-the single Payara Micro instance used by the production pipeline.
-
-\begin{lstlisting}[language=yaml,caption={\texttt{.gitlab-ci.yml} of the first prototype, two-stage pipeline with dual Payara services.},label=lst:javaeeapp-ci]
-default:
-  image: maven:3.9.6-eclipse-temurin-21
-  tags:
-    - ubi-runner
-
-cache:
-  key: global-maven-cache
-  paths:
-    - .m2/repository
-
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-
-stages:
-  - build
-  - test
-
-build-job:
-  stage: build
-  script:
-    - mvn clean package -DskipTests
-  artifacts:
-    paths:
-      - target/*.war
-
-integration-test-job:
-  stage: test
-  services:
-    - name: payara/server-full:7.2026.5
-      alias: payara-node-1
-    - name: payara/server-full:7.2026.5
-      alias: payara-node-2
-  script:
-    - sleep 45
-    - mvn verify
-  artifacts:
-    when: always
-    reports:
-      junit:
-        - "target/failsafe-reports/failsafe-summary.xml"
-        - "target/failsafe-reports/TEST-*.xml"
-    paths:
-      - target/failsafe-reports/
-    expire_in: 1 week
-\end{lstlisting}
-
-Three patterns from this prototype were carried over to the
-production pipeline:
-
-\begin{enumerate}
-  \item the pinned base image and the \texttt{ubi-runner} tag, which
-        together guarantee that the job runs on a known runner with a
-        known toolchain;
-  \item the global Maven cache, which avoids re-downloading the
-        repository on every job;
-  \item the \texttt{reports: junit:} stanza, which is what makes
-        GitLab understand failed assertions as failed pipeline steps
-        rather than as opaque exit codes.
-\end{enumerate}
-
-The forty-five-second \texttt{sleep} that precedes \texttt{mvn
-verify} compensates for the time required by the Payara containers
-to become reachable; a cleaner health-poll loop was tried and
-discarded as not worth the additional complexity for a prototype.
-
-\section{Prototype 2: \texttt{syncspace-jakarta-app}}
-\label{sec:syncspace}
-
-The second prototype goes in the opposite direction. Where the first
-prototype is a few lines of application code with a complete \ac{CI}
-pipeline, the second prototype is a complete application with no
-\ac{CI} pipeline at all. Its goal is to exercise the Jakarta EE 11
-specifications listed in Section~\ref{sec:java} on a domain that is
-small enough to fit in a student's head but large enough to require
-non-trivial use of each specification.
-
-\subsection{The Domain}
-
-\texttt{syncspace-jakarta-app} is the back end of a hypothetical
-room-booking service for a co-working space. The domain is centred
-on three entities: \texttt{User}, \texttt{Room} and \texttt{Booking}.
-A room has a type (\texttt{HOT\_DESK}, \texttt{PODCAST\_STUDIO},
-\texttt{BOARDROOM}, \texttt{EVENT\_SPACE}), a maximum capacity and
-an active flag. A booking links a user to a room over a time
-interval and counts the number of attendees. Users authenticate
-through a login endpoint that issues a \ac{JWT}; subsequent calls to
-the booking endpoints are protected by MicroProfile
-\ac{JWT}~\cite{microprofile}.
-
-\subsection{Jakarta Specifications Exercised}
-
-Each part of the application was deliberately written to use a
-specific Jakarta or MicroProfile specification:
-
-\begin{itemize}
-  \item \textbf{\ac{JAX-RS} 4.0~\cite{jaxrs}.} The
-        \texttt{SyncSpaceApplication} class declares an
-        \texttt{@ApplicationPath("/api/v1")} and the resources
-        (\texttt{AuthResource}, \texttt{BookingResource},
-        \texttt{RoomResource}) follow standard \ac{JAX-RS} idioms,
-        with \texttt{@Inject} for service dependencies and the
-        \texttt{Response} builder for fluent response construction.
-  \item \textbf{\ac{CDI} 4.1.} Services and exception mappers are
-        \ac{CDI} beans, injected into the \ac{JAX-RS} resources.
-        \texttt{AuthResource} is \texttt{@RequestScoped}; services
-        are implicitly singletons.
-  \item \textbf{\ac{JPA} 3.2~\cite{jpa}.} Entities use
-        \texttt{@Entity}, \texttt{@ManyToOne}, \texttt{@OneToMany},
-        \texttt{@Enumerated(STRING)} for the enums, and
-        \texttt{@PrePersist} for default timestamps.
-  \item \textbf{Bean Validation 3.1.} A custom
-        \texttt{@ValidDateRange} class-level annotation is paired
-        with a validator that ensures \texttt{endTime} is strictly
-        greater than \texttt{startTime} and attaches the error to
-        the correct property through
-        \texttt{addPropertyNode("endTime")}.
-  \item \textbf{MicroProfile JWT 2.1.} The
-        \texttt{@LoginConfig(authMethod = "MP-JWT")} on the
-        application class enables token-based authentication; tokens
-        are signed manually with Nimbus JOSE+JWT using an RSA
-        signature, with the user identifier as the subject and the
-        user's roles as the \texttt{groups} claim.
-  \item \textbf{Exception mappers.} Four dedicated mappers
-        (\texttt{BusinessValidationMapper}, \texttt{ValidationExceptionMapper},
-        \texttt{JsonProcessingExceptionMapper},
-        \texttt{GlobalExceptionMapper}) translate domain and
-        framework exceptions into structured \ac{JSON} responses,
-        avoiding the leaking of internal stack traces to the
-        \ac{API} consumer. The end-to-end flow is summarised in
-        Figure~\ref{fig:errormapper}.
-\end{itemize}
+The second prototype, \texttt{syncspace-jakarta-app}, focused on the
+opposite concern: a complete Jakarta EE 11 application with no
+\ac{CI} pipeline, exercising the specifications listed in
+Section~\ref{sec:java} on a small room-booking domain (entities
+\texttt{User}, \texttt{Room}, \texttt{Booking}) protected by
+MicroProfile \ac{JWT}~\cite{microprofile}. \ac{JAX-RS}~\cite{jaxrs}
+declares the resources, \ac{CDI} wires the services, \ac{JPA}~\cite{jpa}
+maps the entities, Bean Validation enforces a custom
+\texttt{@ValidDateRange} constraint, and a focused set of four
+\texttt{ExceptionMapper}s
+(\texttt{Business\-Validation\-Mapper}, \texttt{Validation\-Exception\-Mapper},
+\texttt{Json\-Processing\-Exception\-Mapper}, \texttt{Global\-Exception\-Mapper})
+translates domain and framework exceptions into structured \ac{JSON}
+errors without leaking stack traces. The end-to-end exception flow
+is summarised in Figure~\ref{fig:errormapper}.
 
 \begin{figure}[h]
   \centering
@@ -309,24 +118,15 @@ specific Jakarta or MicroProfile specification:
   \label{fig:errormapper}
 \end{figure}
 
-\subsection{What was Carried Over}
-
-Most of the code of this prototype was never reused in the
-production \ac{API}, the production domain is very different
-from a room booker. Two patterns were nevertheless adopted into the
-refactor. The first is the use of a small set of focused
-\ac{JAX-RS} exception mappers rather than a single catch-all
-\ac{JAX-RS} \texttt{ExceptionMapper<Throwable>}: this leaves
-\ac{HTTP} status codes meaningful and gives the differential test
-harness a stable signal to assert on. The second is the use of
-\texttt{record}-based \acp{POJO} for request and response bodies,
-which avoids hand-written \texttt{equals}/\texttt{hashCode} and
-makes diffing two responses simpler.
-
-The remaining features, in particular the full \ac{JWT} flow,
-were retained in the prototype as a self-contained reference
-example to which future students can look for guidance on Jakarta
-EE 11 idioms.
+Two patterns from \texttt{syncspace-jakarta-app} were adopted by the
+production refactor: the use of a small set of focused
+\texttt{ExceptionMapper}s (which keeps \ac{HTTP} status codes
+meaningful and gives the differential harness a stable signal to
+assert on) and the use of \texttt{record}-based \acp{POJO} for
+request and response bodies (which simplifies diffing). The
+remaining features, in particular the full \ac{JWT} flow, were
+retained in the prototype as a self-contained reference example for
+future students.
 
 \section{Architecture of the Differential Testing Framework}
 \label{sec:arch}
@@ -384,39 +184,25 @@ processes, and the application instances themselves.
   \caption{Overall architecture of the differential testing framework.
   Solid arrows denote control flow inside the pipeline; dashed arrows
   denote artifact or data access. Both diff jobs run a three-way
-  comparison between the \ac{HEAD} build and two baselines, the
+  comparison between the \texttt{HEAD} build and two baselines, the
   immediate parent commit and a fixed reference commit, all
   pointed at the same database fixture.}
   \label{fig:arch}
 \end{figure}
 
-The flow is as follows. A push by the developer is received by the
-self-managed GitLab server, which schedules a pipeline on the runner
-tagged \texttt{ubi-runner-.31}. The pipeline goes through four jobs
-across three stages: \texttt{build-job} produces the \ac{HEAD}
-\ac{WAR}; \texttt{integration-test-job} runs the regular JUnit
-integration tests against that \ac{WAR}; \texttt{validate-diff-job}
-reconstructs both baseline \acp{WAR} (one from
-\texttt{HEAD\textasciitilde 1}, one from the fixed commit in
-\texttt{\$DIFF\_FIXED\_BASELINE}) using Git worktrees and runs the
-code-level differential harness against each in turn;
-\texttt{http-diff-job} boots Payara Micro instances of all three
-\acp{WAR} on different ports, connects them to the real database
-over the laboratory's network and replays the test cases listed in
-\texttt{http-diff-cases.json} against all of them, collecting
-per-case diffs against both baselines independently. The two diff jobs publish reports that
-GitLab understands both as JUnit-style results and as raw
-artifacts for later inspection.
+A push by the developer triggers a pipeline on the runner tagged
+\texttt{ubi-runner-.31}, which goes through four jobs across three
+stages: \texttt{build-job} produces the \texttt{HEAD} \ac{WAR},
+\texttt{integration-test-job} runs the regular JUnit integration
+tests, \texttt{validate-diff-job} reconstructs both baseline
+\acp{WAR} via Git worktrees and runs the code-level diff harness
+against each in turn, and \texttt{http-diff-job} boots all three
+Payara Micro instances on different ports, replays
+\texttt{http-diff-cases.json} against each and emits per-baseline
+diff reports. All reports are picked up by GitLab as both JUnit
+results and raw artifacts.
 
-\section{Conclusion}
-\label{chap4:sec:concs}
-
-The iterative methodology adopted in this project, two prototypes
-followed by the production application, traded an apparently
-longer time-to-result for a much sharper separation of concerns
-between \ac{CI}/\ac{CD} infrastructure and Jakarta EE feature usage.
-The first prototype gave the \texttt{.gitlab-ci.yml} its shape; the
-second prototype gave the production refactor a small but useful
-set of Jakarta EE idioms. The next chapter applies the resulting
-framework to the production \ac{API} and walks through its
-\ac{CI} pipeline, the two diff harnesses and their reports.
+The two prototypes traded a longer time-to-result for a sharper
+separation of concerns between \ac{CI}/\ac{CD} infrastructure and
+Jakarta EE feature usage; the next chapter applies the resulting
+framework to the production \ac{API}.

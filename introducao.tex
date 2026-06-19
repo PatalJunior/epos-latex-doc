@@ -78,125 +78,57 @@ the scope of this particular project.
 \section{Objectives}
 \label{sec:obj}
 
-In line with the project proposal, the work described in this report
-pursues the following objectives:
+In line with the project proposal, the work pursues four objectives:
+to design and implement an automated regression testing framework
+for the Jakarta EE \ac{REST} \ac{API} on the Payara Platform, with
+multi-format response comparison (\ac{JSON}, \ac{XML}, \ac{CSV}); to
+integrate it into a self-managed GitLab \ac{CI}/\ac{CD} pipeline
+running on \ac{VPN}-accessible runners; to validate the approach on
+two prototype applications before applying it to the production
+\ac{API}; and to produce structured per-commit comparisons, both at
+the level of internal logic and at the level of \ac{HTTP} responses,
+in a form consumable by both human developers and the \ac{CI}
+system.
 
-\begin{enumerate}
-  \item To design and implement an \emph{automated regression testing
-        framework} for a Jakarta EE \ac{REST} \ac{API} running on the
-        Payara Platform, capable of comparing the behaviour of two
-        builds of the application across multiple response formats
-        (\ac{JSON}, \ac{XML}, \ac{CSV});
-  \item To integrate that framework into a self-managed GitLab
-        \ac{CI}/\ac{CD} pipeline, with dedicated GitLab Runners hosted
-        inside the laboratory's network and with appropriate access to
-        the laboratory's databases over a \ac{VPN};
-  \item To validate the proposed approach on two prototype Jakarta EE
-        applications, one focused on the \ac{CI}/\ac{CD} pipeline
-        itself, the other focused on Jakarta EE~11 features, before
-        applying it to the production \ac{API};
-  \item To produce a structured comparison between consecutive versions
-        of the production \ac{API}, both at the level of internal
-        validation/geometry logic and at the level of \ac{HTTP}
-        responses, with reports that are consumable both by a human
-        developer and by the \ac{CI} system;
-  \item To document the architecture, usage, limitations and operating
-        procedure of the framework, in such a way that the laboratory
-        can continue to use and evolve it after the end of this
-        project.
-\end{enumerate}
-
-\section{Main Contributions}
-\label{sec:contrib}
-
-The main contributions of this work, expanded in detail in the
-subsequent chapters, can be summarised as:
-
-\begin{itemize}
-  \item A reusable, three-stage GitLab \ac{CI}/\ac{CD} pipeline template
-        for Jakarta EE applications deployed on Payara, with caching,
-        artifact management and JUnit-compatible reporting;
-  \item A code-level differential test harness
-        (\texttt{DiffHarness.java}) that loads the current build and
-        a baseline build of a Java class in two isolated class
-        loaders and compares their outputs on a shared input grid;
-        the harness is invoked twice by the pipeline, against two
-        baselines (the immediate parent commit
-        \texttt{HEAD\textasciitilde 1} and a fixed reference commit
-        whose \ac{ID} is provided through the
-        \texttt{DIFF\_FIXED\_BASELINE} \ac{CI}/\ac{CD} variable),
-        producing a true three-way comparison per pipeline run;
-  \item A complementary \ac{HTTP}-level differential test harness
-        (\texttt{HttpDiff.java}) that boots one instance of Payara
-        Micro per available \ac{WAR}, the \ac{HEAD} build and the
-        two baselines, on different ports, replays a configurable
-        suite of \ac{HTTP} cases against every instance and emits one
-        report per baseline so that per-commit regressions and
-        accumulated drift remain distinguishable;
-  \item Two prototype Jakarta EE 11 applications, a minimal
-        ``hello world'' service used to harden the pipeline itself,
-        and a small room-booking \ac{API} used to evaluate Jakarta EE
-        features in isolation, both reusable as didactic examples
-        for future students of the laboratory.
-\end{itemize}
+The main contributions are a reusable three-stage GitLab pipeline
+template for Jakarta EE applications, a code-level differential test
+harness (\texttt{DiffHarness.java}) that loads two builds in
+isolated class loaders and compares their outputs, a complementary
+\ac{HTTP}-level harness (\texttt{HttpDiff.java}) that boots one
+Payara Micro per available \ac{WAR} and performs a three-way
+comparison between \texttt{HEAD}, the immediate parent commit
+\texttt{HEAD\textasciitilde 1} and a fixed reference commit
+identified by the \texttt{DIFF\_FIXED\_BASELINE} \ac{CI}/\ac{CD}
+variable, and two prototype Jakarta EE 11 applications retained as
+didactic examples for future students.
 
 \section{Organization of the Document}
 \label{sec:organ}
 
-In order to reflect the work carried out, this document is structured
-into six chapters, each serving a specific purpose:
-
-\begin{itemize}
-  \item \textbf{Chapter 1 -- Introduction.} Frames the project in its
-        institutional and technical context, presents the motivation
-        and objectives, lists the main contributions and outlines the
-        organization of the document.
-  \item \textbf{Chapter 2 -- State of the Art.} Reviews the main
-        families of test frameworks and \ac{CI}/\ac{CD} systems
-        relevant to a Jakarta EE \ac{API}, and surveys existing
-        approaches to differential testing of services, in order to
-        situate the proposed solution.
-  \item \textbf{Chapter 3 -- Technologies and Tools Used.} Describes
-        the concrete stack of technologies adopted during the project:
-        \ac{API} styles and specification formats, the Java/Jakarta
-        ecosystem, \ac{SQL} databases, application servers, version
-        control, containerization and networking.
-  \item \textbf{Chapter 4 -- Methodology and Architecture.} Explains
-        the iterative methodology, two prototype applications
-        followed by the production application, and the overall
-        architecture of the testing framework, with particular focus
-        on the first prototype (\texttt{java-ee-app}) and the
-        \ac{CI}/\ac{CD} patterns that were validated on it, as well
-        as the second prototype (\texttt{syncspace-jakarta-app}) used
-        for Jakarta EE 11 feature exploration.
-  \item \textbf{Chapter 5 -- Use Case: EPOS API.} Describes the
-        application of the methodology to the production \ac{API}
-        (\texttt{api\_v4.0}): the \ac{EPOS} context, the structure of
-        the application, the three-stage \ac{CI}/\ac{CD} pipeline, the
-        two differential harnesses and the corresponding reports.
-  \item \textbf{Chapter 6 -- Conclusions and Future Work.}
-        Summarises the results, reflects on what was learned during
-        the project and proposes directions for future work, in
-        particular the items left out of scope.
-\end{itemize}
+The remaining chapters of this document are organised as follows.
+\textbf{Chapter~\ref{chap:estado-da-arte}} reviews the state of the
+art in test frameworks, \ac{CI}/\ac{CD} systems, and differential
+testing. \textbf{Chapter~\ref{chap:tecno-ferra}} describes the
+concrete technology stack adopted during the project.
+\textbf{Chapter~\ref{chap:metodo-arq}} explains the iterative
+methodology (two prototypes followed by the production application)
+and the overall architecture of the testing framework.
+\textbf{Chapter~\ref{chap:caso-epos}} applies the framework to the
+production \ac{API} (\texttt{api\_v4.0}) and walks through the
+pipeline, both differential harnesses and the reports they produce.
+\textbf{Chapter~\ref{chap:conc-trab-futuro}}
+summarises the results, reflects on what was learned and proposes
+directions for future work.
 
 \section{Repository Access}
 \label{sec:repos}
 
-The source code of all three applications discussed in this report is
-hosted on GitLab. The production \ac{API}
-(\texttt{api\_v4.0})~\footnote{\url{https://gitlab.com/segalubi/api_v4.0}}
-is maintained inside the \texttt{segalubi} group and access is
-restricted to laboratory members. The two prototype applications are
-published in the author's personal namespace and can be consulted
-publicly:
-
-\begin{itemize}
-  \item \texttt{java-ee-app}: \url{https://gitlab.com/PatalJunior/java-ee-app}
-  \item \texttt{syncspace-jakarta-app}: \url{https://gitlab.com/PatalJunior/syncspace-jakarta-app}
-\end{itemize}
-
-Each repository contains a \texttt{README.md} with build instructions,
-and a \texttt{.gitlab-ci.yml} file (where applicable) describing the
-pipeline discussed in Chapters~\ref{chap:metodo-arq} and
-\ref{chap:caso-epos}.
+The production \ac{API} (\texttt{api\_v4.0}) is hosted at
+\url{https://gitlab.com/segalubi/api_v4.0} under the
+\texttt{segalubi} group with access restricted to laboratory
+members. The two prototypes are public in the author's personal
+namespace: \url{https://gitlab.com/PatalJunior/java-ee-app} and
+\url{https://gitlab.com/PatalJunior/syncspace-jakarta-app}. Each
+repository contains a \texttt{README.md} with build instructions and
+(where applicable) the \texttt{.gitlab-ci.yml} discussed in
+Chapters~\ref{chap:metodo-arq} and~\ref{chap:caso-epos}.

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.16)  19 JUN 2026 16:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.16)  19 JUN 2026 18:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1564,7 +1564,7 @@ Package hyperref Info: Link coloring OFF on input line 140.
 \openout2 = `capa.aux'.
 
  (./capa.tex
-<ubi-fe-di.png, id=312, 111.0549pt x 107.6823pt>
+<ubi-fe-di.png, id=191, 111.0549pt x 107.6823pt>
 File: ubi-fe-di.png Graphic file (type png)
 <use ubi-fe-di.png>
 Package pdftex.def Info: ubi-fe-di.png  used on input line 20.
@@ -1629,62 +1629,54 @@ LaTeX Font Info:    Font shape `U/futm/m/n' will be
 (Font)              scaled to size 8.27998pt on input line 2.
 LaTeX Font Info:    Font shape `U/futm/m/n' will be
 (Font)              scaled to size 6.43999pt on input line 2.
-Package acronym Info: Label `acro:API' newly defined as it shall be overridden
-although it is yet undefined on input line 18.
 Package acronym Info: Label `acro:JSON' newly defined as it shall be overridden
 
-although it is yet undefined on input line 28.
+although it is yet undefined on input line 22.
 Package acronym Info: Label `acro:XML' newly defined as it shall be overridden
-although it is yet undefined on input line 28.
+although it is yet undefined on input line 22.
 
-Underfull \hbox (badness 5231) in paragraph at lines 28--28
+Underfull \hbox (badness 5231) in paragraph at lines 22--22
  [][] [][][][][]\T1/futs/m/n/12 JavaScript Ob-ject No-ta-tion ([])[] and [][][]
 eXtensible 
  []
 
-
-Underfull \vbox (badness 2189) has occurred while \output is active []
-
- [3]
 Package acronym Info: Label `acro:CSV' newly defined as it shall be overridden
-although it is yet undefined on input line 29.
+although it is yet undefined on input line 23.
 Package acronym Info: Label `acro:OpenAPI' newly defined as it shall be overrid
 den
-although it is yet undefined on input line 30.
+although it is yet undefined on input line 24.
 Package acronym Info: Label `acro:UI' newly defined as it shall be overridden
-although it is yet undefined on input line 30.
+although it is yet undefined on input line 24.
 Package acronym Info: Label `acro:SQL' newly defined as it shall be overridden
-although it is yet undefined on input line 35.
+although it is yet undefined on input line 26.
 Package acronym Info: Label `acro:JPA' newly defined as it shall be overridden
-although it is yet undefined on input line 38.
+although it is yet undefined on input line 27.
 Package acronym Info: Label `acro:EPOS' newly defined as it shall be overridden
 
-although it is yet undefined on input line 39.
-Package acronym Info: Label `acro:CI' newly defined as it shall be overridden
-although it is yet undefined on input line 44.
-Package acronym Info: Label `acro:VPN' newly defined as it shall be overridden
-although it is yet undefined on input line 51.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 5
+although it is yet undefined on input line 28.
+[3]
+Package acronym Info: Label `acro:API' newly defined as it shall be overridden
+although it is yet undefined on input line 32.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
 7.
-
-(/usr/share/texmf-dist/tex/latex/lm/t1lmtt.fd
+ (/usr/share/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [4{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
+)
+Package acronym Info: Label `acro:CI' newly defined as it shall be overridden
+although it is yet undefined on input line 40.
 Package acronym Info: Label `acro:CD' newly defined as it shall be overridden
-although it is yet undefined on input line 73.
+although it is yet undefined on input line 40.
 Package acronym Info: Label `acro:HTTP' newly defined as it shall be overridden
 
-although it is yet undefined on input line 79.
+although it is yet undefined on input line 42.
 
-Overfull \hbox (11.72026pt too wide) in paragraph at lines 79--79
+Overfull \hbox (11.72026pt too wide) in paragraph at lines 42--42
  [][] [][]\T1/futs/m/n/12 The [][][]Hypertext Trans-fer Pro-to-col ([])[]-Level
  Diff: \T1/lmtt/m/n/12 HttpDiff.java[] []  
  []
 
-) [5] [6
-
-
-] (./relatorio-projeto.lof
+) [4{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
+(./relatorio-projeto.lof
 Package acronym Info: Label `acro:CDI' newly defined as it shall be overridden
 although it is yet undefined on input line 7.
 Package acronym Info: Label `acro:JAX-RS' newly defined as it shall be overridd
@@ -1695,46 +1687,35 @@ Underfull \hbox (badness 4779) in paragraph at lines 7--7
  \T1/futs/m/n/12 ful Web Ser-vices ([])[] exception-handling flow used by 
  []
 
-Package acronym Info: Label `acro:HEAD' newly defined as it shall be overridden
-
-although it is yet undefined on input line 8.
-
-Package acronym Warning: Acronym HEAD is not defined on input line 8.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 8.
-
 Package acronym Info: Label `acro:WAR' newly defined as it shall be overridden
-although it is yet undefined on input line 13.
-
-Package acronym Warning: Acronym HEAD is not defined on input line 13.
-
+although it is yet undefined on input line 12.
+Package acronym Info: Label `acro:VPN' newly defined as it shall be overridden
+although it is yet undefined on input line 12.
 )
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [7]
-[8] (./relatorio-projeto.lot) [9
+ [5
 
 
-] [10
+]
+[6] (./relatorio-projeto.lol) [7
 
 
-] (./relatorio-projeto.lol) [11
 
-] [12
+] [8
 
 
 ]
 \openout2 = `acronimos.aux'.
 
+ (./acronimos.tex [9
 
-(./acronimos.tex [13
 
-
-]) [14]
+]) [10]
 \openout2 = `introducao.aux'.
 
- (./introducao.tex
+
+(./introducao.tex
 Chapter 1.
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
 (Font)              scaled to size 13.24796pt on input line 1.
@@ -1778,108 +1759,73 @@ Package acronym Info: Label `acro:XML' overridden on input line 55.
 Package acronym Info: Label `acro:CSV' overridden on input line 55.
 Package acronym Info: Label `acro:CI' overridden on input line 64.
 Package acronym Info: Label `acro:CD' overridden on input line 64.
+Package acronym Info: Label `acro:HTTP' overridden on input line 89.
 
 Underfull \vbox (badness 4048) has occurred while \output is active []
 
  [2]
-Package acronym Info: Label `acro:HTTP' overridden on input line 100.
-Package acronym Info: Label `acro:ID' newly defined as it shall be overridden
-although it is yet undefined on input line 126.
+Package acronym Info: Label `acro:WAR' overridden on input line 98.
 
-[3]
-Package acronym Info: Label `acro:WAR' overridden on input line 131.
-Package acronym Info: Label `acro:HEAD' overridden on input line 131.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 131.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 131.
-
-
-Overfull \hbox (1.18481pt too wide) in paragraph at lines 129--136
-[]\T1/futs/m/n/12 A com-ple-men-tary [][]-level dif-fer-en-tial test har-ness (
-\T1/lmtt/m/n/12 HttpDiff.java\T1/futs/m/n/12 )
+Underfull \hbox (badness 3098) in paragraph at lines 93--104
+[]\T1/futs/m/n/12 The main con-tri-bu-tions are a reusable three-stage Git-Lab 
+pipeline
  []
 
-Package acronym Info: Label `acro:SQL' overridden on input line 162.
-[4]
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 9.19998pt on input line 188.
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 6.99199pt on input line 188.
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 5.51999pt on input line 188.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 9.19998pt on input line 188.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 6.99199pt on input line 188.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 5.51999pt on input line 188.
 
-Underfull \hbox (badness 10000) in paragraph at lines 196--197
-[]\T1/lmtt/m/n/12 syncspace-jakarta-app\T1/futs/m/n/12 : []$\T1/lmtt/m/n/12 htt
-ps : / / gitlab . com / PatalJunior /
+Underfull \hbox (badness 4120) in paragraph at lines 93--104
+\T1/futs/m/n/12 and per-forms a three-way com-par-i-son be-tween \T1/lmtt/m/n/1
+2 HEAD\T1/futs/m/n/12 , the im-me-di-ate
  []
 
-) [5] [6
+)
+Underfull \hbox (badness 10000) in paragraph at lines 126--174
+\T1/futs/m/n/12 The pro-duc-tion [][] (\T1/lmtt/m/n/12 api_v4.0\T1/futs/m/n/12 
+) is hosted at []$\T1/lmtt/m/n/12 https : / / gitlab . com /
+ []
 
 
+Underfull \hbox (badness 3333) in paragraph at lines 126--174
+\T1/lmtt/m/n/12 segalubi / api _ v4 . 0$[] \T1/futs/m/n/12 un-der the \T1/lmtt/
+m/n/12 segalubi \T1/futs/m/n/12 group with ac-cess re-stricted
+ []
 
 
-]
+Underfull \hbox (badness 2884) in paragraph at lines 126--174
+\T1/futs/m/n/12 per-sonal names-pace: []$\T1/lmtt/m/n/12 https : / / gitlab . c
+om / PatalJunior / java-[]ee-[]app$[]
+ []
+
+[3] [4]
 \openout2 = `capitulo-2.aux'.
 
  (./capitulo-2.tex
 Chapter 2.
-Package acronym Info: Label `acro:IDE' newly defined as it shall be overridden
-although it is yet undefined on input line 39.
-
-Underfull \hbox (badness 2334) in paragraph at lines 34--43
-\T1/futs/m/n/12 ar-chi-tec-ture, \T1/futs/m/it/12 Jupiter \T1/futs/m/n/12 as th
-e pro-gram-ming/extension model, \T1/futs/m/it/12 Vin-tage \T1/futs/m/n/12 for
- []
-
-[7
-
-
-]
-Package acronym Info: Label `acro:JAR' newly defined as it shall be overridden
-although it is yet undefined on input line 84.
-Package acronym Info: Label `acro:JAX-RS' overridden on input line 87.
-Package acronym Info: Label `acro:CDI' overridden on input line 87.
-Package acronym Info: Label `acro:JPA' overridden on input line 88.
- [8]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 102.
-
 Package acronym Info: Label `acro:DSL' newly defined as it shall be overridden
-although it is yet undefined on input line 105.
-Package acronym Info: Label `acro:QA' newly defined as it shall be overridden
-although it is yet undefined on input line 118.
-
-Package acronym Warning: Acronym QA is not defined on input line 118.
+although it is yet undefined on input line 43.
+[5
 
 
-Package acronym Warning: Acronym QA is not defined on input line 118.
 
-[9]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [10]
+
+
+] [6]
 Package acronym Info: Label `acro:YAML' newly defined as it shall be overridden
 
-although it is yet undefined on input line 200.
+although it is yet undefined on input line 109.
 )
-[11] [12]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [7]
+[8]
 \openout2 = `capitulo-3.aux'.
 
  (./capitulo-3.tex
 Chapter 3.
+Package acronym Info: Label `acro:SQL' overridden on input line 16.
 Package acronym Info: Label `acro:URL' newly defined as it shall be overridden
-although it is yet undefined on input line 30.
-[13
+although it is yet undefined on input line 28.
+[9
 
 
 
@@ -1892,229 +1838,116 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 96.
+(hyperref)                removing `\@ac' on input line 94.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 96.
+(hyperref)                removing `\@ac' on input line 94.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 108.
+(hyperref)                removing `\@ac' on input line 106.
 
-Package acronym Info: Label `acro:OpenAPI' overridden on input line 117.
-Package acronym Info: Label `acro:UI' overridden on input line 117.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 117.
-
+Package acronym Info: Label `acro:OpenAPI' overridden on input line 115.
+Package acronym Info: Label `acro:UI' overridden on input line 115.
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 117.
+(hyperref)                removing `\@ac' on input line 115.
 
-[14]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [15]
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ac' on input line 115.
+
+[10]
 Package acronym Info: Label `acro:POJO' newly defined as it shall be overridden
 
-although it is yet undefined on input line 151.
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 10.07397pt on input line 172.
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 7.63599pt on input line 172.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 10.07397pt on input line 172.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 7.63599pt on input line 172.
-
-Overfull \hbox (15.21207pt too wide) in paragraph at lines 172--193
- [][] 
- []
-
-[16]
-Package acronym Info: Label `acro:BOM' newly defined as it shall be overridden
-although it is yet undefined on input line 203.
+although it is yet undefined on input line 139.
+ [11]
+Package acronym Info: Label `acro:JAX-RS' overridden on input line 148.
+Package acronym Info: Label `acro:CDI' overridden on input line 148.
+Package acronym Info: Label `acro:JPA' overridden on input line 149.
+Package acronym Info: Label `acro:ORM' newly defined as it shall be overridden
+although it is yet undefined on input line 150.
+Package acronym Info: Label `acro:JWT' newly defined as it shall be overridden
+although it is yet undefined on input line 152.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 215.
+(hyperref)                removing `\@ac' on input line 158.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 218.
+(hyperref)                removing `\@ac' on input line 181.
 
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 248.
-
-[17]
+[12]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 267.
+(hyperref)                removing `\@ac' on input line 200.
 
-
-Overfull \hbox (33.24278pt too wide) in paragraph at lines 291--297
-[]\T1/futs/m/it/12 Junction ta-bles\T1/futs/m/n/12 , \T1/lmtt/m/n/12 agency_net
-work\T1/futs/m/n/12 , \T1/lmtt/m/n/12 station_network\T1/futs/m/n/12 , \T1/lmtt
-/m/n/12 station_agency_role\T1/futs/m/n/12 ,
- []
-
-
-Overfull \hbox (10.83743pt too wide) in paragraph at lines 297--304
-[]\T1/futs/m/it/12 Quality-control sum-maries\T1/futs/m/n/12 , a fam-ily of sev
-en ta-bles (\T1/lmtt/m/n/12 qc_report_summary\T1/futs/m/n/12 ,
- []
-
-
-Overfull \hbox (45.2639pt too wide) in paragraph at lines 297--304
-\T1/lmtt/m/n/12 qc_constellation_-summary\T1/futs/m/n/12 , \T1/lmtt/m/n/12 qc_h
-eader_observations\T1/futs/m/n/12 , \T1/lmtt/m/n/12 qc_navigation_msg
- []
-
-
-Underfull \hbox (badness 2213) in paragraph at lines 297--304
-\T1/futs/m/n/12 and four typed \T1/lmtt/m/n/12 qc_observation_summary_{c,d,l,s}
- \T1/futs/m/n/12 vari-ants for
- []
-
-[18]
-Underfull \hbox (badness 2302) in paragraph at lines 334--342
-\T1/futs/m/n/12 columns (\T1/lmtt/m/n/12 idx_file \T1/futs/m/n/12 on \T1/lmtt/m
-/n/12 rinex_file(id_station)\T1/futs/m/n/12 , \T1/lmtt/m/n/12 idx_qc_filesum \T
-1/futs/m/n/12 on
- []
-
-
-Underfull \hbox (badness 2213) in paragraph at lines 343--357
-\T1/futs/m/n/12 In-dex) in-dexes on the date columns of \T1/lmtt/m/n/12 rinex_f
-ile \T1/futs/m/n/12 (\T1/lmtt/m/n/12 reference_date\T1/futs/m/n/12 ,
- []
-
-[19]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 358.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 380.
-
+Package acronym Info: Label `acro:JAR' newly defined as it shall be overridden
+although it is yet undefined on input line 237.
+[13]
 Package acronym Info: Label `acro:JUnit' newly defined as it shall be overridde
 n
-although it is yet undefined on input line 400.
-
-Package acronym Warning: Acronym JUnit is not defined on input line 400.
+although it is yet undefined on input line 249.
 
 
-Package acronym Warning: Acronym JUnit is not defined on input line 400.
+Package acronym Warning: Acronym JUnit is not defined on input line 249.
+
+
+Package acronym Warning: Acronym JUnit is not defined on input line 249.
+
+
+Underfull \hbox (badness 4429) in paragraph at lines 245--253
+[]\T1/futs/m/n/12 All three ap-pli-ca-tions are built with \T1/futs/b/n/12 Apac
+he Maven\T1/futs/m/n/12 ; the pro-duc-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 245--253
+\T1/futs/m/n/12 pro-duces the de-ploy-able \T1/lmtt/m/n/12 ROOT.war\T1/futs/m/n
+/12 ), \T1/lmtt/m/n/12 maven-failsafe-plugin \T1/futs/m/n/12 (in-te-
+ []
+
+
+Underfull \hbox (badness 2221) in paragraph at lines 245--253
+\T1/futs/m/n/12 gra-tion tests named \T1/lmtt/m/n/12 *IT.java \T1/futs/m/n/12 w
+ith [][][]\T1/futs/b/n/12 JUnit! \T1/futs/m/n/12 ([])[] XML out-put) and
+ []
+
+
+Underfull \hbox (badness 6236) in paragraph at lines 245--253
+\T1/lmtt/m/n/12 maven-dependency-plugin \T1/futs/m/n/12 (which stages the Pa-ya
+ra Mi-cro [][] into
+ []
 
 Package acronym Info: Label `acro:VM' newly defined as it shall be overridden
-although it is yet undefined on input line 412.
-[20] [21]
+although it is yet undefined on input line 257.
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 465.
+Underfull \hbox (badness 2781) in paragraph at lines 271--283
+\T1/lmtt/m/n/12 3.9.6-eclipse-temurin-21 \T1/futs/m/n/12 im-age, which guar-an-
+tees a clean and re-
+ []
 
-) [22]
+) [14] [15] [16
+
+
+
+
+]
 \openout2 = `capitulo-4.aux'.
 
  (./capitulo-4.tex
 Chapter 4.
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 23.
+(hyperref)                removing `\@ac' on input line 4.
 
-
-Underfull \hbox (badness 2173) in paragraph at lines 38--47
-\T1/futs/m/n/12 struc-ture much cleaner, short meth-ods, well-bounded [][] re-s
-ource
- []
-
-[23
-
-
-
-
+[17
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 72--74
-[]|[][]\T1/futs/m/n/10.95 /[][] pipeline pat-terns:
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 72--74
-\T1/futs/m/n/10.95 dual Pa-yara, Ar-quil-lian,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 74--76
-[]|\T1/futs/m/n/10.95 The shape of the
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 74--76
-\T1/lmtt/m/n/10.95 .gitlab-ci.yml\T1/futs/m/n/10.95 , the
- []
-
-
-Overfull \hbox (35.36514pt too wide) in paragraph at lines 77--78
-\T1/lmtt/m/n/10.95 syncspace-jakarta-app| 
- []
-
-
-Underfull \hbox (badness 2189) in paragraph at lines 78--80
-[][]\T1/futs/m/n/10.95 , [][], Bean Val-i-da-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 85--87
-\T1/futs/m/n/10.95 pipeline, code-level diff,
- []
-
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 95.
-[24]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 116.
-
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 128.
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 129.
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 147.
-[25] [26]
-Package acronym Info: Label `acro:JWT' newly defined as it shall be overridden
-although it is yet undefined on input line 214.
-
-Underfull \hbox (badness 2990) in paragraph at lines 224--231
-[][][] \T1/futs/b/n/12 4.0 [[]]. \T1/futs/m/n/12 The \T1/lmtt/m/n/12 SyncSpaceA
-pplication \T1/futs/m/n/12 class de-clares an
- []
-
-
-Underfull \hbox (badness 4441) in paragraph at lines 235--239
-[][][] \T1/futs/b/n/12 3.2 [[]]. \T1/futs/m/n/12 En-ti-ties use \T1/lmtt/m/n/12
- @Entity\T1/futs/m/n/12 , \T1/lmtt/m/n/12 @ManyToOne\T1/futs/m/n/12 , \T1/lmtt/
-m/n/12 @OneToMany\T1/futs/m/n/12 ,
- []
-
-[27]
-Overfull \hbox (28.8665pt too wide) in paragraph at lines 251--259
-[]\T1/futs/b/n/12 Exception map-pers. \T1/futs/m/n/12 Four ded-i-cated map-pers
- (\T1/lmtt/m/n/12 BusinessValidationMapper\T1/futs/m/n/12 ,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 251--259
-\T1/lmtt/m/n/12 ValidationExceptionMapper\T1/futs/m/n/12 , \T1/lmtt/m/n/12 Json
-ProcessingExceptionMapper\T1/futs/m/n/12 ,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 308--308
+Underfull \hbox (badness 10000) in paragraph at lines 117--117
 []\T1/futs/m/n/12 Figure 4.1: []The [][] + [][] exception-handling flow used by
 
  []
@@ -2123,273 +1956,180 @@ Underfull \hbox (badness 10000) in paragraph at lines 308--308
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Package acronym Warning: Acronym HEAD is not defined on input line 389.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 389.
-
-
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Package acronym Warning: Acronym HEAD is not defined on input line 396.
+Underfull \hbox (badness 2293) in paragraph at lines 193--204
+[]\T1/futs/m/n/12 A push by the de-vel-oper trig-gers a pipeline on the run-ner
+ tagged
+ []
 
-[28])
+
+Underfull \hbox (badness 5862) in paragraph at lines 193--204
+\T1/lmtt/m/n/12 ubi-runner-.31\T1/futs/m/n/12 , which goes through four jobs ac
+ross three stages:
+ []
+
+
+Underfull \hbox (badness 2951) in paragraph at lines 193--204
+\T1/lmtt/m/n/12 build-job \T1/futs/m/n/12 pro-duces the \T1/lmtt/m/n/12 HEAD []
+[]\T1/futs/m/n/12 , \T1/lmtt/m/n/12 integration-test-job \T1/futs/m/n/12 runs t
+he
+ []
+
+[18])
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [29]
-Underfull \vbox (badness 4120) has occurred while \output is active []
-
- [30]
-[31] [32
-
-
-
-
-]
+ [19]
+[20]
 \openout2 = `capitulo-5.aux'.
 
  (./capitulo-5.tex
 Chapter 5.
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 20.
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 22.
+LaTeX Warning: `h' float specifier changed to `ht'.
 
-[33
+[21
+
+
+
+
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 66--69
-[]|\T1/futs/m/n/10.95 Database con-nec-tion boot-strap (\T1/lmtt/m/n/10.95 Load
-er.java\T1/futs/m/n/10.95 ,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 76--84
-[]|\T1/futs/m/n/10.95 The [][] layer proper: [][] re-sources
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 76--84
-\T1/futs/m/n/10.95 (\T1/lmtt/m/n/10.95 StationEndpoints\T1/futs/m/n/10.95 , \T1
-/lmtt/m/n/10.95 FilesEndpoints\T1/futs/m/n/10.95 ,
- []
-
-
-Underfull \hbox (badness 3965) in paragraph at lines 76--84
-\T1/lmtt/m/n/10.95 ListEndpoints\T1/futs/m/n/10.95 , \T1/lmtt/m/n/10.95 Start\T
-1/futs/m/n/10.95 ), parsers, for-mat writ-ers
- []
-
-
-Underfull \hbox (badness 3815) in paragraph at lines 76--84
-\T1/futs/m/n/10.95 ([][]/[][]/[][]/script) and the val-i-da-tion/shape
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Underfull \vbox (badness 3826) has occurred while \output is active []
-
- [34]
-Underfull \hbox (badness 10000) in paragraph at lines 159--162
-[]|\T1/futs/m/n/10.95 Seven end-points for sta-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 159--162
-\T1/futs/m/n/10.95 agency, net-work, equip-
- []
-
-
-Underfull \hbox (badness 2875) in paragraph at lines 163--166
-\T1/futs/m/n/10.95 tenna, bound-ing box and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 167--170
-\T1/futs/m/n/10.95 re-turns the valid val-ues
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Overfull \hbox (47.64496pt too wide) in paragraph at lines 241--252
+Underfull \hbox (badness 10000) in paragraph at lines 106--117
 \T1/futs/m/n/12 The per-sis-tence unit, de-clared in \T1/lmtt/m/n/12 src/main/r
-esources/META-INF/persistence.xml\T1/futs/m/n/12 ,
- []
-
-[35]
-Overfull \hbox (49.72293pt too wide) in paragraph at lines 278--295
-\T1/lmtt/m/n/12 node_station\T1/futs/m/n/12 , \T1/lmtt/m/n/12 node_data_center\
-T1/futs/m/n/12 ), quality-control sum-maries (\T1/lmtt/m/n/12 qc_report_summary
-\T1/futs/m/n/12 ,
+esources/META-INF/
  []
 
 
-Overfull \hbox (15.8892pt too wide) in paragraph at lines 278--295
-\T1/lmtt/m/n/12 qc_constellation_summary\T1/futs/m/n/12 , \T1/lmtt/m/n/12 qc_he
-ader_observations\T1/futs/m/n/12 , \T1/lmtt/m/n/12 qc_navigation_msg
+Underfull \hbox (badness 2617) in paragraph at lines 106--117
+\T1/futs/m/n/12 is con-fig-ured as \T1/lmtt/m/n/12 RESOURCE_LOCAL\T1/futs/m/n/1
+2 , with Hi-ber-nate as the [][] provider
  []
 
-[36]
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+Underfull \hbox (badness 2799) in paragraph at lines 106--117
+\T1/futs/m/n/12 ram-e-ters, host, port, database name, user, pass-word, are re-
+solved at
+ []
+
+
+Underfull \hbox (badness 3623) in paragraph at lines 106--117
+\T1/futs/m/n/12 ment, then hard-coded de-faults point-ing at the lab-o-ra-tory'
+s database
+ []
+
+[22]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ac' on input line 197.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 346.
+(hyperref)                removing `\@ac' on input line 197.
 
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 212.
+[23]
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
+nput line 213.
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 214.
+ [24]
+Package acronym Info: Label `acro:ID' newly defined as it shall be overridden
+although it is yet undefined on input line 287.
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 346.
+Underfull \vbox (badness 2189) has occurred while \output is active []
 
-[37] [38]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [39]
-Underfull \hbox (badness 2875) in paragraph at lines 492--506
-[]\T1/futs/b/n/12 Two base-lines, one job.[] \T1/futs/m/n/12 Each diff job runs
- the har-ness twice, once
- []
-
-
-Underfull \hbox (badness 3492) in paragraph at lines 492--506
-\T1/futs/m/n/12 per base-line, with the re-port writ-ten into a sep-a-rate sub-
-di-rec-tory of
- []
-
-
-Underfull \hbox (badness 6961) in paragraph at lines 492--506
-\T1/lmtt/m/n/12 target/diff-report/ \T1/futs/m/n/12 (or \T1/lmtt/m/n/12 target/
-http-diff-report/\T1/futs/m/n/12 ). The \T1/futs/m/it/12 re-cent
- []
-
-[40]
-Underfull \hbox (badness 2689) in paragraph at lines 528--535
-[]\T1/futs/b/n/12 Job de-pen-den-cies.[] \T1/lmtt/m/n/12 validate-diff-job \T1/
-futs/m/n/12 does not need the ar-ti-fact of
- []
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 541.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 552.
-
-
-Underfull \hbox (badness 2538) in paragraph at lines 548--557
-\T1/futs/m/n/12 see Sec-tion []5.4[]). The ex-ported en-vi-ron-ment vari-ables 
+ [25]
+Underfull \hbox (badness 2538) in paragraph at lines 314--323
+\T1/futs/m/n/12 see Sec-tion []5.2[]). The ex-ported en-vi-ron-ment vari-ables 
 \T1/lmtt/m/n/12 BASELINE_WAR\T1/futs/m/n/12 ,
  []
 
 
-Underfull \hbox (badness 2726) in paragraph at lines 548--557
-\T1/lmtt/m/n/12 target/diff-report/recent/ \T1/futs/m/n/12 and \T1/lmtt/m/n/12 
-target/diff-report/fixed/\T1/futs/m/n/12 , so a
+Underfull \hbox (badness 2846) in paragraph at lines 314--323
+\T1/futs/m/n/12 against \T1/lmtt/m/n/12 HEAD \T1/futs/m/n/12 and where to write
+ its out-puts. The on-disk lay-out is
  []
 
 
-Package acronym Warning: Acronym JUnit is not defined on input line 567.
+Underfull \hbox (badness 10000) in paragraph at lines 314--323
+\T1/lmtt/m/n/12 target/diff-report/recent/ \T1/futs/m/n/12 and \T1/lmtt/m/n/12 
+target/diff-report/fixed/\T1/futs/m/n/12 , so
+ []
 
 
-Package acronym Warning: Acronym HEAD is not defined on input line 573.
+Package acronym Warning: Acronym JUnit is not defined on input line 333.
 
+[26]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\@ac' on input line 577.
+(hyperref)                removing `\@ac' on input line 343.
 
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 9.19998pt on input line 407.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 407.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 5.51999pt on input line 407.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 9.19998pt on input line 407.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 407.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 5.51999pt on input line 407.
 
-Package acronym Warning: Acronym HEAD is not defined on input line 585.
-
-[41]
-
-Package acronym Warning: Acronym HEAD is not defined on input line 648.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 648.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-Package acronym Info: Label `acro:JVM' newly defined as it shall be overridden
-although it is yet undefined on input line 653.
-[42]
-
-Package acronym Warning: Acronym HEAD is not defined on input line 702.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 703.
-
-
-Overfull \hbox (19.57117pt too wide) in paragraph at lines 714--722
-\T1/lmtt/m/n/12 target/http-diff-report/recent/ \T1/futs/m/n/12 and \T1/lmtt/m/
-n/12 target/http-diff-report/fixed/\T1/futs/m/n/12 .
+Underfull \hbox (badness 4995) in paragraph at lines 418--432
+[]\T1/futs/m/n/12 The fig-ure al-ready cov-ers the gist; a few im-ple-men-ta-ti
+on de-tails
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 735--748
-\T1/lmtt/m/n/12 (refactor: extract lat/lon range bounds to named constants)
+Underfull \hbox (badness 5787) in paragraph at lines 418--432
+\T1/futs/m/n/12 are worth record-ing. The test cases live in \T1/lmtt/m/n/12 sr
+c/test/resources/
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 735--748
-\T1/futs/m/n/12 and \T1/lmtt/m/n/12 cc223ba (Revert "refactor: extract lat/lon 
-range bounds
+[27])
+Overfull \hbox (6.33597pt too wide) in paragraph at lines 436--182
+\T1/futs/m/n/12 (\T1/lmtt/m/n/12 recent/ \T1/futs/m/n/12 and \T1/lmtt/m/n/12 fi
+xed/ \T1/futs/m/n/12 sub-di-rec-to-ries of \T1/lmtt/m/n/12 target/{diff,http-di
+ff}-report/\T1/futs/m/n/12 )
  []
 
-[43]) [44] [45] [46]
+[28]
 \openout2 = `conc-trab-futuro.aux'.
 
  (./conc-trab-futuro.tex
 Chapter 6.
-[47
+
+Underfull \vbox (badness 6893) has occurred while \output is active []
+
+ [29
 
 
 
 
 
 
-]
-Underfull \hbox (badness 2285) in paragraph at lines 55--66
-[]\T1/futs/b/n/12 The two pro-to-types paid for them-selves.[] \T1/futs/m/n/12 
-In ret-ro-spect, hav-ing spent
- []
-
-[48]
-
-Package acronym Warning: Acronym HEAD is not defined on input line 99.
-
-
-Package acronym Warning: Acronym HEAD is not defined on input line 119.
-
-[49]
-Underfull \hbox (badness 3568) in paragraph at lines 146--152
-[]\T1/futs/b/n/12 Snapshot test-ing of rep-re-sen-ta-tive re-sponses.[] \T1/fut
-s/m/n/12 Not ev-ery end-point is
- []
-
-
-Package acronym Warning: Acronym JUnit is not defined on input line 157.
-
-) [50] (./relatorio-projeto.bbl
-Underfull \hbox (badness 3088) in paragraph at lines 19--22
+])
+[30] (./relatorio-projeto.bbl
+Underfull \hbox (badness 3088) in paragraph at lines 20--24
 []\T1/futs/m/n/12 Eclipse Foun-da-tion.  Jakarta EE 11 Plat-form Spec-i-fi-ca-t
 ion, 2024.
  []
 
 
-Underfull \hbox (badness 2096) in paragraph at lines 19--22
+Underfull \hbox (badness 2096) in paragraph at lines 20--24
 \T1/futs/m/n/12 [On-line] []$\T1/lmtt/m/n/12 https : / / jakarta . ee / specifi
 cations / platform / 11/$[]\T1/futs/m/n/12 . Ac-
  []
 
-[51
+[31
 
 
 
@@ -2397,45 +2137,42 @@ cations / platform / 11/$[]\T1/futs/m/n/12 . Ac-
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 64--67
+Underfull \hbox (badness 10000) in paragraph at lines 68--74
 []\T1/futs/m/n/12 Twitter En-gi-neer-ing.  Diffy --- Au-to-mat-i-cally catch
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 64--67
+Underfull \hbox (badness 10000) in paragraph at lines 68--74
 \T1/futs/m/n/12 bugs in service-oriented ar-chi-tec-tures, 2015.  [On-line]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 64--67
+Underfull \hbox (badness 10000) in paragraph at lines 68--74
 []$\T1/lmtt/m/n/12 https : / / blog . twitter . com / engineering / en _ us / a
  / 2015 /
  []
 
-[52]
-Underfull \hbox (badness 4328) in paragraph at lines 136--139
+
+Underfull \hbox (badness 4328) in paragraph at lines 139--143
 \T1/lmtt/m/n/12 / / jakarta . ee / specifications / persistence / 3 . 2/$[]\T1/
 futs/m/n/12 . Ac-cessed June
  []
 
-
-Underfull \hbox (badness 2903) in paragraph at lines 167--170
+[32]
+Underfull \hbox (badness 2903) in paragraph at lines 196--199
 []\T1/futs/m/n/12 Docker, Inc.  Com-pose Spec-i-fi-ca-tion, 2024.  [On-line] []
 $\T1/lmtt/m/n/12 https : / /
  []
 
-) [53]
+) [33]
 \tf@toc=\write6
 \openout6 = `relatorio-projeto.toc'.
 
 \tf@lof=\write7
 \openout7 = `relatorio-projeto.lof'.
 
-\tf@lot=\write8
-\openout8 = `relatorio-projeto.lot'.
-
-\tf@lol=\write9
-\openout9 = `relatorio-projeto.lol'.
+\tf@lol=\write8
+\openout8 = `relatorio-projeto.lol'.
 
  (./relatorio-projeto.aux (./capa.aux) (./agradecimentos.aux)
 (./acronimos.aux) (./introducao.aux) (./capitulo-2.aux) (./capitulo-3.aux)
@@ -2445,16 +2182,16 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2020/03/25>
  ***********
 Package rerunfilecheck Info: File `relatorio-projeto.out' has not changed.
-(rerunfilecheck)             Checksum: 6D094A931331235FE661B60177CC1617;13445.
+(rerunfilecheck)             Checksum: 6A2524CCF5F6E49A828A7B5A269C9CD8;7772.
  ) 
 Here is how much of TeX's memory you used:
- 32545 strings out of 469515
- 593462 string characters out of 5470807
- 1351206 words of memory out of 5000000
- 60079 multiletter control sequences out of 15000+600000
- 765101 words of font info for 169 fonts, out of 8000000 for 9000
+ 32128 strings out of 469515
+ 587596 string characters out of 5470807
+ 1288247 words of memory out of 5000000
+ 59877 multiletter control sequences out of 15000+600000
+ 749298 words of font info for 149 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 85i,13n,104p,666b,2171s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 85i,12n,104p,666b,2171s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/share/
 texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf-dist/fonts/type1/
 public/lm/lmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></
@@ -2463,10 +2200,10 @@ onts/type1/adobe/utopia/putb8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/uto
 pia/putbi8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></us
 r/share/texmf-dist/fonts/type1/adobe/utopia/putri8a.pfb></usr/share/texmf-dist/
 fonts/type1/urw/helvetic/uhvbo8a.pfb>
-Output written on relatorio-projeto.pdf (69 pages, 422104 bytes).
+Output written on relatorio-projeto.pdf (45 pages, 349139 bytes).
 PDF statistics:
- 1900 PDF objects out of 2073 (max. 8388607)
- 1780 compressed objects within 18 object streams
- 492 named destinations out of 1000 (max. 500000)
- 626 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1278 PDF objects out of 1440 (max. 8388607)
+ 1191 compressed objects within 12 object streams
+ 287 named destinations out of 1000 (max. 500000)
+ 386 words of extra memory for PDF output out of 10000 (max. 10000000)
 
