@@ -6,8 +6,8 @@
 \contentsline {figure}{\numberline {4.1}{\ignorespaces The \ac {CDI} + \ac {JAX-RS} exception-handling flow \ac {JSON} error body.}}{17}{figure.4.1}%
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Overall architecture of the differential testing framework.}}{18}{figure.4.2}%
 \addvspace {10pt}
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Layered architecture of \texttt {EPOS V4}.}}{20}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Simplified view of the core \ac {EPOS} data model}}{21}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Phases of \texttt {HttpDiff.java}.}}{24}{figure.5.3}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Layered architecture of \texttt {EPOS V4}.}}{22}{figure.5.1}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Simplified view of the core \ac {EPOS} data model}}{23}{figure.5.2}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Phases of \texttt {HttpDiff.java}.}}{26}{figure.5.3}%
 \addvspace {10pt}
 \addvspace {10pt}

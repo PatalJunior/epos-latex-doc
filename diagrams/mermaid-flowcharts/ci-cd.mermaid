@@ -1,0 +1,43 @@
+flowchart TD
+    %% Define styles matching the LaTeX node colors
+    classDef lgray fill:#e6e6e6,stroke:#333,stroke-width:2px,color:#000
+    classDef dkblue fill:#e6f0fa,stroke:#333,stroke-width:2px,color:#000
+    classDef dkgreen fill:#e6f2e6,stroke:#333,stroke-width:2px,color:#000
+    classDef mauve fill:#f4ebf4,stroke:#333,stroke-width:2px,color:#000
+    classDef dark fill:#d9d9d9,stroke:#333,stroke-width:2px,color:#000
+
+    %% Core Pipeline Nodes
+    push["Developer push<br/>on a branch"]:::lgray
+    gitlab["GitLab CI server<br/><i>(self-managed)</i>"]:::dkblue
+    runner["GitLab Runner<br/><code>(ubi-runner-.31)</code>"]:::dkblue
+    
+    %% Jobs
+    build["<code>build-job</code><br/><i>mvn package</i>"]:::dkgreen
+    test["<code>integration-test-job</code>"]:::dkgreen
+    http["<code>http-diff-job</code>"]:::dkgreen
+    
+    %% Artifacts
+    head["HEAD WAR"]:::mauve
+    brecent["Baseline WAR<br/>recent<br/><code>(HEAD~1)</code>"]:::mauve
+    bfixed["Baseline WAR<br/>fixed<br/><code>($DIFF_FIXED_BASELINE)</code>"]:::mauve
+    
+    %% Database
+    db["PostgreSQL<br/>"]:::dark
+
+    %% Execution Flow (Solid Arrows)
+    push --> gitlab
+    gitlab --> runner
+    runner --> build
+    build --> test
+    test --> http
+
+    %% Artifact Generation & Usage (Dashed Arrows)
+    build -.->|Generates| head
+    http -.->|Tests against| head
+    http -.->|Tests against| brecent
+    http -.->|Tests against| bfixed
+    
+    %% Database Connections (Dashed Arrows)
+    head -.->|Connects to| db
+    brecent -.->|Connects to| db
+    bfixed -.->|Connects to| db

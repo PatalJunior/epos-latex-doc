@@ -1,8 +1,8 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{Contents}{iii}{chapter*.3}%
-\contentsline {chapter}{List of Figures}{v}{chapter*.8}%
+\contentsline {chapter}{List of Figures}{v}{chapter*.7}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Framing}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.1}Context}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Motivation}{2}{section.1.2}%
 \contentsline {section}{\numberline {1.3}Objectives}{3}{section.1.3}%
 \contentsline {section}{\numberline {1.4}Organization of the Document}{3}{section.1.4}%
@@ -25,19 +25,19 @@
 \contentsline {section}{\numberline {3.4}Servers, Tooling and Network}{12}{section.3.4}%
 \contentsline {section}{\numberline {3.5}Conclusion}{13}{section.3.5}%
 \contentsline {chapter}{\chapternumberline {4}Methodology and Architecture}{15}{chapter.4}%
-\contentsline {section}{\numberline {4.1}The Legacy \ac {API}}{15}{section.4.1}%
+\contentsline {section}{\numberline {4.1}The Legacy API}{15}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Iterative Methodology}{15}{section.4.2}%
 \contentsline {section}{\numberline {4.3}Prototype Applications}{16}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Architecture of the Differential Testing Framework}{16}{section.4.4}%
-\contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{19}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Architecture of \texttt {api\_v4.0}}{19}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Endpoints and Output Formats}{20}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Persistence}{20}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}The \ac {CI}/\ac {CD} Pipeline}{22}{section.5.2}%
-\contentsline {section}{\numberline {5.3}The \ac {HTTP}-Level Diff: \texttt {HttpDiff.java}}{23}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Reports and Findings}{24}{section.5.4}%
-\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{25}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Main Conclusions}{25}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Work}{26}{section.6.2}%
-\contentsline {appendix}{\chapternumberline {A}Raw Survey Data}{27}{appendix.A}%
-\contentsline {chapter}{Bibliography}{29}{chapter*.48}%
+\contentsline {section}{\numberline {4.4}Architecture of the Differential Testing Framework}{18}{section.4.4}%
+\contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{21}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Architecture of \texttt {api\_v4.0}}{21}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Endpoints and Output Formats}{22}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Persistence}{22}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}The \ac {CI}/\ac {CD} Pipeline}{24}{section.5.2}%
+\contentsline {section}{\numberline {5.3}The \ac {HTTP}-Level Diff: \texttt {HttpDiff.java}}{25}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Reports and Findings}{26}{section.5.4}%
+\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{27}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Main Conclusions}{27}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{28}{section.6.2}%
+\contentsline {appendix}{\chapternumberline {A}Raw Survey Data}{29}{appendix.A}%
+\contentsline {chapter}{Bibliography}{31}{chapter*.47}%

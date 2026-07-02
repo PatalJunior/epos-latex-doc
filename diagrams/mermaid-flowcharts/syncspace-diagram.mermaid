@@ -1,0 +1,39 @@
+flowchart TD
+    %% Define styles matching the LaTeX node colors
+    classDef stage fill:#e6f0fa,stroke:#333,stroke-width:2px,color:#000
+    classDef error fill:#ffe6e6,stroke:#333,stroke-width:2px,color:#000
+    classDef mapper fill:#f4ebf4,stroke:#333,stroke-width:2px,color:#000
+    classDef outbox fill:#e6f2e6,stroke:#333,stroke-width:2px,color:#000
+
+    %% Nodes
+    client[HTTP client]:::stage
+    resource["<b>BookingResource</b><br/><i>@Inject BookingService</i>"]:::stage
+    svc["<b>BookingService</b><br/><i>business logic</i>"]:::stage
+    ex[Exception thrown]:::error
+    dispatch["JAX-RS exception dispatch<br/><i>matches type</i>"]:::stage
+    
+    m1["BusinessValidation<br/>Mapper"]:::mapper
+    m2["Validation<br/>ExceptionMapper"]:::mapper
+    m3["JsonProcessing<br/>ExceptionMapper"]:::mapper
+    m4["Global<br/>ExceptionMapper"]:::mapper
+    
+    resp["Response.builder()<br/><code>{ 'error': '...', 'details': [...] }</code>"]:::outbox
+    cliback["HTTP client<br/><i>sees structured JSON, never a stack trace</i>"]:::stage
+
+    %% Connections
+    client -- "POST /api/v1/bookings" --> resource
+    resource --> svc
+    svc --> ex
+    ex --> dispatch
+    
+    dispatch --> m1
+    dispatch --> m2
+    dispatch --> m3
+    dispatch --> m4
+    
+    m1 --> resp
+    m2 --> resp
+    m3 --> resp
+    m4 --> resp
+    
+    resp --> cliback
