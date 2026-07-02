@@ -168,13 +168,14 @@ infrastructure rather than introducing new \ac{VPN} solutions to the laboratory.
 \section{Conclusion}
 \label{chap3:sec:concs}
 
-The technology stack on which this project is built is in large part
-imposed by its environment: Jakarta EE on Payara, PostgreSQL on the
-internal network, GitLab as the self-managed \ac{CI} platform. Where there was
-room for choice, between Jakarta EE and Spring Boot, between Payara Server and
-Apache Tomcat, between PostgreSQL and MySQL, between JUnit 5 and TestNG,
-the decisions documented in this chapter were guided by a preference for
-fewer moving parts, by the alignment with what the laboratory already runs in
-production and by the desire to keep the differential testing harness as simple
-as possible. The next chapter describes the iterative methodology by which
-these technologies were combined into a working solution.
+The technology stack underlying this project was largely dictated by the
+\ac{SEGAL} laboratory's existing operational environment: Jakarta EE on
+Payara, a strictly internal PostgreSQL database, and a self-managed GitLab
+\ac{CI}/\ac{CD} platform. Where architectural choices were required,
+decisions consistently prioritized simplicity and alignment with production
+infrastructure over introducing novel frameworks. By standardizing on native
+Java tools, Payara Micro, and existing Docker-based runners, the project
+minimizes moving parts and avoids unnecessary maintenance overhead. With this
+technological foundation established, the following chapter details the
+iterative methodology used to synthesize these tools into a functional
+differential testing solution.
