@@ -1,0 +1,11 @@
+Syncspace
+GeoJSON
+JAX-RS
+UBI
+eXtensible
+OpenAPI
+uncontainerized
+Payara
+filesystem
+worktree
+subprocess

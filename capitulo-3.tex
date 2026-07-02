@@ -4,302 +4,177 @@
 \section{Introduction}
 \label{chap3:sec:intro}
 
-This chapter describes the concrete set of technologies and tools on
-which the work reported in this document is built. The set was not
-chosen in a single decision, but converged over the course of the
-project through a mixture of constraints (what the production
-\ac{API} already uses, what the laboratory's network allows, what the
-proposal explicitly mandates), comparisons (between equivalent
-alternatives) and pragmatic preference. The chapter is structured by
-layer of the stack: \ac{API} contracts and serialization formats in
-Section~\ref{sec:apis}, the Java/Jakarta ecosystem in
-Section~\ref{sec:java}, persistence and \ac{SQL} databases in
-Section~\ref{sec:sql}, and servers, tooling and network in
-Section~\ref{sec:servers}.
+This chapter details the specific technologies and frameworks utilized to build
+the solutions presented in this document. The selected stack is the result
+of pragmatic engineering, balancing the established architecture of the production
+\ac{API} with modern technical requirements. Rather than enumerating these tools
+in isolation, the chapter examines the architecture layer by layer. It begins
+with \ac{API} contracts and serialization formats, transitions through the Java
+and Jakarta EE application ecosystem and its relational databases, and
+finally covers the underlying servers and network tooling that support the
+deployment.
 
-\section{APIs, Serialization Formats and Specification}
-\label{sec:apis}
+\subsection{Explicit Data Serialization}
+\label{sec:data-ser}
 
-\subsection{REST and the Multi-format Response}
+Unlike typical Jakarta \ac{REST} applications that rely on automatic
+content negotiation via \texttt{Accept} headers and transparent message body
+writers, the \ac{EPOS} \ac{API} handles serialization explicitly. Because endpoint
+inputs consist solely of path and query parameters rather than incoming payload
+bodies, the application bypasses automatic input deserialization entirely.
 
-All endpoints exposed by the applications discussed in this report
-follow the \ac{REST} architectural style as described by
-Fielding~\cite{fielding2000rest}: resources are identified by stable
-\acp{URL}, manipulated through a small set of \ac{HTTP} verbs (with
-\texttt{GET} dominating for read-only \ac{GNSS} metadata), and the
-\ac{API} is stateless on the server side. There is no session
-affinity, which is a property that the differential test harness
-described in Chapter~\ref{chap:caso-epos} relies on heavily: the same
-request can be replayed against two independent server processes and
-the responses can be compared directly.
+For outputs, the formatting logic is driven strictly by the \ac{URL} path
+parameter. A dedicated parser component evaluates this parameter and routes the
+data to the appropriate conversion method. Whether the requested format is
+standard \ac{JSON}, its \ac{JSON-LD} or \ac{GeoJSON} variants, \ac{XML}, or \ac{CSV},
+the parser explicitly converts the domain objects into a formatted text string.
+The application then manually assigns the corresponding \ac{HTTP} \texttt{MediaType}
+before constructing the final response.
 
-The production \ac{API} (\texttt{api\_v4.0}) is unusual in that it
-serves the \emph{same} resource in several serialization formats,
-selected by a path parameter at the end of the \ac{URL}. The supported
-formats are \ac{JSON} (default), \ac{XML} (produced through Jackson's
-XML data format module), \ac{CSV} (produced through a custom writer)
-and, for the file metadata endpoints, an executable shell
-\emph{script} that downloads the corresponding files. This multi-format
-output was inherited from the legacy \ac{API}, many of its clients
-are scientific scripts that consume \ac{CSV} or \ac{JSON} directly,
-and was preserved in the refactor; it is also the reason the
-\ac{HTTP}-level differential harness has to compare not only headers
-and status codes but also the body, format by format.
-Figure~\ref{fig:multiformat} sketches the content negotiation pattern
-that turns a single resource method into four wire formats.
+This explicit architectural choice simplifies the validation strategy for
+the differential testing harness. Because all serialization regardless of the
+format ultimately produces a finalized string payload before leaving the Java
+method, the test harness can treat the resulting \ac{HTTP} response body as an
+opaque textual blob. It simply verifies the candidate's output byte-for-byte
+against the parent commit's baseline, ensuring absolute formatting consistency
+without needing format-specific parsing logic in the test suite.
 
-\begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      every node/.style={font=\small},
-      box/.style={draw, rounded corners=2pt, align=center, thick,
-                  minimum height=9mm, minimum width=22mm},
-      writer/.style={box, fill=dkgreen!10, minimum width=20mm},
-      arrow/.style={-{Stealth[length=2mm]}, thick}
-    ]
-    \node[box, fill=dkblue!10] (req) {\texttt{GET /api/stations/.../\{format\}}};
-    \node[box, fill=mauve!10, below=8mm of req, minimum width=46mm]
-      (resource) {\textbf{StationEndpoints}\\[2pt]\footnotesize same Java method, regardless of format};
-    \node[box, below=8mm of resource, minimum width=46mm, fill=lgray]
-      (negot) {Content negotiation \\\footnotesize (path parameter \texttt{\{format\}})};
+\subsection{OpenAPI and Swagger UI}
 
-    \node[writer, below=10mm of negot, xshift=-36mm] (json)   {\textbf{JSON} \\\footnotesize Jackson};
-    \node[writer, right=4mm of json]                 (xml)    {\textbf{XML}  \\\footnotesize jackson-xml};
-    \node[writer, right=4mm of xml]                  (csv)    {\textbf{CSV}  \\\footnotesize custom writer};
-    \node[writer, right=4mm of csv]                  (script) {\textbf{Script}\\\footnotesize files only};
+The contract of the production \ac{API} is defined in an \ac{OpenAPI} 3.1.0~\cite{openapi}
+document (\texttt{openapi.json}) packaged within the \ac{WAR}. This
+document powers a Swagger \ac{UI}~\cite{swaggerui} instance hosted at \texttt{/swagger.html},
+providing an interactive, in-browser environment to explore and test the
+endpoints.
 
-    \node[box, below=10mm of csv, fill=dark!10, minimum width=66mm]
-      (resp) {HTTP response body};
-
-    \draw[arrow] (req)       -- (resource);
-    \draw[arrow] (resource)  -- (negot);
-    \draw[arrow] (negot)     -- (json);
-    \draw[arrow] (negot)     -- (xml);
-    \draw[arrow] (negot)     -- (csv);
-    \draw[arrow] (negot)     -- (script);
-    \draw[arrow] (json)      -- (resp);
-    \draw[arrow] (xml)       -- (resp);
-    \draw[arrow] (csv)       -- (resp);
-    \draw[arrow] (script)    -- (resp);
-  \end{tikzpicture}%
-  }
-  \caption{Multi-format content negotiation in \texttt{api\_v4.0}. The
-  same Java resource method is reused across four serializations,
-  selected by a path parameter, and the differential harness must
-  compare the body of each format separately.}
-  \label{fig:multiformat}
-\end{figure}
-
-\subsection{\ac{JSON} and \ac{XML}}
-
-\ac{JSON} is the default serialization and the format on which most
-of the test fixtures of this project rely. The Jakarta \ac{REST}
-implementation provided by Payara takes care of object serialization
-through Jackson, with negligible per-request overhead. \ac{XML} is
-provided by the \texttt{jackson-dataformat-xml} module, configured to
-preserve the same Java models that produce \ac{JSON}. This dual
-configuration is valuable because it removes a whole class of
-\emph{schema drift} bugs: as long as the Java model is correct, both
-\ac{JSON} and \ac{XML} outputs are consistent with each other.
-
-\subsection{\ac{CSV}}
-
-\ac{CSV} is the format favoured by historical clients of the \ac{API}
-and is produced through a small set of writer classes that flatten
-the entity tree into rows. The differential harness handles \ac{CSV}
-exactly the same way it handles \ac{JSON} and \ac{XML}: the textual
-body of the response is treated as an opaque blob that must match,
-byte for byte, against the baseline.
-
-\subsection{\ac{OpenAPI} and Swagger \ac{UI}}
-
-The contract of the production \ac{API} is described in an
-\ac{OpenAPI} 3.1.0~\cite{openapi} document
-(\texttt{openapi.json}) that ships inside the \ac{WAR}. The same
-document is served to a Swagger \ac{UI}~\cite{swaggerui} instance
-hosted at \texttt{/swagger.html}, which provides an interactive,
-in-browser playground for the endpoints. Two practical benefits arise
-from this setup. First, the document is the single source of truth
-shared with downstream consumers of the \ac{API}, in particular the
-\ac{EPOS} portal. Second, the same document can be used to drive
-contract tests: a future evolution of the test framework, briefly
-discussed in Chapter~\ref{chap:conc-trab-futuro}, is to derive the
-\ac{HTTP} differential test cases automatically from the \ac{OpenAPI}
-specification instead of maintaining them in a separate \ac{JSON} file.
+This setup yields two primary benefits. First, the document serves as the
+definitive source of truth for downstream consumers of the \ac{API}, most
+notably the \ac{EPOS} portal. Second, it enables future automated contract testing:
+a planned evolution of the test framework, discussed in Chapter~\ref{chap:conc-trab-futuro},
+involves dynamically deriving \ac{HTTP} differential test cases directly from
+this \ac{OpenAPI} specification, rather than maintaining them as separate,
+static \ac{JSON} definitions.
 
 \section{Java and Jakarta EE}
 \label{sec:java}
 
-The applications target Java SE 21~\cite{javaSE21} (the production
-\ac{API} and the second prototype) and Java SE 17 (the first
-prototype, kept compatible with the \texttt{maven:\allowbreak 3.9.6-eclipse-\allowbreak temurin-21}
-\ac{CI} image). The choice of Java was effectively imposed by the
-existing code base; \texttt{record} types are used liberally for
-request/response \acp{POJO} and the new \texttt{switch} expression
-syntax replaces several long \texttt{if/else} chains from the legacy
-\ac{API}.
+The applications developed in this project target Java SE 21~\cite{javaSE21}.
+The decision to utilize Java was effectively dictated by the existing \ac{API}
+codebase. However, modern language features are leveraged extensively: \texttt{record}
+types are used liberally to model immutable request and response \acp{POJO},
+while the new pattern-matching \texttt{switch} expressions replace several complex
+\texttt{if/else} chains inherited from the legacy system, resulting in more maintainable
+code.
 
-\textbf{Jakarta EE 11}~\cite{jakartaee} provides the platform layer.
-The renaming from Java EE in 2018 had already been absorbed by the
-time this project started; the current code base targets the
-\texttt{jakarta.*} package namespace. The specifications actively
-used across the three applications are: Jakarta \ac{REST} 4.0
-(\ac{JAX-RS})~\cite{jaxrs} for endpoints, Jakarta \ac{CDI} 4.1 for
-injection, Jakarta Persistence 3.2 (\ac{JPA})~\cite{jpa} for
-\ac{ORM}, Jakarta Bean Validation 3.1 for declarative constraints,
-Jakarta JSON Binding 3.0 for serialization, and Eclipse
-MicroProfile~\cite{microprofile} 2.1 \ac{JWT} (used by the second
-prototype) plus Health 4.0 for probes. Spring Boot~\cite{springBoot}
-was considered but rejected: the existing code base is already on
-Jakarta EE on top of an existing Payara installation, and a parallel
-migration would have brought no proportional benefit.
+\textbf{Jakarta EE 11}~\cite{jakartaee} serves as the foundational platform
+layer, with the codebase fully migrated to the modern \texttt{jakarta.*}
+namespace. The production application actively relies on a focused subset of
+core specifications: Jakarta \ac{REST} 4.0 (\ac{JAX-RS})~\cite{jaxrs} is
+used strictly for routing endpoints, while Jakarta \ac{CDI} 4.1 handles all
+dependency injection (deliberately eschewing the standard JAX-RS \texttt{@Context}
+injection). Furthermore, the application utilizes Jakarta Persistence 3.2 (\ac{JPA})~\cite{jpa}
+for object-relational mapping and Jakarta Bean Validation 3.1 for
+declarative constraints. Notably, standard Jakarta JSON Binding is omitted
+in favour of explicit serialization via Jackson, as detailed in Section~\ref{sec:data-ser}.
 
-\section{\ac{SQL} and the Database Layer}
+During the early stages of the project, development prototypes served as a
+learning sandbox to evaluate the broader capabilities of the Jakarta
+ecosystem. These initial iterations experimented with Eclipse MicroProfile~\cite{microprofile}
+features, specifically \ac{JWT} 2.1 for authentication mechanics and Health 4.0
+for application probes. While these tools provided valuable insight into
+the platform's offerings, they were ultimately excluded from the final application
+in favour of a leaner, more tailored architecture.
+
+Finally, alternative frameworks such as Spring Boot~\cite{springBoot} were briefly
+considered but rejected. The existing production codebase is already built
+upon Jakarta EE and deployed on an established Payara server infrastructure.
+Attempting a parallel migration to a completely different ecosystem would have
+introduced significant risk and overhead without providing any proportional technical
+benefit.
+
+\section{SQL and the Database Layer}
 \label{sec:sql}
 
-The persistence model of the production \ac{API} is heavily
-relational: \ac{GNSS} stations, networks, agencies, countries, file
-types, observation summaries and embargo windows are all linked
-through foreign keys, and most endpoints execute several joins per
-request. \ac{SQL}~\cite{postgresql} is therefore the natural query
-language, and even where \ac{JPA}'s object-oriented abstractions
-(Section~\ref{sec:jpa-hibernate}) are used, what reaches the database
-is plain \ac{SQL}. The laboratory standardised on
-\textbf{PostgreSQL}~\cite{postgresql} for the \ac{EPOS} production
-database; the choice over \textbf{MySQL}~\cite{mysql} was driven
-mainly by PostgreSQL's adherence to the \ac{SQL} standard (advanced
-\texttt{JOIN} types, common table expressions, the
-\texttt{numeric} type for high-precision station coordinates) and by
-its rich set of index types (B-tree, BRIN, GiST). The PostGIS
-extension is not in use today (Section~\ref{sec:epos-db}) but
-remains a realistic future addition. MySQL was nevertheless used in
-the docker-compose configuration of the second prototype
-(Section~\ref{sec:prototypes}) to validate that the application-level
-code is not tied to a specific dialect.
+The persistence model of the production \ac{API} is heavily relational: \ac{GNSS}
+stations, networks, agencies, countries, file types, observation summaries, and
+embargo windows are all inextricably linked through foreign keys. Because
+users require highly specific data filtering, most endpoints must execute complex,
+conditional joins per request.
 
-\subsection{\ac{JPA}, Hibernate and the Persistence Unit}
-\label{sec:jpa-hibernate}
+While \ac{JPA} is utilized for its foundational object-relational mapping,
+the sheer complexity of the API's query requirements makes purely object-oriented
+querying (such as the \ac{JPA} Criteria API) unwieldy. Instead, developers actively
+construct dynamic, hand-made queries through conditional string
+concatenations directly in Java. These hand-crafted strings are then passed to
+the \ac{JPA} \texttt{EntityManager}, which safely binds the parameters and
+maps the resulting data rows back into Java \acp{POJO}. Consequently, native
+\ac{SQL} and its structural logic remain the true driving force of the
+database layer.
 
-\ac{JPA}~\cite{jpa} is the Jakarta specification for object-relational
-mapping in Java. The production \ac{API} uses
-Hibernate~\cite{hibernate} as the \ac{JPA} provider, configured
-through a \texttt{persistence.xml} file. The persistence unit is
-named \texttt{MeuPU} and is declared as
-\texttt{RESOURCE\_LOCAL}, which means that transactions are managed
-explicitly by application code rather than by the container, a
-deliberate choice that keeps the differential test harness in full
-control of when transactions begin and end.
-
-Database connections are pooled through \textbf{HikariCP}~\cite{hikaricp}
-with a small, conservative pool (2--15 connections, 20-second connect
-timeout, 30-second idle, 5-second validation), tuned for the
-read-mostly workload of the \ac{API} and for the relatively low
-concurrency observed in production.
-
-\subsection{The \ac{EPOS} Database in Practice}
-\label{sec:epos-db}
-
-The production database lives on a PostgreSQL 16 instance reachable
-from the laboratory network at \texttt{192.168.168.30:5432}, and the
-same schema serves two fixtures: \texttt{DB\_3.0\_J}, a small but
-representative production subset used by the correctness diffs, and
-\texttt{DB\_3.0\_F}, the full dataset used for volume-oriented and
-performance experiments. The schema contains forty-two tables and
-around fifty foreign-key constraints, grouped into a core domain
-(\texttt{station}, \texttt{network}, \texttt{agency},
-\texttt{country}, \texttt{rinex\_file}, \texttt{highrate\_rinex\_file},
-\texttt{file\_type}), the junction tables that materialise its
-many-to-many relationships, a family of seven quality-control
-summary tables, and a handful of auxiliary tables (embargoes,
-documents, licenses, infrastructure). Station coordinates are
-plain \texttt{numeric}; spatial logic is currently performed in Java
-by the \texttt{Geometry} package rather than by PostGIS, which is
-not installed (the only non-default extension is \texttt{plpgsql}).
-The twenty-five existing indexes are mostly B-trees on foreign-key
-columns, with \texttt{fillfactor=90} on the read-heavy quality-control
-tables. The next planned optimisation, and the reason the larger
-\texttt{F} fixture was provisioned, is the introduction of BRIN
-indexes on the date columns of \texttt{rinex\_file}: \ac{RINEX} files
-are written in approximate date order, so the on-disk layout already
-correlates with the indexed column, which is the precondition for a
-small and fast BRIN index. The differential framework introduced in
-Chapter~\ref{chap:caso-epos} is used to validate that this
-optimisation does not change observable behaviour against the
-\texttt{F} fixture.
+The laboratory has standardized on \textbf{PostgreSQL}~\cite{postgresql} for
+the \ac{EPOS} production database. The decision to use PostgreSQL over alternatives
+like \textbf{MySQL}~\cite{mysql} was driven primarily by historical
+precedent within the lab, as well as its robust support for specialized index
+types (such as B-tree, BRIN, and GiST) that are highly effective for large scientific
+datasets. Furthermore, while the PostGIS extension is not actively utilized today,
+standardizing on PostgreSQL provides a realistic, low-friction pathway for future
+spatial data integrations.
 
 \section{Servers, Tooling and Network}
 \label{sec:servers}
 
-\textbf{Payara Server}~\cite{payara} is the Jakarta EE application
-server adopted by the laboratory; the production \ac{API} is deployed
-onto an existing Payara installation. Its companion product,
-\textbf{Payara Micro}, is a single self-contained \ac{JAR} that
-launches a deployable \ac{WAR} from the command line and is the
-engine on which the \ac{HTTP}-level differential harness relies (the
-harness boots one Payara Micro per \ac{WAR} on different ports and
-replays the same requests against each). Apache Tomcat~\cite{apacheTomcat}
-was considered for the prototypes but rejected because it does not
-ship a full Jakarta EE 11 runtime out of the box.
+\textbf{Payara Server}~\cite{payara} is the Jakarta EE application server adopted
+by the laboratory; the production \ac{API} is simply deployed onto an existing
+Payara installation. Its companion product, \textbf{Payara Micro}, is a single,
+self-contained \ac{JAR} that launches a deployable \ac{WAR} directly from
+the command line. Because Payara was already the established stack,
+adopting Payara Micro for test orchestration was the immediate and obvious
+choice. It serves as the engine for the \ac{HTTP}-level differential
+harness, booting one instance per \ac{WAR} on different ports to safely
+replay and compare requests.
 
-All three applications are built with \textbf{Apache Maven}; the
-production \texttt{pom.xml} configures, among others, the
-\texttt{maven-war-plugin} (which produces the deployable
-\texttt{ROOT.war}), \texttt{maven-failsafe-plugin} (integration tests
-named \texttt{*IT.java} with \ac{JUnit} XML output) and
-\texttt{maven-dependency-plugin} (which stages the Payara Micro
-\ac{JAR} into \texttt{target/payara-micro/} so the \ac{HTTP} harness
-can spawn it as a subprocess).
+The applications are built using \textbf{Apache Maven}. The project's
+\texttt{pom.xml} orchestrates the build lifecycle, utilizing the \texttt{maven-war-plugin}
+to produce the deployable \texttt{ROOT.war}, the \texttt{maven-failsafe-plugin}
+for integration testing (outputting JUnit \ac{XML} reports), and the
+\texttt{maven-dependency-plugin} to stage the Payara Micro \ac{JAR} so the
+differential harness can spawn it as a subprocess.
 
-\textbf{GitLab}~\cite{gitlabci} provides both the source-control
-front end and the \ac{CI}/\ac{CD} platform. The GitLab server is a
-self-managed installation~\cite{gitlabSelfManaged} running on a
-\ac{VM} inside the laboratory; the GitLab Runner~\cite{gitlabRunner}
-is a separate process on another \ac{VM} (tagged
-\texttt{ubi-runner-.31}) that picks up jobs and executes them inside
-Docker containers. That separation matters because the runner is the
-machine that needs network access to the laboratory's database, not
-the control plane. \textbf{Git}~\cite{chacon2014pro} itself is used
-non-trivially in the pipeline: \texttt{git worktree} is what
-materialises each baseline build alongside the \texttt{HEAD} build on
-the runner's filesystem, without disturbing the working copy
-(Section~\ref{sec:pipeline}). All three repositories are hosted on
-\texttt{gitlab.com}, the production \ac{API} under the
-\texttt{segalubi} group, the two prototypes under the personal
-namespace of the author.
+\textbf{GitLab}~\cite{gitlabci} handles both source control and \ac{CI}/\ac{CD}
+orchestration. The laboratory hosts a self-managed GitLab instance~\cite{gitlabSelfManaged},
+while the runner operates on a separate internal \ac{VM} executing jobs
+inside \textbf{Docker}~\cite{docker} containers. Pipeline jobs utilize the
+official \texttt{maven:\allowbreak 3.9.6-eclipse-\allowbreak temurin-21} image
+to guarantee a clean, reproducible toolchain. Under the hood, \textbf{Git}~\cite{git}
+is used heavily in the pipeline: the \texttt{git worktree} command materializes
+the baseline build alongside the candidate build on the runner's filesystem without
+disrupting the working copy (detailed in Section~\ref{sec:pipeline}).
 
-\textbf{Docker}~\cite{docker} appears in two roles. \ac{CI} jobs run
-inside the official
-\texttt{maven:\allowbreak 3.9.6-eclipse-\allowbreak temurin-21} image,
-which guarantees a clean and reproducible toolchain regardless of the
-runner host. The two prototypes additionally ship a
-\texttt{docker-compose.yaml}~\cite{composeSpec} for local development
-(PostgreSQL plus, in the first prototype, a pair of Payara Server
-containers for the dual-node Arquillian tests). The production
-\ac{API} is intentionally \emph{not} containerised: the deployment
-model is to copy the \ac{WAR} onto an existing Payara installation,
-and an image would add a moving part with no benefit (this is
-revisited in Chapter~\ref{chap:conc-trab-futuro}).
+During early development, local database instances were simulated using
+Docker containers. However, this was later abandoned in favor of connecting
+directly to the real development database. Because the GitLab runners are provisioned
+on the same internal network as the \ac{EPOS} database, connecting to the actual
+infrastructure was the most obvious and reliable choice for integration testing.
+The production \ac{API} itself remains uncontainerized, deployed
+traditionally by copying the \ac{WAR} onto the existing Payara server.
 
-Finally, the production database is reachable only inside the
-laboratory's network on \texttt{192.168.168.30:5432}, which is why
-the runner is pinned by tag and why developers operating from outside
-connect through the laboratory's \ac{VPN}, maintained by the SEGAL
-staff. Alternatives such as WireGuard~\cite{wireguard} were
-considered as lighter-weight options for one-off remote sessions but
-were not adopted.
+Finally, the production database is strictly isolated within the laboratory's
+internal network. While the internal runners can access it directly,
+developers operating remotely must connect via the university's established
+\textbf{OpenVPN} infrastructure, managed through pfSense. This setup utilizes
+existing \ac{UBI} certificates, relying on proven, pre-configured network
+infrastructure rather than introducing new \ac{VPN} solutions to the laboratory.
 
 \section{Conclusion}
 \label{chap3:sec:concs}
 
 The technology stack on which this project is built is in large part
 imposed by its environment: Jakarta EE on Payara, PostgreSQL on the
-internal network, GitLab as the self-managed \ac{CI} platform. Where
-there was room for choice, between Jakarta EE and Spring Boot,
-between Payara Server and Apache Tomcat, between PostgreSQL and
-MySQL, between JUnit 5 and TestNG, the decisions documented in
-this chapter were guided by a preference for fewer moving parts, by
-the alignment with what the laboratory already runs in production
-and by the desire to keep the differential testing harness as simple
-as possible. The next chapter describes the iterative methodology by
-which these technologies were combined into a working solution.
+internal network, GitLab as the self-managed \ac{CI} platform. Where there was
+room for choice, between Jakarta EE and Spring Boot, between Payara Server and
+Apache Tomcat, between PostgreSQL and MySQL, between JUnit 5 and TestNG,
+the decisions documented in this chapter were guided by a preference for
+fewer moving parts, by the alignment with what the laboratory already runs in
+production and by the desire to keep the differential testing harness as simple
+as possible. The next chapter describes the iterative methodology by which
+these technologies were combined into a working solution.

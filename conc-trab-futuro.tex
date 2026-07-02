@@ -10,18 +10,17 @@ Jakarta EE \ac{API} without silently breaking the \ac{EPOS} clients
 that depend on it. The answer is a three-stage \ac{CI}/\ac{CD}-driven
 testing framework that, for every commit, compares the new build
 against two baselines (the immediate parent commit and a fixed
-long-term reference) both at the level of internal Java classes and
-at the level of \ac{HTTP} responses.
+long-term reference) at the level of \ac{HTTP} responses.
 
 A few conclusions stand out. \emph{Differential testing fits a
 refactor naturally}: asserting that the new build produces the same
 output as a known-good one sidesteps the brittle fixture problem and
 made the framework useful from the very first commit it ran on.
-\emph{Two layers of comparison are better than one}: the code-level
-harness catches behavioural changes in focused helper classes with
-fast feedback, the \ac{HTTP}-level harness catches integration
-regressions visible only against a live database, and neither one
-alone covers the spectrum the laboratory cares about. \emph{A
+\emph{Comparing whole \ac{HTTP} responses catches what unit tests
+miss}: the \ac{HTTP}-level harness surfaces integration regressions
+that appear only when the full stack runs against a live database,
+the class of change a refactor is most likely to introduce and that
+isolated unit tests are least likely to reveal. \emph{A
 self-hosted pipeline is not optional here}: only a runner inside the
 laboratory's network can exercise the \ac{API} end-to-end against
 the production database, so self-managing both the GitLab control
@@ -30,10 +29,9 @@ constraint, not from a preference. \emph{The two prototypes paid for
 themselves}: each answered a small, well-bounded set of questions in
 an environment where mistakes were cheap, sparing the production
 code base from them. \emph{The framework reveals what a human review
-would miss}: the most representative example, discussed in
-Section~\ref{sec:reports}, is the named-constants refactor of the
-latitude/longitude bounds that no amount of code review would
-plausibly have caught at the laboratory's commit rate.
+would miss}: during the refactor it surfaced behavioural changes
+buried inside seemingly cosmetic commits that no amount of code
+review would plausibly have caught at the laboratory's commit rate.
 
 \section{Future Work}
 \label{sec:trab-futuro}

@@ -4,147 +4,146 @@
 \section{Introduction}
 \label{chap2:sec:intro}
 
-This chapter reviews the body of practice and tooling relevant to the
-problem addressed by this project: how to automatically validate a
-Jakarta EE \ac{REST} \ac{API}, build after build, against a moving
-reference. It is organised around three axes. Section~\ref{sec:soa-tests}
-surveys the main families of test frameworks used in the Java world,
-from low-level unit testing to in-container and \ac{HTTP}-level testing.
-Section~\ref{sec:soa-cicd} discusses the \ac{CI}/\ac{CD} platforms that
-are commonly used to orchestrate those tests, with particular focus
-on GitLab, which is the platform used by the \ac{SEGAL} laboratory and
-which directly constrains the design described later in the report.
-Section~\ref{sec:soa-diff} reviews differential and regression testing
-approaches that influenced the design of the harnesses presented in
-Chapter~\ref{chap:caso-epos}. Section~\ref{chap2:sec:concs} closes the
-chapter.
+This chapter establishes the technical background required to automatically validate
+a Jakarta EE \ac{REST} \ac{API}, build after build, against a moving reference.
+It explores the main families of Java testing frameworks—from standard unit
+tests to in-container and \ac{HTTP}-level approaches—and the \ac{CI}/\ac{CD}
+orchestration tools that automate them. Because the \ac{SEGAL} laboratory utilizes
+GitLab, special focus is given to its pipeline architecture, which directly constrained
+the design of this project. Finally, this chapter reviews the differential and
+regression testing concepts that served as the foundation for the test harness
+developed in Chapter~\ref{chap:caso-epos}.
 
 \section{Test Frameworks for the Java Ecosystem}
 \label{sec:soa-tests}
 
-The Java test landscape spans four layers, each combined by modern
-projects: unit testing
-(\textbf{JUnit 5}~\cite{junit5}, the de facto standard, chosen here
-for its first-class Maven Surefire/Failsafe support and native JUnit
-XML output understood by GitLab; \textbf{TestNG}~\cite{testng}
-remains a legacy alternative), integration testing (Maven Failsafe
-runs \texttt{*IT.java} during the \texttt{verify}
-phase; \textbf{Testcontainers}~\cite{testcontainers} stands up real
-infrastructure in Docker containers per test run, but was not
-adopted because the production database fixture is already reachable
-over the laboratory \ac{VPN}), container testing
-(\textbf{Arquillian}~\cite{arquillian}, used in the first prototype
-to validate the \ac{CI}/\ac{CD} pipeline through its
-\emph{micro-deployment} pattern, but rejected for the production
-\ac{API} which is too large for per-test redeployments and needs
-side-by-side comparison rather than isolated deployment), and
-\ac{API}-level testing
-(\textbf{REST Assured}~\cite{restassured} provides a fluent Java
-\ac{DSL}; \textbf{Postman} with \textbf{Newman}~\cite{postman,newman}
-can replay JSON collections in \ac{CI}). For the present project,
-both were ultimately rejected in favour of plain
-\texttt{java.net.http.HttpClient}, which maps more naturally onto a
-differential workflow where the same request is sent to multiple
-ports and the responses are diffed pairwise.
+The Java testing landscape spans multiple layers, which modern projects typically
+combine to ensure comprehensive coverage. At the foundational level is unit
+testing, where \textbf{JUnit 5}~\cite{junit5} serves as the de facto
+standard. We selected it for this project due to its first-class Maven support
+and its ability to generate native JUnit XML reports, which integrate
+seamlessly with GitLab. While \textbf{TestNG}~\cite{testng} remains a
+viable alternative, it was deemed a legacy option for this context.
+
+Moving up to the integration layer, Maven conventionally handles tests
+during its \texttt{verify} phase by executing \texttt{*IT.java} classes. To test
+within a container context, we evaluated \textbf{Arquillian}~\cite{arquillian}
+during the first prototype. Its \emph{micro-deployment} pattern successfully
+validated our initial \ac{CI}/\ac{CD} pipeline setup. However, Arquillian was
+ultimately rejected for the production \ac{API}: the application is simply too
+large for efficient per-test redeployments, and our methodology requires
+side-by-side execution rather than isolated deployments.
 
 \subsection{Differential Testing}
 \label{sec:soa-diff}
 
-The directly relevant family of approaches is \emph{differential
-testing}: instead of asserting a specific expected response, the
-candidate is compared against a reference implementation (or
-version) on a shared input grid. The canonical example in the
-service world is \textbf{Diffy}~\cite{diffyTwitter}, a proxy released
-by Twitter Engineering that sits in front of a candidate and a
-primary service and replays each incoming request against both. This
-is exactly the situation faced by the \ac{SEGAL} laboratory during
-the refactor of its \ac{API}. \emph{Snapshot testing}, popularised
-in the JavaScript world by Jest, was also considered but scales
-poorly when the output depends on a live database, as is the case
-here. The approach taken in this project is therefore closer to
-Diffy in spirit: rather than freezing a single reference, the
-baseline is always the parent commit of the build under test (plus
-an optional long-term fixed reference), which keeps the comparison
-meaningful across long refactor branches without requiring a human
-to maintain fixtures.
+The most relevant testing paradigm for this project is \emph{differential
+testing}, which compares a candidate's response directly against a reference
+implementation rather than relying on statically defined expected outputs.
+A notable industry example of this concept is \textbf{Diffy}~\cite{diffyTwitter},
+which dynamically routes requests to multiple service versions to surface
+discrepancies side-by-side. This comparative approach addresses the exact challenge
+faced by the \ac{SEGAL} laboratory during the refactoring of its \ac{API}.
+
+We also considered \emph{snapshot testing}, a technique popularized by tools
+like Jest. However, our test infrastructure utilizes a fixed database populated
+with large-scale synthetic data. Freezing such massive \ac{API} responses into
+static fixture files is highly impractical and would quickly bloat the repository.
+Therefore, we adopted a dynamic differential approach: rather than relying
+on static files or a proxy service, our harness uses the parent commit of the
+build under test (alongside an optional long-term reference) as the baseline.
+This strategy ensures comparisons remain accurate across long-running
+refactor branches while completely eliminating the burden of manual fixture
+maintenance.
 
 \section{Continuous Integration and Continuous Delivery}
 \label{sec:soa-cicd}
 
 \subsection{Foundations}
 
-The notion of \ac{CI}/\ac{CD} as articulated by Humble and
-Farley~\cite{humbleFarley2010continuous} is the practice of integrating
-code into a shared mainline frequently, typically several times a
-day, and of keeping that mainline in a state from which a deployable
-artifact can be produced at any time, through a fully automated
-pipeline. The pipeline is canonically organised into a small number of
-stages, build, test, deploy, with strict gating between them:
-no stage runs unless the previous one has succeeded, and a failure
-stops the pipeline and surfaces a clear signal to the team.
+\ac{CI}/\ac{CD} is the practice of frequently integrating code into a
+shared repository while keeping the codebase in a consistently deployable
+state through full automation. A standard deployment pipeline is structured into
+sequential stages typically build, test, and deploy with strict gating. A
+stage only executes if the previous one succeeds, ensuring that any failure immediately
+halts the process and alerts the development team.
 
-The same publication popularised the idea of the
-\emph{deployment pipeline} as the single source of truth about a
-build's quality. In a mature setup, the artifact produced by the
-\texttt{build} stage is the exact same artifact that flows through the
-test stages and eventually to deployment, ensuring there is no drift
-between what was tested and what was shipped. The same principle is
-applied in this project: the \ac{WAR} built once in the first stage of
-the pipeline is consumed verbatim by the testing stages later on.
+The pipeline serves as the single source of truth for software quality. To
+prevent configuration drift between environments, a mature setup dictates that
+the exact artifact generated during the build stage must flow unchanged through
+all subsequent testing and deployment phases. This project strictly adheres
+to this principle: the \ac{WAR} file is compiled only once during the
+initial pipeline stage and is passed directly to all subsequent testing
+phases without modification.
 
+\subsection{Source Code Management with Git}
+\label{sec:soa-git}
+
+Before evaluating the orchestration platforms that drive continuous integration,
+it is necessary to establish the underlying technology that manages the
+source code itself: \textbf{Git}~\cite{git}. Git is a distributed version control
+system where every developer maintains a complete, local copy of the
+repository's history. It tracks changes as a series of immutable snapshots (commits),
+allowing developers to work on isolated features through branching without
+disrupting the main codebase.
+
+In the context of this project, Git's graph-based history is a structural requirement
+rather than just a collaboration tool. Because each commit strictly
+references its predecessor, the differential testing harness described in Section~\ref{sec:soa-diff}
+can reliably identify and dynamically pull the \emph{parent commit} to
+serve as the baseline for its side-by-side comparisons.
+
+While Git provides the core version control mechanics, it is fundamentally a
+decentralized, command-line tool. To facilitate team collaboration at scale,
+organizations rely on centralized Source Code Management (SCM) platforms to
+host their Git repositories. Platforms such as GitHub and GitLab wrap the underlying
+Git protocol with web interfaces, access controls, code review mechanics (Merge
+Requests), and crucially for this work integrated \ac{CI}/\ac{CD} engines.
 \subsection{Platforms}
 
-Three platforms dominate the modern \ac{CI}/\ac{CD} space and are
-worth comparing in the context of the laboratory's choice.
+Three major platforms dominate the modern \ac{CI}/\ac{CD} landscape. Evaluating
+them clarifies the architectural choices made for this project.
 
-\textbf{Jenkins}~\cite{jenkins} is the long-standing, plugin-based,
-self-hosted automation server. Its strengths are flexibility and
-breadth of plugin coverage; its main drawbacks are that pipelines are
-historically described in Groovy (with the related learning curve) and
-that the maintenance burden of the master/agent topology is
-non-trivial.
+\textbf{Jenkins}~\cite{jenkins} is a highly flexible, self-hosted automation
+server. While I have significant personal experience deploying and managing
+my own Jenkins infrastructure and its flexibility might have been ideal for
+our custom testing requirements it was ultimately rejected. Introducing a standalone
+\ac{CI} server would impose an unnecessary maintenance burden on the \ac{SEGAL}
+laboratory, which strongly prefers to standardize on Docker-based runners
+integrated with their existing tools.
 
-\textbf{GitHub Actions}~\cite{githubActions} is a hosted \ac{CI}/\ac{CD}
-service that integrates tightly with repositories hosted on GitHub.
-Its pipelines are described in \ac{YAML} and its ecosystem of reusable
-\emph{actions} is large. It is a very strong default for open source
-projects, but it cannot be self-hosted as an end-to-end platform; the
-control plane runs on GitHub's infrastructure.
+\textbf{GitHub Actions}~\cite{githubActions} is a popular, \ac{YAML}-based \ac{CI}/\ac{CD}
+service. Although it fully supports self-hosted runners operating securely
+inside private networks, it was bypassed for a straightforward operational reason:
+the laboratory's source code management is already established on GitLab.
 
-\textbf{GitLab \ac{CI}/\ac{CD}}~\cite{gitlabci} is the \ac{CI} system
-integrated into GitLab. Pipelines are described in a single
-\texttt{.gitlab-ci.yml} file at the root of the repository; runners are
-separate processes that pick up jobs from the GitLab server, and can
-be \emph{shared} (provided by gitlab.com) or
-\emph{specific}~\cite{gitlabRunner}, registered against a particular
-project or group. The feature that matters most for this project is that GitLab
-itself can be \emph{self-managed}~\cite{gitlabSelfManaged}: the entire
-control plane can be installed inside the laboratory's network, and
-combined with one or more locally-hosted runners can be used to
-build, test and deploy applications that depend on internal resources
-such as the laboratory's \ac{GNSS} database, without exposing
-those resources to the public Internet.
-
-That last property is the deciding factor. The \ac{SEGAL} laboratory
-operates a self-managed GitLab instance and a GitLab Runner host
-provisioned specifically for the \ac{EPOS} \ac{API}; that runner is
-inside the laboratory's network and can reach the production database
-directly. The choice of GitLab \ac{CI}/\ac{CD} as the orchestration
-platform for this project is therefore not an abstract preference but
-a consequence of the operating environment.
+\textbf{GitLab \ac{CI}/\ac{CD}}~\cite{gitlabci} provides pipeline automation
+seamlessly integrated into the GitLab ecosystem. Pipelines are configured
+via a single \texttt{.gitlab-ci.yml} file, and jobs are executed by
+separate runner processes~\cite{gitlabRunner}. The \ac{SEGAL} laboratory
+already operates a self-managed GitLab instance~\cite{gitlabSelfManaged}, along
+with a dedicated, Docker-based internal runner for the \ac{EPOS} \ac{API}. Because
+this runner is already inside the laboratory's network and can directly reach
+the production \ac{GNSS} database without exposing it to the internet, adopting
+GitLab \ac{CI}/\ac{CD} was not an abstract preference, but the most
+practical choice to avoid operational friction.
 
 \section{Conclusion}
 \label{chap2:sec:concs}
 
-The state of the practice in Java \ac{API} testing offers a rich
-catalogue of tools at each layer of the stack, and a small number of
-mature \ac{CI}/\ac{CD} platforms in which to orchestrate them. From
-this catalogue, the project adopts JUnit 5 as the unit/integration
-test framework, plain \texttt{java.net.http.HttpClient} as the
-\ac{HTTP} client for the differential harness, and GitLab \ac{CI} as
-the orchestration platform, the last choice being effectively
-mandated by the laboratory's infrastructure. Differential testing, as
-embodied by tools like Diffy, provides the conceptual model on top of
-which the bespoke harnesses described in Chapter~\ref{chap:caso-epos}
-are built. The next chapter details the concrete stack of technologies
-on which the implementation rests.
+The state of the practice in Java \ac{API} testing provides a rich
+catalogue of tools across all layers of the stack, alongside mature \ac{CI}/\ac{CD}
+platforms to orchestrate them. From this catalogue, the project adopts JUnit
+5 and the native \texttt{java.net.http.HttpClient} to build the custom test
+harness. A pure Java implementation was deliberately chosen over external testing
+tools because the existing codebase is already written in Java, ensuring
+the development team is working within a familiar ecosystem. Furthermore,
+this approach allows the harness to be executed via standard, well-documented
+Maven workflows, integrating seamlessly into the existing build lifecycle.
+
+For orchestration, GitLab \ac{CI}/\ac{CD} was selected, a choice directly
+mandated by the \ac{SEGAL} laboratory's established infrastructure.
+Conceptually, the bespoke harness described in Chapter~\ref{chap:caso-epos} draws
+heavily on the differential testing principles embodied by tools like Diffy.
+Having established this theoretical and tooling foundation, the next chapter
+details the concrete technological stack upon which the implementation rests.

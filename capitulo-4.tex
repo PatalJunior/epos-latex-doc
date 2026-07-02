@@ -1,208 +1,215 @@
 \chapter{Methodology and Architecture}
 \label{chap:metodo-arq}
 
-\section{The Legacy \ac{API} and the Need for a Safety Net}
+\section{The Legacy \ac{API}}
 \label{sec:legacy}
 
-The starting point of the work is a code base that had grown
-organically for several years and that nobody fully understood any
-more: the previous version of the \ac{EPOS} \ac{API} contained Java
-methods of more than five thousand lines, source files of more than
-thirty thousand lines, and many subtle behavioural quirks introduced
-as patches by successive developers in response to specific bug
-reports. The corollary was that no member of the laboratory could
-realistically guarantee, for an arbitrary change, that no client of
-the \ac{API} would be silently broken. The full rewrite on top of
-Jakarta EE 11 made the internal structure much cleaner (short
-methods, well-bounded \ac{JAX-RS} resources, clear separation
-between parsing, validation, query construction and serialization)
-but opened a window of risk: at any given commit during the
-refactor, an endpoint may produce subtly different output from the
-version deployed in production. The role of this project is to build
-the safety net that turns those subtle differences into a visible
-signal in the \ac{CI} pipeline.
+The starting point of the work is a code base that had grown organically for
+several years and that nobody fully understood anymore: the previous
+version of the \ac{EPOS} \ac{API} contained Java methods enormous scale, and
+source files of an even larger scale, and many subtle behavioral quirks
+introduced as patches by successive developers in response to specific bug
+reports. Consequently, the laboratory could not confidently guarantee that
+an arbitrary change would avoid silently breaking downstream \ac{API} clients.
+While the full rewrite to Jakarta EE 11 significantly improved the internal
+architecture introducing concise methods, cohesive \ac{JAX-RS} resources, and
+a strict separation between parsing, validation, querying, and
+serialization it also introduced a major regression risk. At any given commit
+during the refactoring process, an endpoint might produce output subtly
+different from the production baseline. The objective of this project is to construct
+a testing harness that mitigates this risk, turning subtle data deviations
+into immediate, actionable failures within the \ac{CI} pipeline.
 
 \section{Iterative Methodology}
 \label{sec:methodology}
 
-The work was organised into three iterations, each carried out in its
-own dedicated repository. This separation served two purposes. First,
-it kept each iteration small and focused: the first prototype is
-deliberately stripped down to two trivial endpoints, so that the
-entire complexity is in the \ac{CI} configuration and not in the
-application; the second prototype is the opposite, focusing on
-application code and leaving \ac{CI} aside; the production \ac{API}
-then brings the two strands back together. Second, the prototypes
-have value in their own right as didactic artifacts that future
-students of the laboratory can read and re-use.
+The work was organised into three iterations, each carried out in its own
+dedicated repository. This separation served two purposes. First, it kept each
+iteration small and focused: the first prototype is deliberately stripped
+down to two trivial endpoints, so that the entire complexity is in the \ac{CI}
+configuration and not in the application; the second prototype is the opposite,
+focusing on application code and leaving \ac{CI} aside; the production \ac{API}
+then brings the two strands back together. Second, the prototypes have value
+in their own right as didactic artifacts that future students of the laboratory
+can read and re-use.
 
 \section{Prototype Applications}
 \label{sec:prototypes}
 
-The first prototype, \texttt{java-ee-app}, validated the
-\ac{CI}/\ac{CD} infrastructure end-to-end before any of the
-production code base was touched: it is a minimal Maven \ac{WAR}
-exposing two trivial \ac{JAX-RS} endpoints, with a
-\texttt{.gitlab-ci.yml} that builds the artifact and runs Arquillian
-integration tests against two managed Payara Server containers
-declared as \emph{services} in the job. Three patterns from that
-pipeline were carried over verbatim to the production one: the
-pinned base image with the \texttt{ubi-runner} tag, the global Maven
-repository cache, and the \texttt{reports: junit:} stanza that makes
-GitLab understand assertion failures as failed pipeline steps.
+The first prototype, \texttt{java-ee-app}, validated the \ac{CI}/\ac{CD} infrastructure
+end-to-end before any of the production code base was touched: it is a
+minimal Maven \ac{WAR} exposing two trivial \ac{JAX-RS} endpoints, with a \texttt{.gitlab-ci.yml}
+that builds the artifact and runs Arquillian integration tests against two
+managed Payara Server containers declared as \emph{services} in the job.
+Three patterns from that pipeline were carried over verbatim to the
+production one: the pinned base image with the \texttt{ubi-runner} tag, the global
+Maven repository cache, and the \texttt{reports: junit:} stanza that makes GitLab
+understand assertion failures as failed pipeline steps.
 
 The second prototype, \texttt{syncspace-jakarta-app}, focused on the
-opposite concern: a complete Jakarta EE 11 application with no
-\ac{CI} pipeline, exercising the specifications listed in
-Section~\ref{sec:java} on a small room-booking domain (entities
-\texttt{User}, \texttt{Room}, \texttt{Booking}) protected by
-MicroProfile \ac{JWT}~\cite{microprofile}. \ac{JAX-RS}~\cite{jaxrs}
-declares the resources, \ac{CDI} wires the services, \ac{JPA}~\cite{jpa}
-maps the entities, Bean Validation enforces a custom
-\texttt{@ValidDateRange} constraint, and a focused set of four
-\texttt{ExceptionMapper}s
-(\texttt{Business\-Validation\-Mapper}, \texttt{Validation\-Exception\-Mapper},
-\texttt{Json\-Processing\-Exception\-Mapper}, \texttt{Global\-Exception\-Mapper})
-translates domain and framework exceptions into structured \ac{JSON}
-errors without leaking stack traces. The end-to-end exception flow
-is summarised in Figure~\ref{fig:errormapper}.
+opposite concern: a complete Jakarta EE 11 application with no \ac{CI}
+pipeline, exercising the specifications listed in Section~\ref{sec:java} on a
+small room-booking domain (entities \texttt{User}, \texttt{Room}, \texttt{Booking})
+protected by MicroProfile \ac{JWT}~\cite{microprofile}. \ac{JAX-RS}~\cite{jaxrs}
+declares the resources, \ac{CDI} wires the services, \ac{JPA}~\cite{jpa} maps
+the entities, Bean Validation enforces a custom \texttt{@ValidDateRange} constraint,
+and a focused set of four \texttt{ExceptionMapper}s (\texttt{Business\-Validation\-Mapper},
+\texttt{Validation\-Exception\-Mapper}, \texttt{Json\-Processing\-Exception\-Mapper},
+\texttt{Global\-Exception\-Mapper}) translates domain and framework exceptions
+into structured \ac{JSON} errors without leaking stack traces. The end-to-end
+exception flow is summarised in Figure~\ref{fig:errormapper}.
 
 \begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      every node/.style={font=\small},
-      node distance=8mm,
-      box/.style={draw, rounded corners=2pt, align=center, thick,
-                  minimum height=8mm, minimum width=28mm},
-      stage/.style={box, fill=dkblue!10},
-      mapper/.style={box, fill=mauve!10, minimum width=36mm, font=\footnotesize},
-      outbox/.style={box, fill=dkgreen!10, minimum width=36mm},
-      arrow/.style={-{Stealth[length=2mm]}, thick}
-    ]
-    \node[stage] (client) {HTTP client};
-    \node[stage, below=of client] (resource) {\textbf{BookingResource} \\\footnotesize \texttt{@Inject BookingService}};
-    \node[stage, below=of resource] (svc) {\textbf{BookingService} \\\footnotesize business logic};
-    \node[stage, below=of svc, fill=red!12] (ex) {Exception thrown};
-    \node[stage, below=of ex] (dispatch) {JAX-RS exception dispatch \\\footnotesize matches type};
+	\centering
+	\resizebox{\linewidth}{!}{%
+	\begin{tikzpicture}[
+		every node/.style={font=\small},
+		node distance=8mm,
+		box/.style={draw, rounded corners=2pt, align=center, thick, minimum height=8mm, minimum width=28mm},
+		stage/.style={box, fill=dkblue!10},
+		mapper/.style={box, fill=mauve!10, minimum width=36mm, font=\footnotesize},
+		outbox/.style={box, fill=dkgreen!10, minimum width=36mm},
+		arrow/.style={-{Stealth[length=2mm]}, thick}
+	]
+		\node[stage] (client) {HTTP client};
+		\node[stage, below=of client]
+			(resource)
+			{\textbf{BookingResource} \\\footnotesize \texttt{@Inject BookingService}};
+		\node[stage, below=of resource]
+			(svc)
+			{\textbf{BookingService} \\\footnotesize business logic};
+		\node[stage, below=of svc, fill=red!12] (ex) {Exception thrown};
+		\node[stage, below=of ex]
+			(dispatch)
+			{JAX-RS exception dispatch \\\footnotesize matches type};
 
-    \node[mapper, below=10mm of dispatch, xshift=-58mm] (m1) {BusinessValidation\\Mapper};
-    \node[mapper, right=4mm of m1] (m2) {Validation\\ExceptionMapper};
-    \node[mapper, right=4mm of m2] (m3) {JsonProcessing\\ExceptionMapper};
-    \node[mapper, right=4mm of m3] (m4) {Global\\ExceptionMapper};
+		\node[mapper, below=10mm of dispatch, xshift=-58mm]
+			(m1)
+			{BusinessValidation\\Mapper};
+		\node[mapper, right=4mm of m1] (m2) {Validation\\ExceptionMapper};
+		\node[mapper, right=4mm of m2] (m3) {JsonProcessing\\ExceptionMapper};
+		\node[mapper, right=4mm of m3] (m4) {Global\\ExceptionMapper};
 
-    \node[outbox, below=10mm of m2, xshift=20mm] (resp) {Response.builder() \\\footnotesize \texttt{\{ "error": "...", "details": [...] \}}};
-    \node[stage, below=of resp] (cliback) {HTTP client \\\footnotesize sees structured JSON, never a stack trace};
+		\node[outbox, below=10mm of m2, xshift=20mm]
+			(resp)
+			{Response.builder() \\\footnotesize \texttt{\{ "error": "...", "details": [...] \}}};
+		\node[stage, below=of resp]
+			(cliback)
+			{HTTP client \\\footnotesize sees structured JSON, never a stack trace};
 
-    \draw[arrow] (client)   -- node[right,font=\scriptsize]{POST /api/v1/bookings} (resource);
-    \draw[arrow] (resource) -- (svc);
-    \draw[arrow] (svc)      -- (ex);
-    \draw[arrow] (ex)       -- (dispatch);
-    \draw[arrow] (dispatch) -- (m1);
-    \draw[arrow] (dispatch) -- (m2);
-    \draw[arrow] (dispatch) -- (m3);
-    \draw[arrow] (dispatch) -- (m4);
-    \draw[arrow] (m1)       -- (resp);
-    \draw[arrow] (m2)       -- (resp);
-    \draw[arrow] (m3)       -- (resp);
-    \draw[arrow] (m4)       -- (resp);
-    \draw[arrow] (resp)     -- (cliback);
-  \end{tikzpicture}%
-  }
-  \caption{The \ac{CDI} + \ac{JAX-RS} exception-handling flow used by
-  \texttt{syncspace-jakarta-app} and partly inherited by
-  \texttt{api\_v4.0}. Any exception thrown inside a resource or
-  service bean is intercepted by the most specific registered
-  \texttt{ExceptionMapper}, which produces a stable \ac{JSON}
-  error body.}
-  \label{fig:errormapper}
+		\draw[arrow]
+			(client) --
+			node[right, font=\scriptsize] {POST /api/v1/bookings}
+			(resource);
+		\draw[arrow] (resource) -- (svc);
+		\draw[arrow] (svc) -- (ex);
+		\draw[arrow] (ex) -- (dispatch);
+		\draw[arrow] (dispatch) -- (m1);
+		\draw[arrow] (dispatch) -- (m2);
+		\draw[arrow] (dispatch) -- (m3);
+		\draw[arrow] (dispatch) -- (m4);
+		\draw[arrow] (m1) -- (resp);
+		\draw[arrow] (m2) -- (resp);
+		\draw[arrow] (m3) -- (resp);
+		\draw[arrow] (m4) -- (resp);
+		\draw[arrow] (resp) -- (cliback);
+	\end{tikzpicture}%
+	}
+	\caption{The \ac{CDI} + \ac{JAX-RS} exception-handling flow \ac{JSON} error
+	body.}
+	\label{fig:errormapper}
 \end{figure}
 
-Two patterns from \texttt{syncspace-jakarta-app} were adopted by the
-production refactor: the use of a small set of focused
-\texttt{ExceptionMapper}s (which keeps \ac{HTTP} status codes
-meaningful and gives the differential harness a stable signal to
-assert on) and the use of \texttt{record}-based \acp{POJO} for
-request and response bodies (which simplifies diffing). The
-remaining features, in particular the full \ac{JWT} flow, were
-retained in the prototype as a self-contained reference example for
-future students.
+Two patterns from \texttt{syncspace-jakarta-app} were adopted by the production
+refactor: the use of a small set of focused \texttt{ExceptionMapper}s (which
+keeps \ac{HTTP} status codes meaningful and gives the differential harness
+a stable signal to assert on) and the use of \texttt{record}-based \acp{POJO}
+for request and response bodies (which simplifies diffing). The remaining
+features, in particular the full \ac{JWT} flow, were retained in the prototype
+as a self-contained reference example for future students.
 
 \section{Architecture of the Differential Testing Framework}
 \label{sec:arch}
 
-The architecture of the final testing framework, applied to the
-production \ac{API}, is summarised in Figure~\ref{fig:arch}. It is
-made of three concentric layers: the GitLab pipeline, the harness
-processes, and the application instances themselves.
+The architecture of the final testing framework, applied to the production \ac{API},
+is summarised in Figure~\ref{fig:arch}. It is made of three concentric
+layers: the GitLab pipeline, the harness processes, and the application instances
+themselves.
+
+Solid arrows denote control flow inside the pipeline; dashed arrows denote
+artifact or data access. The \texttt{http-diff-job} runs a three-way
+comparison between the \texttt{HEAD} build and two baselines, the immediate
+parent commit and a fixed reference commit, all pointed at the same database
+fixture.
 
 \begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      node distance=8mm and 12mm,
-      every node/.style={font=\small},
-      box/.style={draw, rounded corners=2pt, minimum height=10mm,
-                  minimum width=28mm, align=center, thick},
-      smallbox/.style={box, minimum width=22mm, minimum height=8mm,
-                  font=\footnotesize},
-      arrow/.style={-{Stealth[length=2mm]}, thick}
-    ]
-    \node[box, fill=lgray] (push) {Developer push \\ on a branch};
-    \node[box, right=18mm of push, fill=dkblue!10] (gitlab) {GitLab CI server \\ (self-managed)};
-    \node[box, right=18mm of gitlab, fill=dkblue!10] (runner) {GitLab Runner \\ (\texttt{ubi-runner-.31})};
+	\centering
+	\resizebox{\linewidth}{!}{%
+	\begin{tikzpicture}[
+		node distance=8mm and 12mm,
+		every node/.style={font=\small},
+		box/.style={draw, rounded corners=2pt, minimum height=10mm, minimum width=28mm, align=center, thick},
+		smallbox/.style={box, minimum width=22mm, minimum height=8mm, font=\footnotesize},
+		arrow/.style={-{Stealth[length=2mm]}, thick}
+	]
+		\node[box, fill=lgray] (push) {Developer push \\ on a branch};
+		\node[box, right=18mm of push, fill=dkblue!10]
+			(gitlab)
+			{GitLab CI server \\ (self-managed)};
+		\node[box, right=18mm of gitlab, fill=dkblue!10]
+			(runner)
+			{GitLab Runner \\ (\texttt{ubi-runner-.31})};
 
-    \node[smallbox, below=12mm of runner, fill=dkgreen!10] (build) {\texttt{build-job} \\ \scriptsize mvn package};
-    \node[smallbox, below=of build, fill=dkgreen!10] (test) {\texttt{integration-test-job}};
-    \node[smallbox, below=of test, fill=dkgreen!10] (diff)  {\texttt{validate-diff-job}};
-    \node[smallbox, below=of diff, fill=dkgreen!10] (http)  {\texttt{http-diff-job}};
+		\node[smallbox, below=12mm of runner, fill=dkgreen!10]
+			(build)
+			{\texttt{build-job} \\ \scriptsize mvn package};
+		\node[smallbox, below=of build, fill=dkgreen!10]
+			(test)
+			{\texttt{integration-test-job}};
+		\node[smallbox, below=of test, fill=dkgreen!10]
+			(http)
+			{\texttt{http-diff-job}};
 
-    \node[box, left=24mm of test, fill=mauve!10] (head) {HEAD WAR};
-    \node[box, below=of head, fill=mauve!10] (brecent) {Baseline WAR \\ recent \\ (\texttt{HEAD\textasciitilde 1})};
-    \node[box, below=of brecent, fill=mauve!10] (bfixed) {Baseline WAR \\ fixed \\ (\texttt{\$DIFF\_FIXED\_BASELINE})};
+		\node[box, left=24mm of test, fill=mauve!10] (head) {HEAD WAR};
+		\node[box, below=of head, fill=mauve!10]
+			(brecent)
+			{Baseline WAR \\ recent \\ (\texttt{HEAD\textasciitilde 1})};
+		\node[box, below=of brecent, fill=mauve!10]
+			(bfixed)
+			{Baseline WAR \\ fixed \\ (\texttt{\$DIFF\_FIXED\_BASELINE})};
 
-    \node[box, below=10mm of bfixed, fill=dark!10] (db) {PostgreSQL \\ (\texttt{192.168.168.30}) \\ \scriptsize J or F fixture};
+		\node[box, below=10mm of bfixed, fill=dark!10]
+			(db)
+			{PostgreSQL \\ (\texttt{192.168.168.30}) \\ \scriptsize J or F fixture};
 
-    \draw[arrow] (push) -- (gitlab);
-    \draw[arrow] (gitlab) -- (runner);
-    \draw[arrow] (runner) -- (build);
-    \draw[arrow] (build)  -- (test);
-    \draw[arrow] (test)   -- (diff);
-    \draw[arrow] (diff)   -- (http);
+		\draw[arrow] (push) -- (gitlab);
+		\draw[arrow] (gitlab) -- (runner);
+		\draw[arrow] (runner) -- (build);
+		\draw[arrow] (build) -- (test);
+		\draw[arrow] (test) -- (http);
 
-    \draw[arrow, dashed] (build) -- (head);
-    \draw[arrow, dashed] (diff)  -- (brecent);
-    \draw[arrow, dashed] (diff)  -- (bfixed);
-    \draw[arrow, dashed] (http)  -- (head);
-    \draw[arrow, dashed] (http)  -- (brecent);
-    \draw[arrow, dashed] (http)  -- (bfixed);
-    \draw[arrow, dashed] (head)    -- (db);
-    \draw[arrow, dashed] (brecent) -- (db);
-    \draw[arrow, dashed] (bfixed)  -- (db);
-  \end{tikzpicture}%
-  }
-  \caption{Overall architecture of the differential testing framework.
-  Solid arrows denote control flow inside the pipeline; dashed arrows
-  denote artifact or data access. Both diff jobs run a three-way
-  comparison between the \texttt{HEAD} build and two baselines, the
-  immediate parent commit and a fixed reference commit, all
-  pointed at the same database fixture.}
-  \label{fig:arch}
+		\draw[arrow, dashed] (build) -- (head);
+		\draw[arrow, dashed] (http) -- (head);
+		\draw[arrow, dashed] (http) -- (brecent);
+		\draw[arrow, dashed] (http) -- (bfixed);
+		\draw[arrow, dashed] (head) -- (db);
+		\draw[arrow, dashed] (brecent) -- (db);
+		\draw[arrow, dashed] (bfixed) -- (db);
+	\end{tikzpicture}%
+	}
+	\caption{Overall architecture of the differential testing framework.}
+	\label{fig:arch}
 \end{figure}
 
-A push by the developer triggers a pipeline on the runner tagged
-\texttt{ubi-runner-.31}, which goes through four jobs across three
-stages: \texttt{build-job} produces the \texttt{HEAD} \ac{WAR},
-\texttt{integration-test-job} runs the regular JUnit integration
-tests, \texttt{validate-diff-job} reconstructs both baseline
-\acp{WAR} via Git worktrees and runs the code-level diff harness
-against each in turn, and \texttt{http-diff-job} boots all three
-Payara Micro instances on different ports, replays
-\texttt{http-diff-cases.json} against each and emits per-baseline
-diff reports. All reports are picked up by GitLab as both JUnit
-results and raw artifacts.
+A push by the developer triggers a pipeline on the runner tagged \texttt{ubi-runner-.31},
+which goes through three jobs across three stages: \texttt{build-job}
+produces the \texttt{HEAD} \ac{WAR}, \texttt{integration-test-job} runs the
+regular JUnit integration tests, and \texttt{http-diff-job} reconstructs
+both baseline \acp{WAR} via Git worktrees, boots all three Payara Micro
+instances on different ports, replays \texttt{http-diff-cases.json} against
+each and emits per-baseline diff reports. All reports are picked up by GitLab
+as both JUnit results and raw artifacts.
 
-The two prototypes traded a longer time-to-result for a sharper
-separation of concerns between \ac{CI}/\ac{CD} infrastructure and
-Jakarta EE feature usage; the next chapter applies the resulting
-framework to the production \ac{API}.
+The two prototypes traded a longer time-to-result for a sharper separation of
+concerns between \ac{CI}/\ac{CD} infrastructure and Jakarta EE feature usage;
+the next chapter applies the resulting framework to the production \ac{API}.

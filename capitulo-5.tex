@@ -36,6 +36,10 @@ agencies, file types, observation summaries, embargoes); and
 \texttt{Config} (\texttt{Loader.java}) is the cross-cutting concern
 that handles bootstrap.
 
+Solid arrows
+denote ordinary call/data flow; dashed arrows denote configuration
+and infrastructure binding established at deployment time.
+
 \begin{figure}[h]
   \centering
   \resizebox{\linewidth}{!}{%
@@ -74,9 +78,7 @@ that handles bootstrap.
     \draw[arrow, dashed] (pu)  -- (jpa);
   \end{tikzpicture}%
   }
-  \caption{Layered architecture of \texttt{api\_v4.0}. Solid arrows
-  denote ordinary call/data flow; dashed arrows denote configuration
-  and infrastructure binding established at deployment time.}
+  \caption{Layered architecture of \texttt{EPOS V4}.}
   \label{fig:apiv4-layers}
 \end{figure}
 
@@ -144,6 +146,14 @@ The shape of the schema is discussed in
 Section~\ref{sec:epos-db}; a simplified view of the central entities
 is given in Figure~\ref{fig:datamodel}.
 
+Representative columns as they appear in the live PostgreSQL schema.
+Green entities carry domain data; purple entities are
+controlled-vocabulary lookups (note that \texttt{country.iso\_code}
+is the natural primary key, not a surrogate \texttt{id});
+grey entities are junction tables that materialise the many-to-many
+relationships of the model. Arrows point from the ``one'' side to
+the ``many'' side of the relationship.
+
 \begin{figure}[h]
   \centering
   \resizebox{\linewidth}{!}{%
@@ -183,14 +193,7 @@ is given in Figure~\ref{fig:datamodel}.
     \draw[arrow] (nodest)  -- node[rel,right]{*..1} (node);
   \end{tikzpicture}%
   }
-  \caption{Simplified view of the core \ac{EPOS} data model, with
-  representative columns as they appear in the live PostgreSQL schema.
-  Green entities carry domain data; purple entities are
-  controlled-vocabulary lookups (note that \texttt{country.iso\_code}
-  is the natural primary key, not a surrogate \texttt{id});
-  grey entities are junction tables that materialise the many-to-many
-  relationships of the model. Arrows point from the ``one'' side to
-  the ``many'' side of the relationship.}
+  \caption{Simplified view of the core \ac{EPOS} data model}
   \label{fig:datamodel}
 \end{figure}
 
@@ -198,8 +201,8 @@ is given in Figure~\ref{fig:datamodel}.
 \label{sec:pipeline}
 
 The pipeline of \texttt{api\_v4.0} extends the patterns validated on
-the first prototype with two additional jobs in a new \texttt{diff}
-stage. Each diff job compares the current build against \emph{two}
+the first prototype with an additional job in a new \texttt{diff}
+stage. The diff job compares the current build against \emph{two}
 baselines, in what amounts to a three-way comparison: the immediate
 parent commit \texttt{HEAD\textasciitilde 1} (which catches
 regressions introduced by the commit currently being pushed) and a
@@ -210,7 +213,7 @@ along a long-running refactor branch). The key parts of the
 \texttt{.gitlab-ci.yml} are shown, condensed, in
 Listing~\ref{lst:apiv4-ci}.
 
-\begin{lstlisting}[language=yaml,caption={Condensed view of the production \texttt{.gitlab-ci.yml}, three stages and four jobs.},label=lst:apiv4-ci]
+\begin{lstlisting}[language=yaml,caption={Condensed view of the production \texttt{.gitlab-ci.yml}, three stages and three jobs.},label=lst:apiv4-ci]
 default:
   image: maven:3.9.6-eclipse-temurin-21
   tags: [ ubi-runner-.31 ]
@@ -231,29 +234,6 @@ integration-test-job:
   artifacts:
     when: always
     reports: { junit: [ "target/failsafe-reports/TEST-*.xml" ] }
-
-validate-diff-job:
-  stage: diff
-  needs: [ { job: build-job, artifacts: false } ]
-  variables: { DIFF_FIXED_BASELINE: "" }   # commit SHA, CI/CD var
-  script:
-    - |
-      run() { # $1=label, $2=sha
-        [ -z "$2" ] && return 0
-        WORK=/tmp/$1-baseline-build
-        git worktree add "$WORK" "$2"
-        ( cd "$WORK" && mvn -q -o package -DskipTests )
-        export BASELINE_WAR="$WORK/target/ROOT.war" DIFF_LABEL="$1"
-        export DIFF_REPORT_DIR="target/diff-report/$1"
-        mkdir -p "$DIFF_REPORT_DIR"
-        mvn test -Dtest=DiffHarness -DfailIfNoTests=false
-      }
-      run recent "$(git rev-parse --verify HEAD~1 2>/dev/null)"
-      run fixed  "$DIFF_FIXED_BASELINE"
-  artifacts:
-    when: always
-    paths: [ target/diff-report/ ]
-    reports: { junit: [ "target/surefire-reports/TEST-Diff.DiffHarness.xml" ] }
 
 http-diff-job:
   stage: diff
@@ -299,59 +279,24 @@ the corresponding sub-run is skipped. A pipeline can therefore have
 zero, one or two diff sub-runs depending on the situation, and never
 fails because a baseline is simply unavailable.
 
-\section{The Code-Level Diff: \texttt{DiffHarness.java}}
-\label{sec:diffharness}
-
-\texttt{DiffHarness.java} is a JUnit~5 test that compares two
-versions of a specific Java class on a shared input grid, in
-process. Its core idea is to load the baseline and the \texttt{HEAD}
-\acp{WAR} through two independent \texttt{URLClassLoader} instances,
-to reflect into the class under test on both sides and to invoke
-each method of interest with the same arguments. Any difference
-between the two returned values, thrown exceptions included,
-is recorded as a row in the diff report.
-
-The pipeline invokes the harness once per baseline (recent and
-fixed; see Section~\ref{sec:pipeline}). The exported environment
-variables \texttt{BASELINE\_WAR}, \texttt{DIFF\_REPORT\_DIR} and
-\texttt{DIFF\_LABEL} tell the harness which \ac{WAR} to load against
-\texttt{HEAD} and where to write its outputs. The on-disk layout is
-\texttt{target/diff-report/recent/} and
-\texttt{target/diff-report/fixed/}, so a glance at the artifact tree
-of a finished pipeline immediately distinguishes a per-commit
-regression from a long-term drift.
-
-The harness focuses on two classes for which behaviour is critical
-and for which an entire endpoint cannot be exercised in isolation:
-\texttt{Validate}, which parses and validates client query
-parameters, and \texttt{Shape}, which evaluates geometric polygon
-queries against the bounding box of a request. Both classes are
-purely functional, take simple inputs (strings, lists of doubles)
-and return simple outputs (booleans, lists, error strings), which
-makes them well suited to a code-level diff.
-
-The output of each sub-run is twofold. A \ac{JUnit} XML report
-(\texttt{TEST-Diff.\allowbreak DiffHarness.xml}, with the \texttt{DIFF\_LABEL}
-appearing as a test-suite property) integrates with GitLab so that
-divergences appear as failed assertions on the pipeline page. In
-parallel, a richer \ac{CSV}/\ac{JSON} report under the per-baseline
-subdirectory records every input row, the value returned by the
-baseline, the value returned by \texttt{HEAD} and an indicator of
-whether the two match. The \ac{CSV} format makes the report easy
-to open in a spreadsheet for ad-hoc analysis.
-
 \section{The \ac{HTTP}-Level Diff: \texttt{HttpDiff.java}}
 \label{sec:httpdiff}
 
-\texttt{HttpDiff.java} is the second harness, and the one that
+\texttt{HttpDiff.java} is the harness that
 exercises the \ac{API} end-to-end. Its execution proceeds in four
 phases, summarised graphically in Figure~\ref{fig:httpdiff-phases}.
-Unlike the code-level harness, which is invoked twice by the
-pipeline, the \ac{HTTP} harness runs once and internally boots
+The \ac{HTTP} harness runs once and internally boots
 \emph{all} the available \acp{WAR} in parallel (the \texttt{HEAD}
 \ac{WAR}, the recent baseline if any, and the fixed baseline if
 any). It then issues every test case against every running instance
 and emits one diff report per baseline.
+
+The harness boots one
+Payara Micro per available \ac{WAR}, the \texttt{HEAD} build and
+whichever of the recent/fixed baselines were provided, waits
+for all of them to be ready, fires every test case against every
+instance in parallel, then performs a three-way comparison and
+emits one diff report per baseline.
 
 \begin{figure}[h]
   \centering
@@ -405,13 +350,7 @@ and emits one diff report per baseline.
         node[midway,above,font=\scriptsize]{SIGTERM all payara-micro};
   \end{tikzpicture}%
   }
-  \caption{Phases of \texttt{HttpDiff.java}. The harness boots one
-  Payara Micro per available \ac{WAR}, the \texttt{HEAD} build and
-  whichever of the recent/fixed baselines were provided, waits
-  for all of them to be ready, fires every test case against every
-  instance in parallel, then performs a three-way comparison and
-  emits one diff report per baseline. All instances share the same
-  real PostgreSQL fixture over the laboratory \ac{VPN}.}
+  \caption{Phases of \texttt{HttpDiff.java}.}
   \label{fig:httpdiff-phases}
 \end{figure}
 
@@ -419,9 +358,7 @@ The figure already covers the gist; a few implementation details are
 worth recording. The test cases live in
 \texttt{src/\allowbreak test/\allowbreak resources/\allowbreak http-diff-cases.json}
 as a \ac{JSON} array of request descriptors (method, path, headers,
-optional body); the deploy-verification handshake added in commit
-\texttt{67a0da9} (``\emph{prove deploy actually happened before
-counting it as ready}'') guards against spurious failures from
+optional body); This guards against spurious failures from
 requests landing on still-deploying containers. Bodies are compared
 as normalised strings (sorted \ac{JSON} keys, trimmed whitespace)
 and the headers that vary by definition (\texttt{Date},
@@ -433,20 +370,14 @@ accumulated drift remain distinguishable in the artifact tree.
 \section{Reports and Findings}
 \label{sec:reports}
 
-Each pipeline run publishes the integration-test reports, the two
+Each pipeline run publishes the integration-test reports, the
 diff reports (\texttt{recent/} and \texttt{fixed/} subdirectories of
-\texttt{target/\{diff,http-diff\}-report/}) and the JUnit XML files
+\texttt{target/http-diff-report/}) and the JUnit XML files
 consumed by GitLab. Integration test results expire after one week;
 the diff reports are kept for four because they are the historical
 record of behavioural change across the refactor. During development
-the harnesses surfaced a handful of real regressions hidden inside
-seemingly cosmetic refactors. The most representative example is
-the extraction of latitude and longitude range bounds to named
-constants (commits \texttt{7c8ff37} and the subsequent
-\texttt{cc223ba} revert): the diff harness reported a silent
-behavioural change at the boundary that no human review of the diff
-would have caught by eye. Those two commits, in the author's view,
-are the best validation that the framework does what it was designed
-for. The next chapter draws the main conclusions of the project and
+the harness surfaced real regressions hidden inside seemingly
+cosmetic refactors that no line-by-line review of the diff would
+plausibly have caught by eye. The next chapter draws the main conclusions of the project and
 outlines the items that, by choice or by constraint, were left out
 of its scope.

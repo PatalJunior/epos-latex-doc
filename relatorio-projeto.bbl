@@ -12,71 +12,60 @@
 
 \bibitem{rinex}
 Werner Gurtner and Lou Estey.
-\newblock {RINEX --- The Receiver Independent Exchange Format, Version 3.05},
-  2020.
+\newblock {RINEX --- The Receiver Independent Exchange Format, Version 3.05}, 2020.
 \newblock International GNSS Service (IGS), RINEX Working Group.
 
 \bibitem{jakartaee}
 {Eclipse Foundation}.
 \newblock {Jakarta EE 11 Platform Specification}, 2024.
-\newblock [Online] \url{https://jakarta.ee/specifications/platform/11/}.
-  Accessed June 2026.
+\newblock [Online] \url{https://jakarta.ee/specifications/platform/11/}. Accessed June 2026.
 
 \bibitem{payara}
 {Payara Services Ltd.}
 \newblock {Payara Platform Community Documentation}, 2024.
 \newblock [Online] \url{https://docs.payara.fish/}. Accessed June 2026.
 
+\bibitem{repo-gnss-v4}
+{SEGAL Laboratory}.
+\newblock {GNSs V4 Production API Repository}.
+\newblock \url{https://gitlab.com/segalubi/api_v4.0}, 2026.
+\newblock Access restricted to laboratory members.
+
+\bibitem{repo-java-ee}
+Eduardo Abrantes.
+\newblock {Java EE Prototype Application Repository}.
+\newblock \url{https://gitlab.com/PatalJunior/java-ee-app}, 2026.
+
+\bibitem{repo-syncspace}
+Eduardo Abrantes.
+\newblock {Syncspace Jakarta Prototype Application Repository}.
+\newblock \url{https://gitlab.com/PatalJunior/syncspace-jakarta-app}, 2026.
+
 \bibitem{junit5}
 {JUnit Team}.
 \newblock {JUnit 5 User Guide}, 2024.
-\newblock [Online] \url{https://junit.org/junit5/docs/current/user-guide/}.
-  Accessed June 2026.
+\newblock [Online] \url{https://junit.org/junit5/docs/current/user-guide/}. Accessed June 2026.
 
 \bibitem{testng}
 C{\'e}dric Beust.
 \newblock {TestNG documentation}, 2024.
 \newblock [Online] \url{https://testng.org/}. Accessed June 2026.
 
-\bibitem{testcontainers}
-{AtomicJar, Inc.}
-\newblock {Testcontainers for Java}, 2024.
-\newblock [Online] \url{https://java.testcontainers.org/}. Accessed June 2026.
-
 \bibitem{arquillian}
 {Red Hat, Inc.}
 \newblock {Arquillian Container Testing Framework}, 2024.
 \newblock [Online] \url{https://arquillian.org/}. Accessed June 2026.
 
-\bibitem{restassured}
-{REST Assured Contributors}.
-\newblock {REST Assured --- Java DSL for testing REST services}, 2024.
-\newblock [Online] \url{https://rest-assured.io/}. Accessed June 2026.
-
-\bibitem{postman}
-{Postman, Inc.}
-\newblock {Postman API Platform}, 2024.
-\newblock [Online] \url{https://www.postman.com/}. Accessed June 2026.
-
-\bibitem{newman}
-{Postman, Inc.}
-\newblock {Newman --- a Postman command-line collection runner}, 2024.
-\newblock [Online] \url{https://github.com/postmanlabs/newman}. Accessed June
-  2026.
-
 \bibitem{diffyTwitter}
 {Twitter Engineering}.
-\newblock {Diffy --- Automatically catch bugs in service-oriented
-  architectures}, 2015.
-\newblock [Online]
-  \url{https://blog.twitter.com/engineering/en_us/a/2015/diffy-testing-services-without-writing-tests}.
-  Accessed June 2026.
+\newblock {Diffy --- Automatically catch bugs in service-oriented architectures}, 2015.
+\newblock [Online] \url{https://blog.twitter.com/engineering/en_us/a/2015/diffy-testing-services-without-writing-tests}. Accessed June 2026.
 
-\bibitem{humbleFarley2010continuous}
-Jez Humble and David Farley.
-\newblock {\em {Continuous Delivery: Reliable Software Releases through Build,
-  Test, and Deployment Automation}}.
-\newblock Addison-Wesley Professional, 2010.
+\bibitem{git}
+{Git Development Community}.
+\newblock {Git: Fast Version Control System}.
+\newblock \url{https://git-scm.com/}, 2005.
+\newblock Original author: Linus Torvalds.
 
 \bibitem{jenkins}
 {Jenkins Project}.
@@ -103,25 +92,15 @@ Jez Humble and David Farley.
 \newblock {GitLab Self-Managed --- Install and configure}, 2024.
 \newblock [Online] \url{https://about.gitlab.com/install/}. Accessed June 2026.
 
-\bibitem{fielding2000rest}
-Roy~T. Fielding.
-\newblock {Architectural Styles and the Design of Network-based Software
-  Architectures}.
-\newblock In {\em {Ph.D. dissertation, University of California, Irvine}},
-  2000.
-\newblock Chapter 5 introduces REST.
-
 \bibitem{openapi}
 {OpenAPI Initiative}.
 \newblock {OpenAPI Specification, Version 3.1.0}, 2021.
-\newblock [Online] \url{https://spec.openapis.org/oas/v3.1.0}. Accessed June
-  2026.
+\newblock [Online] \url{https://spec.openapis.org/oas/v3.1.0}. Accessed June 2026.
 
 \bibitem{swaggerui}
 {SmartBear Software}.
 \newblock {Swagger UI}, 2024.
-\newblock [Online] \url{https://swagger.io/tools/swagger-ui/}. Accessed June
-  2026.
+\newblock [Online] \url{https://swagger.io/tools/swagger-ui/}. Accessed June 2026.
 
 \bibitem{javaSE21}
 Oracle Corporation.
@@ -132,14 +111,12 @@ Oracle Corporation.
 \bibitem{jaxrs}
 {Eclipse Foundation}.
 \newblock {Jakarta RESTful Web Services 4.0}, 2024.
-\newblock [Online] \url{https://jakarta.ee/specifications/restful-ws/4.0/}.
-  Accessed June 2026.
+\newblock [Online] \url{https://jakarta.ee/specifications/restful-ws/4.0/}. Accessed June 2026.
 
 \bibitem{jpa}
 {Eclipse Foundation}.
 \newblock {Jakarta Persistence 3.2}, 2024.
-\newblock [Online] \url{https://jakarta.ee/specifications/persistence/3.2/}.
-  Accessed June 2026.
+\newblock [Online] \url{https://jakarta.ee/specifications/persistence/3.2/}. Accessed June 2026.
 
 \bibitem{microprofile}
 {Eclipse Foundation}.
@@ -149,57 +126,21 @@ Oracle Corporation.
 \bibitem{springBoot}
 {VMware, Inc.}
 \newblock {Spring Boot Reference Documentation}, 2024.
-\newblock [Online] \url{https://docs.spring.io/spring-boot/index.html}.
-  Accessed June 2026.
+\newblock [Online] \url{https://docs.spring.io/spring-boot/index.html}. Accessed June 2026.
 
 \bibitem{postgresql}
 {PostgreSQL Global Development Group}.
 \newblock {PostgreSQL 16 Documentation}, 2024.
-\newblock [Online] \url{https://www.postgresql.org/docs/16/}. Accessed June
-  2026.
+\newblock [Online] \url{https://www.postgresql.org/docs/16/}. Accessed June 2026.
 
 \bibitem{mysql}
 {Oracle Corporation}.
 \newblock {MySQL 8.0 Reference Manual}, 2024.
-\newblock [Online] \url{https://dev.mysql.com/doc/refman/8.0/en/}. Accessed
-  June 2026.
-
-\bibitem{hibernate}
-{Red Hat, Inc.}
-\newblock {Hibernate ORM Documentation}, 2024.
-\newblock [Online] \url{https://hibernate.org/orm/documentation/}. Accessed
-  June 2026.
-
-\bibitem{hikaricp}
-Brett Wooldridge.
-\newblock {HikariCP --- A high-performance JDBC connection pool}, 2024.
-\newblock [Online] \url{https://github.com/brettwooldridge/HikariCP}. Accessed
-  June 2026.
-
-\bibitem{apacheTomcat}
-{The Apache Software Foundation}.
-\newblock {Apache Tomcat documentation}, 2024.
-\newblock [Online] \url{https://tomcat.apache.org/}. Accessed June 2026.
-
-\bibitem{chacon2014pro}
-Scott Chacon and Ben Straub.
-\newblock {\em {Pro Git}}.
-\newblock Apress, 2nd edition, 2014.
-\newblock [Online] \url{https://git-scm.com/book/en/v2}.
+\newblock [Online] \url{https://dev.mysql.com/doc/refman/8.0/en/}. Accessed June 2026.
 
 \bibitem{docker}
 {Docker, Inc.}
 \newblock {Docker Documentation}, 2024.
 \newblock [Online] \url{https://docs.docker.com/}. Accessed June 2026.
-
-\bibitem{composeSpec}
-{Docker, Inc.}
-\newblock {Compose Specification}, 2024.
-\newblock [Online] \url{https://compose-spec.io/}. Accessed June 2026.
-
-\bibitem{wireguard}
-Jason~A. Donenfeld.
-\newblock {WireGuard: Next Generation Kernel Network Tunnel}, 2020.
-\newblock [Online] \url{https://www.wireguard.com/}. Accessed June 2026.
 
 \end{thebibliography}

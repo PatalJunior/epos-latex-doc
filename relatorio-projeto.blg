@@ -10,46 +10,47 @@ A level-1 auxiliary file: capitulo-3.aux
 A level-1 auxiliary file: capitulo-4.aux
 A level-1 auxiliary file: capitulo-5.aux
 A level-1 auxiliary file: conc-trab-futuro.aux
+A level-1 auxiliary file: apendice1.aux
 The style file: unsrt.bst
 Database file #1: bibliografia.bib
-You've used 36 entries,
+You've used 28 entries,
             1791 wiz_defined-function locations,
-            611 strings with 8537 characters,
-and the built_in function-call counts, 4774 in all, are:
-= -- 378
-> -- 156
+            578 strings with 7406 characters,
+and the built_in function-call counts, 3650 in all, are:
+= -- 293
+> -- 116
 < -- 0
-+ -- 75
-- -- 39
-* -- 55
-:= -- 728
-add.period$ -- 111
-call.type$ -- 36
-change.case$ -- 34
++ -- 57
+- -- 29
+* -- 34
+:= -- 560
+add.period$ -- 87
+call.type$ -- 28
+change.case$ -- 27
 chr.to.int$ -- 0
-cite$ -- 36
-duplicate$ -- 202
-empty$ -- 659
-format.name$ -- 39
-if$ -- 1125
+cite$ -- 28
+duplicate$ -- 145
+empty$ -- 506
+format.name$ -- 29
+if$ -- 860
 int.to.chr$ -- 0
-int.to.str$ -- 36
-missing$ -- 7
-newline$ -- 186
-num.names$ -- 36
-pop$ -- 248
+int.to.str$ -- 28
+missing$ -- 2
+newline$ -- 146
+num.names$ -- 28
+pop$ -- 191
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 107
+skip$ -- 81
 stack$ -- 0
 substring$ -- 0
-swap$ -- 37
+swap$ -- 28
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 36
-width$ -- 38
-write$ -- 369
+while$ -- 28
+width$ -- 30
+write$ -- 288
