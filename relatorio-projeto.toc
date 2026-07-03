@@ -32,23 +32,30 @@
 \contentsline {subsection}{\numberline {4.3.2}Prototype 2: The SyncSpace Application (\texttt {syncspace-jakarta-app})}{16}{subsection.4.3.2}%
 \contentsline {section}{\numberline {4.4}Architecture of the Differential Testing Framework}{17}{section.4.4}%
 \contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{19}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Architecture of \texttt {api\_v4.0}}{19}{section.5.1}%
+\contentsline {section}{\numberline {5.1}Architecture of \texttt {GLASS V4}}{19}{section.5.1}%
 \contentsline {subsection}{\numberline {5.1.1}Endpoints and Output Formats}{20}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Persistence}{20}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}The CI/CD Pipeline}{22}{section.5.2}%
-\contentsline {section}{\numberline {5.3}The HTTP-Level Diff: \texttt {HttpDiff.java}}{22}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Reports and Findings}{23}{section.5.4}%
-\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{25}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Main Conclusions}{25}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Work}{26}{section.6.2}%
-\contentsline {appendix}{\chapternumberline {A}Prototype 1: Infra Validation}{27}{appendix.A}%
-\contentsline {appendix}{\chapternumberline {B}Prototype 2: SyncSpace Architecture Details}{29}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Technology Stack}{29}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Architecture and Domain Model}{30}{section.B.2}%
-\contentsline {section}{\numberline {B.3}Authentication and Security}{30}{section.B.3}%
-\contentsline {section}{\numberline {B.4}Booking Logic and Data Access}{32}{section.B.4}%
-\contentsline {section}{\numberline {B.5}API Surface}{33}{section.B.5}%
-\contentsline {section}{\numberline {B.6}Validation and Centralized Error Handling}{34}{section.B.6}%
-\contentsline {section}{\numberline {B.7}Design Highlights}{35}{section.B.7}%
-\contentsline {appendix}{\chapternumberline {C}Code Snippet: GLASS CI/CD}{37}{appendix.C}%
-\contentsline {chapter}{Bibliography}{39}{chapter*.44}%
+\contentsline {subsection}{\numberline {5.1.2}Persistence}{21}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}The CI/CD Pipeline Flow}{22}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Stage 1 \& 2: Build and Unit Testing}{23}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Stage 3: Differential Testing (\texttt {diff})}{24}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}The HTTP-Level Diff}{24}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Reports and Findings}{27}{section.5.4}%
+\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{29}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Main Conclusions}{29}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{30}{section.6.2}%
+\contentsline {appendix}{\chapternumberline {A}Prototype 1: Infrastructure and CI/CD Scaffolding}{33}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Technology Stack}{33}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Architecture and Endpoints}{34}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Persistence Readiness}{34}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Testing Framework}{35}{section.A.4}%
+\contentsline {section}{\numberline {A.5}CI/CD Pipeline}{35}{section.A.5}%
+\contentsline {appendix}{\chapternumberline {B}Prototype 2: SyncSpace Architecture Details}{37}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Technology Stack}{37}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Architecture and Domain Model}{38}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Authentication and Security}{38}{section.B.3}%
+\contentsline {section}{\numberline {B.4}Booking Logic and Data Access}{40}{section.B.4}%
+\contentsline {section}{\numberline {B.5}API Surface}{41}{section.B.5}%
+\contentsline {section}{\numberline {B.6}Validation and Centralized Error Handling}{42}{section.B.6}%
+\contentsline {section}{\numberline {B.7}Design Highlights}{43}{section.B.7}%
+\contentsline {appendix}{\chapternumberline {C}Code Snippet: GLASS CI/CD}{45}{appendix.C}%
+\contentsline {chapter}{Bibliography}{47}{chapter*.46}%

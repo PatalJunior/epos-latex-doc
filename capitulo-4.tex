@@ -43,19 +43,29 @@ into the production \ac{API}.
 \subsection{Prototype 1: Infrastructure Validation (\texttt{java-ee-app})}
 \label{subsec:proto1}
 
-The first prototype validated the \ac{CI}/\ac{CD} infrastructure end-to-end before
-any of the production code base was touched. It is a minimal Maven \ac{WAR} exposing
-two trivial \ac{JAX-RS} endpoints, with a \texttt{.gitlab-ci.yml} that
-builds the artifact and runs Arquillian integration tests against two
-managed Payara Server containers declared as \emph{services} in the job.
+The first prototype was constructed strictly to validate the \ac{CI}/\ac{CD}
+infrastructure end-to-end before modifying the production codebase. Built
+as a minimal Maven \ac{WAR} exposing two trivial \ac{JAX-RS} endpoints, its primary
+purpose was to prove that Arquillian integration tests could run reliably against
+managed Payara Server containers provisioned directly within the GitLab pipeline.
 
-Three patterns from that pipeline were carried over verbatim to the production
-one: the pinned base image with the \texttt{ubi-runner} tag, the global
-Maven repository cache, and the \texttt{reports: junit:} stanza that makes
-GitLab understand assertion failures as failed pipeline steps.
+Because this testing environment proved stable, three core pipeline
+patterns were carried over verbatim to the production repository:
+\begin{itemize}
+	\item \textbf{Runner Isolation:} Utilizing the pinned \texttt{ubi-runner} tag
+		to ensure jobs execute on the correct internal \ac{VM} with database
+		access.
 
-For a detailed breakdown of the pipeline configuration, the containerized testing
-environment, and the complete infrastructure setup, please refer to Appendix~\ref{app:infra-validation}.
+	\item \textbf{Build Optimization:} Implementing a global Maven repository
+		cache to prevent redundant dependency downloads across pipeline runs.
+
+	\item \textbf{Test Visibility:} Using the \texttt{reports: junit:} directive
+		to integrate test \ac{XML} reports natively into GitLab, ensuring assertion
+		failures correctly block the pipeline and are visible in the \ac{UI}.
+\end{itemize}
+
+For a comprehensive breakdown of the containerized testing environment, Arquillian
+configuration, and the complete \ac{CI}/\ac{CD} setup, please refer to Appendix~\ref{app:proto1}.
 
 \subsection{Prototype 2: The SyncSpace Application (\texttt{syncspace-jakarta-app})}
 \label{subsec:proto2}

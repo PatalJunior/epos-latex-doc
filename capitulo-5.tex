@@ -2,354 +2,273 @@
 \label{chap:caso-epos}
 
 This chapter applies the framework of Chapter~\ref{chap:metodo-arq} to the
-production \ac{API}, \texttt{api\_v4.0}. The \ac{EPOS} itself~\cite{epos} is
-a pan-European research infrastructure in solid Earth science, organised
-into Thematic Core Services for seismology, geomagnetic observations, \ac{GNSS}
-data and products~\cite{eposGnss}, and so on; the \ac{SEGAL} laboratory of
-\ac{UBI} contributes to the \ac{GNSS} service by operating a node that
-hosts station metadata and \ac{RINEX}~\cite{rinex} observation files, and
-\texttt{api\_v4.0} is the public interface of that node. Three properties
-of the domain shape the test framework: the entities are relatively static (stable
-baselines are easy to obtain), the typical client request returns a long
-list of records (the comparison algorithm must scale to long diffs), and the
-same information is exposed in several serialization formats (the surface
-area to test multiplies but the underlying logic does not).
+production \ac{API}, \texttt{GLASS V4}. The \ac{EPOS} itself~\cite{epos} is a
+pan-European research infrastructure in solid Earth science, organised into
+Thematic Core Services for seismology, geomagnetic observations, \ac{GNSS} data
+and products~\cite{eposGnss}, and so on. The \ac{SEGAL} laboratory of \ac{UBI}
+contributes to the \ac{GNSS} service by operating a node that hosts station
+metadata and \ac{RINEX}~\cite{rinex} observation files. \texttt{GLASS V4} serves
+as the public interface of that node.
 
-\section{Architecture of \texttt{api\_v4.0}}
+Three properties of this domain shape the testing framework: the entities
+are relatively static (making stable baselines easy to obtain), typical client
+requests return extensive lists of records (requiring the comparison
+algorithm to scale to large diffs), and the same information is exposed
+across multiple serialization formats (multiplying the testing surface area without
+changing the underlying logic).
+
+\section{Architecture of \texttt{GLASS V4}}
 \label{sec:apiv4-arch}
 
-The application is a Maven \ac{WAR} project targeting Java SE 21 and Jakarta
-EE 11, deployed onto Payara Server 6 with \texttt{finalName=ROOT} so that it
-serves the root context. Its source tree is organised into four top-level
-packages that form a classical layered architecture (Figure~\ref{fig:apiv4-layers}):
-\texttt{Glass} provides the \ac{REST} layer (\ac{JAX-RS} resources \texttt{StationEndpoints},
-\texttt{FilesEndpoints}, \texttt{ListEndpoints} and \texttt{Start}, plus
-parsers, format writers and the validation/shape helpers); \texttt{Geometry}
-and the helper classes \texttt{Validate.java} and \texttt{Shape.java} form
-a thin business layer; \texttt{DB\_Tables} holds the forty \ac{JPA} entities
-that model the relational schema (stations, networks, agencies, file types,
-observation summaries, embargoes); and \texttt{Config} (\texttt{Loader.java})
-is the cross-cutting concern that handles bootstrap.
+The application is a stateless Jakarta EE 11 \ac{REST} service targeting
+Java SE 21. It is packaged as a Maven \ac{WAR} (\texttt{target/ROOT.war})
+and deployed onto Payara Server 6, anchoring the \ac{JAX-RS} application at
+the root context via \texttt{@ApplicationPath("/api")}.
 
-Solid arrows denote ordinary call/data flow; dashed arrows denote
-configuration and infrastructure binding established at deployment time.
+Its source tree is organised into a strict layered request pipeline where no
+state is held between calls. This stateless design is critical, as it allows
+the differential testing harness to boot parallel application instances simultaneously.
+As shown in Figure~\ref{fig:apiv4-layers}, the architecture implements a "validate-then-query"
+pattern, ensuring malformed requests are rejected with a \texttt{400 Bad
+Request} before initiating costly database round-trips. Furthermore, the core
+is format-agnostic: queries return raw entities, and the requested format (\ac{JSON},
+\ac{XML}, \ac{CSV}, etc.) is applied only at final serialization.
 
 \begin{figure}[h]
 	\centering
-	\resizebox{\linewidth}{!}{%
-	\begin{tikzpicture}[
-		every node/.style={font=\small},
-		node distance=4mm,
-		layer/.style={draw, rounded corners=2pt, align=center, thick, minimum width=92mm, minimum height=12mm},
-		cc/.style={draw, dashed, rounded corners=2pt, align=center, minimum width=28mm, minimum height=10mm, font=\footnotesize},
-		arrow/.style={-{Stealth[length=2mm]}, thick}
-	]
-		\node[layer, fill=dkblue!10]
-			(rest)
-			{\textbf{REST layer}, package \texttt{Glass} \\ \footnotesize Start, StationEndpoints, FilesEndpoints, ListEndpoints, Format writers};
-		\node[layer, fill=mauve!10, below=of rest]
-			(biz)
-			{\textbf{Business / validation layer} \\ \footnotesize \texttt{Validate.java}, \texttt{Shape.java}, package \texttt{Geometry} (\texttt{NativePolygonCheck})};
-		\node[layer, fill=dkgreen!10, below=of biz]
-			(jpa)
-			{\textbf{Persistence layer}, package \texttt{DB\_Tables} \\ \footnotesize 40 JPA entities (Station, RinexFile, Network, Agency, \ldots)};
-		\node[layer, fill=dark!10, below=of jpa]
-			(db)
-			{\textbf{Database}, PostgreSQL \texttt{192.168.168.30:5432/DB\_3.0\_J} \\ \footnotesize over the SEGAL internal network / \ac{VPN}};
-
-		\node[cc, right=6mm of biz, yshift=8mm]
-			(cfg)
-			{\textbf{Config} \\\texttt{Loader.java} \\ env / file / default};
-		\node[cc, right=6mm of biz, yshift=-8mm]
-			(pu)
-			{Persistence unit \\\texttt{MeuPU} \\ HikariCP pool};
-
-		\draw[arrow] (rest) -- (biz);
-		\draw[arrow] (biz) -- (jpa);
-		\draw[arrow] (jpa) -- (db);
-		\draw[arrow, dashed] (cfg) -- (db);
-		\draw[arrow, dashed] (pu) -- (jpa);
-	\end{tikzpicture}%
+	\includegraphics[width=\textwidth, height=11cm, keepaspectratio]{
+		diagrams/epos-layered-architecture.png
 	}
-	\caption{Layered architecture of \texttt{EPOS V4}.}
+	\caption{Layered architecture of \texttt{EPOS V4}. Solid arrows denote
+	call/data flow; dashed arrows denote infrastructure binding.}
 	\label{fig:apiv4-layers}
 \end{figure}
 
 \subsection{Endpoints and Output Formats}
 
-The \ac{REST} surface is declared in four classes inside the \texttt{Glass}
-package. \texttt{Start.java} carries the \texttt{@ApplicationPath("/api")} annotation
-and registers a \texttt{PingResource} for the trivial \texttt{/api/ping} liveness
-check. The three substantive resources are \texttt{StationEndpoints} (\texttt{/api/stations},
-seven endpoints for station metadata indexed by identifier, location,
-agency, network, equipment or coordinates), \texttt{FilesEndpoints} (\texttt{/api/files},
-four endpoints for \ac{RINEX} file metadata filtered by agency/antenna/bounding
-box/date, by marker, the high-rate variant, and an aggregated combination),
-and \texttt{ListEndpoints} (\texttt{/api/list}, a parametric endpoint
-returning the valid values of a given filter). Every endpoint accepts a
-\texttt{\{format\}} path parameter and emits \ac{JSON}, \ac{XML}, \ac{CSV}
-or (for the file endpoints) a downloadable shell script; the same \ac{OpenAPI}
-3.1.0 document is served at \texttt{/swagger.html} through a Swagger \ac{UI}
-hosted inside the \ac{WAR}.
+The \ac{REST} surface consists of four primary resource families. \texttt{Start.java}
+registers a \texttt{PingResource} for liveness checks (executing a trivial \texttt{SELECT
+1} against the database). The core domain is handled by \texttt{StationEndpoints}
+(\texttt{/api/stations}) and \texttt{FilesEndpoints} (\texttt{/api/files}). Finally,
+\texttt{ListEndpoints} (\texttt{/api/list}) provides controlled
+vocabularies and lookups exclusively in \ac{JSON}.
+
+Endpoints follow a uniform grammatical structure driven by path parameters (e.g.,
+\texttt{/stations/<selector>/.../\{size\}/\{format\}}). Selectors include identifiers,
+locations, agencies, and coordinates. The \texttt{combination} endpoints
+offer the highest flexibility, allowing an open set of query parameters validated
+against a strict allow-list. For file endpoints, responses are paginated,
+carrying metadata headers such as \texttt{X-Total-Count}, \texttt{X-Page},
+and \texttt{X-Total-Pages}.
+
+A single switch statement in each resource resolves the output format matrix.
+Stations can be serialized to \ac{JSON}, \ac{XML}, \ac{CSV}, GeoJSON, or JSON-LD.
+Files support \ac{JSON}, \ac{XML}, \ac{CSV}, and executable shell scripts. To
+prevent structural drift, formats like \ac{JSON}, GeoJSON, and JSON-LD share
+the same serialization logic, manipulated via boolean flags. Empty result sets
+actively short-circuit to a \texttt{200 OK} plain-text message rather than
+an empty document.
 
 \subsection{Persistence}
 
-The persistence unit, declared in \texttt{src/\allowbreak main/\allowbreak
-resources/\allowbreak META-INF/\allowbreak persistence.xml}, is named
-\texttt{MeuPU} (inherited from the legacy code). It is configured as
-\texttt{RESOURCE\_LOCAL}, with Hibernate as the \ac{JPA} provider and a connection
-pool managed by HikariCP\@. Database connection parameters, host, port,
-database name, user, password, are resolved at startup by \texttt{Config/Loader.java},
-with the following precedence: environment variables, then a \texttt{Config.config}
-file at the root of the deployment, then hard-coded defaults pointing at the
-laboratory's database (\texttt{192.168.168.30:5432}).
+Persistence is managed by Hibernate over PostgreSQL, utilising a \texttt{RESOURCE\_LOCAL}
+unit named \texttt{MeuPU}. The connection configuration is resolved dynamically
+at startup by \texttt{Config.Loader}, following a strict precedence: an
+explicit \texttt{DATABASE\_URL} environment variable overrides individual host/port
+variables, which override local configuration files, which finally fall back
+to hard-coded defaults (\texttt{192.168.168.30:5432}).
 
-The laboratory maintains two database fixtures with the same schema but
-different volumes of data:
+This environment-variable precedence is the linchpin of the differential
+harness: it enables the pipeline to point multiple historical builds at a single,
+shared database purely by injecting \texttt{DATABASE\_URL} at runtime,
+requiring no artifact rebuilds. As a safeguard, the pipeline enforces
+\texttt{JAKARTA\_SCHEMA\_ACTION=none} to ensure Hibernate never executes \ac{DDL}
+statements against live data.
 
-\begin{itemize}
-	\item \texttt{DB\_3.0\_J} hosts a small but representative production
-		subset, on the order of ten stations, eighty-six networks, two hundred and
-		thirty agencies and roughly one hundred and forty-six thousand \texttt{rinex\_file}
-		rows at the time of writing. This is the fixture used by the correctness
-		diff runs, because it is small enough to allow per-case comparison of
-		full response bodies without overwhelming the report.
+To mitigate performance bottlenecks across complex joins, the architecture heavily
+employs batch fetching (\texttt{hibernate.default\_batch\_fetch\_size = 512}).
+This collapses potentially hundreds of thousands of lazy-loading \texttt{N+1}
+queries into highly efficient \texttt{IN (...)} clauses.
 
-	\item \texttt{DB\_3.0\_F} hosts the full dataset and is used by the
-		volume-oriented diff runs, where the goal is not byte-for-byte equality but
-		the detection of changes that would only be apparent at scale, for
-		example, an inadvertent \texttt{N+1} query introduced by a refactor, or a
-		query plan regression visible only on a large table.
-\end{itemize}
-
-The precedence rules of \texttt{Loader.java} are what allow the \texttt{http-diff-job}
-to switch the running \acp{WAR} between the two fixtures without rebuilding
-the artifact: the job sets the appropriate environment variables in its \texttt{variables:}
-block and the application picks them up at boot.
-
-The shape of the schema is discussed in Section~\ref{sec:epos-db}; a simplified
-view of the central entities is given in Figure~\ref{fig:datamodel}.
-
-Representative columns as they appear in the live PostgreSQL schema. Green
-entities carry domain data; purple entities are controlled-vocabulary lookups
-(note that \texttt{country.iso\_code} is the natural primary key, not a
-surrogate \texttt{id}); grey entities are junction tables that materialise the
-many-to-many relationships of the model. Arrows point from the ``one'' side
-to the ``many'' side of the relationship.
-
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
-	\resizebox{\linewidth}{!}{%
-	\begin{tikzpicture}[
-		every node/.style={font=\footnotesize},
-		entity/.style={draw, rounded corners=2pt, align=center, thick, minimum width=24mm, minimum height=11mm, fill=dkgreen!10},
-		lookup/.style={entity, fill=mauve!10},
-		junc/.style={entity, fill=lgray, minimum width=22mm},
-		arrow/.style={-{Stealth[length=2mm]}, thick},
-		rel/.style={font=\scriptsize, text=dark}
-	]
-		\node[entity]
-			(station)
-			{\textbf{station} \\\scriptsize id, marker[9], lat, lon, x/y/z,\\\scriptsize country\_code, station\_type};
-		\node[junc, left=10mm of station]
-			(sn)
-			{\textbf{station\_network} \\\scriptsize include\_date};
-		\node[entity, left=10mm of sn]
-			(network)
-			{\textbf{network} \\\scriptsize id, name, network\_type, doi};
-		\node[junc, left=10mm of network]
-			(an)
-			{\textbf{agency\_network} \\\scriptsize role};
-		\node[lookup, left=10mm of an]
-			(agency)
-			{\textbf{agency} \\\scriptsize id, name, abbreviation,\\\scriptsize ror};
-		\node[lookup, above=8mm of station]
-			(country)
-			{\textbf{country} \\\scriptsize iso\_code (PK), name};
-		\node[entity, right=12mm of station]
-			(rinex)
-			{\textbf{rinex\_file} \\\scriptsize id, name, file\_size,\\\scriptsize reference\_date, md5checksum};
-		\node[entity, below=8mm of rinex]
-			(highrate)
-			{\textbf{highrate\_rinex\_file}};
-		\node[lookup, right=12mm of rinex]
-			(ftype)
-			{\textbf{file\_type} \\\scriptsize format, sampling\_window};
-		\node[junc, below=8mm of station] (nodest) {\textbf{node\_station}};
-		\node[entity, below=8mm of nodest]
-			(node)
-			{\textbf{node} / \textbf{data\_center}};
-
-		\draw[arrow] (agency) -- node[rel, above] {1..*} (an);
-		\draw[arrow] (network) -- node[rel, above] {1..*} (an);
-		\draw[arrow] (station) -- node[rel, above] {1..*} (sn);
-		\draw[arrow] (network) -- node[rel, above] {1..*} (sn);
-		\draw[arrow] (country) -- node[rel, right] {1..*} (station);
-		\draw[arrow] (station) -- node[rel, above] {1..*} (rinex);
-		\draw[arrow] (station) -- node[rel, above, sloped] {1..*} (highrate);
-		\draw[arrow] (ftype) -- node[rel, above] {1..*} (rinex);
-		\draw[arrow] (ftype) -- node[rel, below, sloped] {1..*} (highrate);
-		\draw[arrow] (station) -- node[rel, right] {1..*} (nodest);
-		\draw[arrow] (nodest) -- node[rel, right] {*..1} (node);
-	\end{tikzpicture}%
+	\includegraphics[width=\textwidth, height=1\textheight, keepaspectratio]{
+		diagrams/epos-schema.png
 	}
-	\caption{Simplified view of the core \ac{EPOS} data model}
+	\caption{Simplified view of the core \ac{EPOS} data model.}
 	\label{fig:datamodel}
 \end{figure}
 
-\section{The CI/CD Pipeline}
+\section{The CI/CD Pipeline Flow}
 \label{sec:pipeline}
 
-The pipeline of \texttt{api\_v4.0} extends the patterns validated on the first
-prototype with an additional job in a new \texttt{diff} stage. The diff job compares
-the current build against \emph{two} baselines, in what amounts to a three-way
-comparison: the immediate parent commit \texttt{HEAD\textasciitilde 1} (which
-catches regressions introduced by the commit currently being pushed) and a \emph{fixed}
-reference commit identified by a SHA stored in the \texttt{DIFF\_FIXED\_BASELINE}
-GitLab \ac{CI}/\ac{CD} variable (which catches the slow drift that
-accumulates over many commits along a long-running refactor branch). The
-key parts of the \texttt{.gitlab-ci.yml} are shown, condensed, in Listing~\ref{app:glass-ci-cd}.
+The continuous integration and deployment lifecycle is orchestrated by GitLab,
+but the actual compilation and testing workloads are offloaded to a self-managed
+internal runner (using the \texttt{ubi-runner} image). This runner is
+provisioned within the laboratory's infrastructure, granting it secure \ac{VPN}
+access to the reference PostgreSQL databases.
 
-Three details of the listing are worth highlighting. The \emph{recent} baseline
-is \texttt{HEAD\textasciitilde 1}, which keeps the per-commit comparison focused
-on the change just introduced; the \emph{fixed} baseline is a commit \ac{ID}
-stored in \texttt{DIFF\_FIXED\_BASELINE} (typically pointing at the last
-commit known to have shipped to the \ac{EPOS} portal) and acts as a long-term
-reference against which the cumulative drift of the branch is measured. Each
-baseline build is materialised through \texttt{git worktree} rather than
-\texttt{git checkout}, so the working copy is never disturbed and the
-harness can freely compare files from both checkouts in parallel. Finally,
-each baseline is optional and treated independently: if \texttt{HEAD\textasciitilde
-1} does not exist (first commit of the repository) or \texttt{DIFF\_FIXED\_BASELINE}
-is unset (start of a refactor branch), the corresponding sub-run is skipped.
-A pipeline can therefore have zero, one or two diff sub-runs depending on
-the situation, and never fails because a baseline is simply unavailable.
+Before detailing the specific pipeline stages, it is important to understand
+the execution flow between the control plane and this runner, as
+illustrated in Figure~\ref{fig:gitlab-runner}. The runner process operates in
+a continuous polling loop. Once registered, it periodically requests jobs from
+the GitLab \ac{API}. When a developer pushes a new commit, GitLab queues
+the pipeline jobs; the runner claims them, pulls the job payload, and delegates
+the workload to its local executor. The executor then clones the repository,
+downloads any necessary artifacts from previous stages, runs the defined
+scripts, and streams the status and output back to GitLab.
 
-\section{The HTTP-Level Diff: \texttt{HttpDiff.java}}
+\begin{figure}[H]
+	\centering
+	\includegraphics[
+		width=\textwidth,
+		height=0.75\textheight,
+		keepaspectratio
+	]{diagrams/gitlab-runner.png}
+	\caption{Sequence diagram of registration, polling, and execution flow.}
+	\label{fig:gitlab-runner}
+\end{figure}
+
+Mapped onto this execution architecture, our specific pipeline is divided into
+three sequential stages: \texttt{build}, \texttt{test}, and \texttt{diff}.
+
+\subsection{Stage 1 \& 2: Build and Unit Testing}
+The \texttt{build} stage initiates the process. The executor compiles the candidate
+\texttt{HEAD} \ac{WAR} and publishes it back to GitLab as a pipeline artifact.
+Following this, the \texttt{test} stage downloads that artifact and
+executes standard JUnit 5 logic tests. Crucially, these tests are entirely
+isolated from the database. A deliberate design choice was made to forgo traditional
+data-access integration tests; instead, behavioral database correctness is strictly
+deferred to the differential harness.
+
+\subsection{Stage 3: Differential Testing (\texttt{diff})}
+The final stage is the \texttt{http-diff-job}, which performs a strict three-way
+\ac{HTTP} comparison. It relies heavily on the executor's ability to pull sources
+and artifacts, evaluating the compiled \texttt{HEAD} commit against two historical
+baselines:
+\begin{itemize}
+	\item \textbf{Recent Baseline (\texttt{HEAD\textasciitilde 1}):}
+		Identifies immediate regressions introduced by the developer's current
+		push.
+
+	\item \textbf{Fixed Baseline (\texttt{DIFF\_FIXED\_BASELINE}):} A pinned, stable
+		anchor commit that tracks cumulative drift over the lifecycle of a long-running
+		refactor.
+\end{itemize}
+
+To execute this without polluting the active workspace, the job leverages
+\texttt{git worktree} to check out both baseline sources into isolated,
+temporary directories. It compiles them cleanly from scratch to avoid cross-contamination
+from stale artifacts. If a baseline is unavailable (for instance, if the
+repository is new and lacks sufficient commit history), the harness
+dynamically detects this and safely skips that specific sub-run.
+
+\section{The HTTP-Level Diff}
 \label{sec:httpdiff}
 
-\texttt{HttpDiff.java} is the harness that exercises the \ac{API} end-to-end.
-Its execution proceeds in four phases, summarised graphically in Figure~\ref{fig:httpdiff-phases}.
-The \ac{HTTP} harness runs once and internally boots \emph{all} the available
-\acp{WAR} in parallel (the \texttt{HEAD} \ac{WAR}, the recent baseline if
-any, and the fixed baseline if any). It then issues every test case against every
-running instance and emits one diff report per baseline.
+\texttt{HttpDiff.java} is the testing oracle. Because hand-writing expected outputs
+for forty endpoints across five formats is unreliable, the harness uses
+previous, trusted Git commits as free ground-truth oracles.
 
-The harness boots one Payara Micro per available \ac{WAR}, the \texttt{HEAD}
-build and whichever of the recent/fixed baselines were provided, waits for all
-of them to be ready, fires every test case against every instance in
-parallel, then performs a three-way comparison and emits one diff report per
-baseline.
+As detailed in Figure~\ref{fig:httpdiff-phases}, the harness boots up to
+three Payara Micro subprocesses simultaneously on separate ports (\texttt{8081}
+for last, \texttt{8082} for current, and \texttt{8083} for fixed).
+Crucially, all instances are injected with the same \texttt{DATABASE\_URL}
+environment variable, ensuring they query identical fixtures.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
-	\resizebox{\linewidth}{!}{%
-	\begin{tikzpicture}[
-		every node/.style={font=\footnotesize},
-		proc/.style={draw, rounded corners=2pt, align=center, thick, minimum width=26mm, minimum height=10mm, fill=dkblue!10},
-		micro/.style={proc, fill=mauve!10, minimum width=30mm},
-		head/.style={proc, fill=dkgreen!10, minimum width=30mm},
-		stage/.style={font=\small\bfseries, text=dark},
-		barrow/.style={-{Stealth[length=2mm]}, thick},
-		darrow/.style={-{Stealth[length=2mm]}, thick, dashed}
-	]
-		\node[proc]
-			(harness)
-			{\textbf{HttpDiff.java} \\ \footnotesize (JUnit 5)};
-		\node[head, right=18mm of harness]
-			(p80)
-			{\textbf{payara-micro :8080} \\ \footnotesize HEAD WAR};
-		\node[micro, right=8mm of p80]
-			(p81)
-			{\textbf{payara-micro :8081} \\ \footnotesize recent baseline};
-		\node[micro, right=8mm of p81]
-			(p82)
-			{\textbf{payara-micro :8082} \\ \footnotesize fixed baseline};
-		\node[proc, fill=dark!10, right=12mm of p82]
-			(pg)
-			{\textbf{PostgreSQL} \\ \footnotesize 192.168.168.30};
-
-		\node[stage, below=4mm of harness] (s1) {Phase 1, Boot};
-		\draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p80.south);
-		\draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p81.south);
-		\draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p82.south);
-
-		\node[stage, below=20mm of s1] (s2) {Phase 2, Verify};
-		\draw[barrow]
-			($(harness.south)+(0,-30mm)$) -- ++(1.8,0)
-			node[midway, above, font=\scriptsize] {GET /api/ping}
-			-|
-			(p80);
-		\draw[barrow]
-			($(harness.south)+(0,-34mm)$) -- ++(4.6,0)
-			node[midway, above, font=\scriptsize] {GET /api/ping}
-			-|
-			(p81);
-		\draw[barrow]
-			($(harness.south)+(0,-38mm)$) -- ++(7.4,0)
-			node[midway, above, font=\scriptsize] {GET /api/ping}
-			-|
-			(p82);
-
-		\node[stage, below=24mm of s2] (s3) {Phase 3, Replay \& 3-way diff};
-		\draw[barrow]
-			($(harness.south)+(0,-56mm)$) -- ++(1.8,0)
-			node[midway, above, font=\scriptsize] {case[i]}
-			-|
-			(p80);
-		\draw[barrow]
-			($(harness.south)+(0,-60mm)$) -- ++(4.6,0)
-			node[midway, above, font=\scriptsize] {case[i]}
-			-|
-			(p81);
-		\draw[barrow]
-			($(harness.south)+(0,-64mm)$) -- ++(7.4,0)
-			node[midway, above, font=\scriptsize] {case[i]}
-			-|
-			(p82);
-		\draw[darrow]
-			($(p80.south)+(0,-12mm)$) -- ($(pg.south)+(0,-12mm)$)
-			node[midway, below, font=\scriptsize] {all three query the same DB};
-
-		\node[
-			proc,
-			fill=dkgreen!10,
-			below=70mm of harness,
-			minimum width=132mm
-		]
-			(diff)
-			{\textbf{Diff} HEAD vs recent $\rightarrow$ \texttt{http-diff-report/recent/} \quad \textbf{Diff} HEAD vs fixed $\rightarrow$ \texttt{http-diff-report/fixed/}};
-
-		\node[stage, below=4mm of diff] (s4) {Phase 4, Teardown + Report};
-		\draw[barrow]
-			($(harness.south)+(0,-92mm)$) -- ++(10.0,0)
-			node[midway, above, font=\scriptsize] {SIGTERM all payara-micro};
-	\end{tikzpicture}%
+	\includegraphics[width=\textwidth, height=22cm, keepaspectratio]{
+		diagrams/http-level-diff.png
 	}
-	\caption{Phases of \texttt{HttpDiff.java}.}
+
+	\caption{Phases of \texttt{HttpDiff.java}. The harness orchestrates boot, verification,
+	parallel replay, and teardown.}
 	\label{fig:httpdiff-phases}
 \end{figure}
 
-The figure already covers the gist; a few implementation details are worth recording.
-The test cases live in \texttt{src/\allowbreak test/\allowbreak resources/\allowbreak
-http-diff-cases.json} as a \ac{JSON} array of request descriptors (method,
-path, headers, optional body); This guards against spurious failures from
-requests landing on still-deploying containers. Bodies are compared as normalised
-strings (sorted \ac{JSON} keys, trimmed whitespace) and the headers that vary
-by definition (\texttt{Date}, \texttt{Server}, \texttt{Content-Length}) are
-ignored. The two comparisons (HEAD vs recent, HEAD vs fixed) are kept in
-separate report directories so that a per-commit regression and an
-accumulated drift remain distinguishable in the artifact tree.
+To make the testing strategy concrete, Listing~\ref{lst:diffcases} shows a representative
+extract from the \texttt{http-diff-cases.json} test corpus. The file is structured
+as an array of \ac{JSON} objects, where each object declaratively defines a request
+profile.
+
+\begin{lstlisting}[caption={Representative extract of the \texttt{http-diff-cases.json} test corpus.}, label={lst:diffcases}]
+[
+  { "name": "ping", "method": "GET", "path": "/api/ping" },
+  { "name": "stations short csv", "method": "GET", "path": "/api/stations/station/short/csv", "timeoutSeconds": 120 },
+  { "name": "station by id short json", "method": "GET", "path": "/api/stations/stationid/CASC00PRT/short/json" },
+  { "name": "NEG unknown query param", "method": "GET", "path": "/api/stations/station/short/json?bogusparam=1" }
+]
+\end{lstlisting}
+
+This declarative format allows the framework to evaluate roughly forty
+specific scenarios across three distinct dimensions of the \ac{API}:
+\begin{itemize}
+	\item \textbf{Serialization and Volume Matrices:} Massive full-table
+		queries (such as retrieving the entire station catalog) place high
+		contention on the database when executed by three instances
+		simultaneously. These cases are explicitly granted a \texttt{timeoutSeconds}
+		boundary to prevent false failures while still guaranteeing byte-for-byte
+		correctness across \ac{JSON}, \ac{XML}, \ac{CSV}, and GeoJSON formats.
+
+	\item \textbf{Targeted Lookups:} Precise queries (e.g., filtering by the \texttt{CASC00PRT}
+		marker or the \texttt{EUREF} network) verify that deeper \ac{SQL} joins and
+		parameter bindings remain structurally intact after a refactor.
+
+	\item \textbf{Negative Validation (\texttt{NEG}):} Cases prefixed with
+		\texttt{NEG} intentionally inject malformed parameters, bogus output
+		formats, or unregistered query keys. These ensure the "validate-then-query"
+		architecture functions correctly, strictly intercepting bad requests with
+		a \texttt{400 Bad Request} before they reach the persistence layer.
+\end{itemize}
+
+Every case in the corpus is then evaluated by the harness on a three-tier verdict
+model:
+\begin{itemize}
+	\item \textbf{OK:} Both instances returned identical \ac{HTTP} statuses and
+		normalized bodies.
+
+	\item \textbf{WARN:} Both instances responded successfully, but their outputs
+		differ (flagging an intentional or unintentional behavioral change).
+
+	\item \textbf{FAIL:} One instance encountered an execution failure (e.g., a
+		\texttt{5xx} server error, a connection refusal, or a timeout) while the
+		other succeeded.
+\end{itemize}
+
+Because three parallel instances place high contention on a single database,
+some heavy queries slow down. To prevent false failures, the harness
+implements per-case timeout boundaries (\texttt{timeoutSeconds}), allowing
+massive full-table list queries to process without globally lowering the
+performance bar for faster endpoints.
 
 \section{Reports and Findings}
 \label{sec:reports}
 
-Each pipeline run publishes the integration-test reports, the diff reports
-(\texttt{recent/} and \texttt{fixed/} subdirectories of \texttt{target/http-diff-report/})
-and the JUnit XML files consumed by GitLab. Integration test results expire
-after one week; the diff reports are kept for four because they are the historical
-record of behavioural change across the refactor. During development the
-harness surfaced real regressions hidden inside seemingly cosmetic
-refactors that no line-by-line review of the diff would plausibly have
-caught by eye. The next chapter draws the main conclusions of the project and
-outlines the items that, by choice or by constraint, were left out of its scope.
+Upon completion, the harness generates a self-contained report tree. The pipeline
+uses \texttt{when: always} to guarantee these artifacts are uploaded even
+if the job fails, as failing reports provide the most actionable diagnostic data.
+
+\begin{itemize}
+	\item \texttt{summary.json}: The entry point, containing pairwise verdict
+		tallies and performance deltas (measuring if the current commit has become
+		slower).
+
+	\item \texttt{report.csv}: A row-by-row breakdown of all requests,
+		including HTTP statuses and latency metrics.
+
+	\item \texttt{details.txt}: A truncated, human-readable snippet of the
+		differing payloads for non-OK requests, allowing developers to immediately
+		spot the deviation.
+
+	\item \texttt{payara-*.log}: The raw container logs for deep debugging.
+\end{itemize}
+
+Several operational realities shaped this reporting design. First, database
+coupling is load-bearing: if the \texttt{FIXED\_SHA} anchor predates a
+major schema change, it will query mismatched data, resulting in a wall of
+bogus diffs. Thus, anchors must always represent compatible database eras. Second,
+non-determinism does not equate to behavioral change. Early runs flagged \texttt{WARN}s
+due to the unpredictable iteration order of Java \texttt{HashSet}s in error messages;
+standardizing on sorted sets eliminated this cosmetic noise, yielding a highly
+stable signal.

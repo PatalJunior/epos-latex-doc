@@ -1,0 +1,69 @@
+Table country {
+  iso_code varchar [pk]
+  name varchar
+}
+
+Table agency {
+  id varchar [pk]
+  name varchar
+  abbreviation varchar
+  ror varchar
+}
+
+Table file_type {
+  format varchar [pk]
+  sampling_window varchar
+}
+
+Table network {
+  id varchar [pk]
+  name varchar
+  network_type varchar
+  doi varchar
+}
+
+Table station {
+  id varchar [pk]
+  marker varchar
+  lat_lon varchar [note: 'lat, lon']
+  xyz varchar [note: 'x/y/z']
+  country_code varchar [ref: > country.iso_code]
+  station_type varchar
+}
+
+Table rinex_file {
+  id varchar [pk]
+  station_id varchar [ref: > station.id]
+  file_type varchar [ref: > file_type.format]
+  name varchar
+  file_size int
+  reference_date date
+  md5checksum varchar
+}
+
+Table highrate_rinex_file {
+  id varchar [pk]
+  station_id varchar [ref: > station.id]
+  file_type varchar [ref: > file_type.format]
+}
+
+Table node {
+  id varchar [pk, note: 'node / data_center']
+}
+
+Table agency_network {
+  agency_id varchar [ref: > agency.id]
+  network_id varchar [ref: > network.id]
+  role varchar
+}
+
+Table station_network {
+  station_id varchar [ref: > station.id]
+  network_id varchar [ref: > network.id]
+  include_date date
+}
+
+Table node_station {
+  node_id varchar [ref: > node.id]
+  station_id varchar [ref: > station.id]
+}

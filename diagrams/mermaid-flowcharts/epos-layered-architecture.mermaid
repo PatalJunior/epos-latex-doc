@@ -1,0 +1,26 @@
+flowchart TD
+    %% Define styles matching the LaTeX node colors and borders
+    classDef restLayer fill:#e6f0fa,stroke:#333,stroke-width:2px,color:#000
+    classDef bizLayer fill:#f4ebf4,stroke:#333,stroke-width:2px,color:#000
+    classDef jpaLayer fill:#e6f2e6,stroke:#333,stroke-width:2px,color:#000
+    classDef dbLayer fill:#d9d9d9,stroke:#333,stroke-width:2px,color:#000
+    classDef ccBox fill:#ffffff,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5,color:#000
+
+    %% Main Architecture Layers
+    rest["<b>REST layer</b>, package <code>Glass</code><br/><i>Start, StationEndpoints, FilesEndpoints, ListEndpoints, Format writers</i>"]:::restLayer
+    biz["<b>Business / validation layer</b><br/><i>Validate.java, Shape.java, package Geometry (NativePolygonCheck)</i>"]:::bizLayer
+    jpa["<b>Persistence layer</b>, package <code>DB_Tables</code><br/><i>40 JPA entities (Station, RinexFile, Network, Agency, ...)</i>"]:::jpaLayer
+    db["<b>Database</b>, PostgreSQL <code>192.168.168.30:5432/DB_3.0_F</code><br/><i>over the SEGAL internal network / VPN</i>"]:::dbLayer
+
+    %% Cross-cutting Config / Infrastructure
+    cfg["<b>Config</b><br/><code>Loader.java</code><br/><i>env / file / default</i>"]:::ccBox
+    pu["<b>Persistence unit</b><br/><code>MeuPU</code><br/><i>HikariCP pool</i>"]:::ccBox
+
+    %% Control / Data Flow (Solid Arrows)
+    rest --> biz
+    biz --> jpa
+    jpa --> db
+
+    %% Infrastructure Binding (Dashed Arrows)
+    cfg -.->|binds to| db
+    pu -.->|binds to| jpa

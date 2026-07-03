@@ -4,72 +4,88 @@
 \section{Main Conclusions}
 \label{sec:conc-princ}
 
-The work described in this report addresses a concrete problem of
-the \ac{SEGAL} laboratory: how to refactor a large, several-years-old
-Jakarta EE \ac{API} without silently breaking the \ac{EPOS} clients
-that depend on it. The answer is a three-stage \ac{CI}/\ac{CD}-driven
-testing framework that, for every commit, compares the new build
-against two baselines (the immediate parent commit and a fixed
-long-term reference) at the level of \ac{HTTP} responses.
+The work described in this report solves a concrete challenge for the \ac{SEGAL}
+laboratory: safely refactoring a legacy Jakarta EE \ac{API} without
+silently breaking existing \ac{EPOS} clients. The solution is a \ac{CI}/\ac{CD}-driven
+differential testing framework that evaluates every new commit against two
+baselines (the immediate parent and a fixed reference) by comparing raw \ac{HTTP}
+responses.
 
-A few conclusions stand out. \emph{Differential testing fits a
-refactor naturally}: asserting that the new build produces the same
-output as a known-good one sidesteps the brittle fixture problem and
-made the framework useful from the very first commit it ran on.
-\emph{Comparing whole \ac{HTTP} responses catches what unit tests
-miss}: the \ac{HTTP}-level harness surfaces integration regressions
-that appear only when the full stack runs against a live database,
-the class of change a refactor is most likely to introduce and that
-isolated unit tests are least likely to reveal. \emph{A
-self-hosted pipeline is not optional here}: only a runner inside the
-laboratory's network can exercise the \ac{API} end-to-end against
-the production database, so self-managing both the GitLab control
-plane and the GitLab Runner host followed from the data-locality
-constraint, not from a preference. \emph{The two prototypes paid for
-themselves}: each answered a small, well-bounded set of questions in
-an environment where mistakes were cheap, sparing the production
-code base from them. \emph{The framework reveals what a human review
-would miss}: during the refactor it surfaced behavioural changes
-buried inside seemingly cosmetic commits that no amount of code
-review would plausibly have caught at the laboratory's commit rate.
+Several key conclusions emerged from this project:
+\begin{itemize}
+	\item \textbf{Differential testing perfectly suits refactoring:} By
+		comparing new outputs against known-good baselines, the framework avoids
+		the brittleness of hard-coded expected values. It provided immediate, actionable
+		feedback from the very first commit.
+
+	\item \textbf{\ac{HTTP}-level comparison catches integration flaws:}
+		Testing full \ac{HTTP} responses against a live database surfaces subtle
+		regressions that isolated unit tests naturally miss. This is especially
+		critical during a refactor, where database interactions are the most likely
+		point of failure.
+
+	\item \textbf{Self-hosted infrastructure is mandatory:} Because the tests
+		require access to the production database, deploying a self-managed GitLab
+		instance and runner within the laboratory's internal network was a strict
+		data-locality requirement, not merely a preference.
+
+	\item \textbf{Prototypes mitigate risk:} Building two isolated prototypes
+		allowed for cheap experimentation with \ac{CI} configurations and Jakarta
+		EE 11 features, keeping the production codebase clean of failed
+		experiments.
+
+	\item \textbf{Automation outperforms human review:} The framework
+		successfully caught behavioral changes hidden inside seemingly cosmetic
+		refactoring commits regressions that manual code review would likely
+		have missed at the laboratory's standard commit rate.
+\end{itemize}
 
 \section{Future Work}
 \label{sec:trab-futuro}
 
-Several extensions to the framework were deliberately left out of
-scope. The most immediate are the introduction of \textbf{BRIN}
-indexes on the date columns of \texttt{rinex\_file} (and the
-companion \emph{performance-regression subsystem} that would record
-wall-clock durations against the \texttt{F} fixture to justify them
-empirically), the \textbf{PostGIS migration} of the spatial helpers
-in the \texttt{Geometry} package (with the same differential
-framework used to verify byte-for-byte equivalence), and the
-\textbf{automatic generation of \ac{HTTP} test cases} from the
-\ac{OpenAPI} document shipped inside the \ac{WAR} (so newly added
-endpoints are exercised by the diff from the moment they are
-merged). The framework would also benefit from a \textbf{schema diff}
-of the \ac{OpenAPI} document itself across builds (to surface
-contract regressions distinct from behavioural ones), from a
-\textbf{snapshot test} layer for endpoints that should remain stable
-across releases (such as \texttt{/api/ping}), and from
-\textbf{containerization of the production deployment} to remove
-the residual gap between the \ac{WAR} that was tested and the
-\ac{WAR} that ships. Finally, the harness code itself could be
-\textbf{generalised into a small library} reusable by other Jakarta
-EE services of the laboratory, with the application-specific bits
-factored into a clean configuration interface; orthogonal to that,
-several \textbf{operational aspects} (transient-error retries, clean
-termination of orphan Payara Micro processes, automated provisioning
-of the runner host, a long-term dashboard on top of the diff
-reports) deserve more attention than the present project could
-afford.
+While the framework successfully meets its primary goals, several extensions
+were deliberately left for future work to further mature the system:
+
+\begin{itemize}
+	\item \textbf{AI-Assisted Automated Triage:} Enhancing developer
+		experience by integrating a lightweight \ac{LLM} analysis step at the end
+		of the pipeline. By pushing the \texttt{summary.json} and \texttt{details.txt}
+		artifacts to a serverless AI service (such as Cloudflare's AI \ac{REST}
+		\ac{API}) via a simple \ac{HTTP} call, the system could automatically
+		generate a structured, natural-language summary of any regressions.
+		This would accelerate triage by posting immediate, human-readable feedback
+		directly into the merge request, without requiring the laboratory to
+		host its own AI infrastructure.
+
+	\item \textbf{Endpoint URI Mapping (\texttt{prevURL}):} Currently, the harness
+		assumes endpoint paths remain static. A necessary feature is the
+		ability to map a \texttt{prevURL} to a new \ac{URI}. If an endpoint is renamed
+		or versioned, the test should know to route the baseline request to the
+		old URL and the candidate request to the new URL, ensuring the output remains
+		identical.
+
+	\item \textbf{Performance Benchmarking:} Implementing \textbf{BRIN} indexes
+		on the \texttt{rinex\_file} date columns. This should be accompanied by a
+		performance-regression subsystem that records wall-clock execution times
+		against the large \texttt{DB\_3.0\_F} fixture to empirically measure
+		speed improvements.
+
+	\item \textbf{Spatial Database Migration:} Moving the custom spatial
+		logic from the Java \texttt{Geometry} package directly into the database
+		using \textbf{PostGIS}. The differential framework will be crucial here to
+		guarantee byte-for-byte equivalence during the transition.
+
+	\item \textbf{Automated Test Generation:} Dynamically generating the \ac{HTTP}
+		test cases directly from the \ac{OpenAPI} document shipped inside the
+		\ac{WAR}, ensuring newly added endpoints are automatically covered by
+		the diff harness.
+\end{itemize}
 
 \bigskip
 
-Overall, the framework delivered by this project addresses the
-problem that motivated it, has already proved its value on a real
-regression caught during the refactor, and lays the groundwork for
-the laboratory to continue evolving the \ac{API} with a much higher
-degree of confidence than was previously possible. The items listed
-in this section are natural next steps; none of them invalidates
-the design that was put in place.
+Overall, the framework delivered by this project solves the problem that
+motivated it. It has already proven its value by catching real regressions during
+the refactoring process, laying a solid foundation for the laboratory to
+evolve the \ac{API} with a much higher degree of confidence. The future
+work identified here represents natural next steps that build upon, rather than
+invalidate, the current robust design.

@@ -1,9 +1,111 @@
-\chapter{Prototype 1: Infra Validation}
-\label{app:infra-validation}
+\chapter{Prototype 1: Infrastructure and CI/CD Scaffolding}
+\label{app:proto1}
 
-This appendix provides a detailed overview of the first prototype which was
-made as a first test of the GitLab CI CD pipeline and maven workflow
+This appendix outlines the architecture and configuration of the first
+prototype developed during this project (\texttt{java-ee-app}). Unlike the
+second prototype (detailed in Appendix~\ref{app:syncspace}), which focused on
+Jakarta EE feature exploration, this initial application was built with a
+strictly constrained scope: to serve as a proof-of-concept for the underlying
+infrastructure. Its primary objective was to validate the integration
+between the Payara 7 application server, Arquillian integration testing,
+and the GitLab \ac{CI}/\ac{CD} pipeline before introducing complex domain
+logic.
 
-Here below is an example
+\section{Technology Stack}
+\label{app:proto1-stack}
 
---- PLACEHOLDER ---
+The prototype establishes the baseline toolchain that was later adapted for both
+the SyncSpace prototype and the production \ac{EPOS} \ac{API} refactoring.
+
+\begin{table}[H]
+	\centering
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabular}{ll}
+		\toprule \textbf{Concern} & \textbf{Technology}                                   \\
+		\midrule Platform         & Jakarta EE 11 (\texttt{jakarta.jakartaee-api 11.0.0}) \\
+		Language                  & Java 17                                               \\
+		App Server                & Payara 7 (\texttt{7.2026.x})                          \\
+		Build                     & Maven 3.9.6 (\ac{WAR} packaging)                      \\
+		Database                  & PostgreSQL 16 (Alpine Docker image)                   \\
+		\ac{REST} Layer           & Jakarta \ac{REST}ful Web Services (\ac{JAX-RS})       \\
+		Testing                   & Arquillian 1.10 + JUnit 5 (Payara Managed container)  \\
+		\ac{CI}/\ac{CD}           & GitLab CI                                             \\
+		\bottomrule
+	\end{tabular}
+	\caption{Prototype 1 baseline technology stack.}
+\end{table}
+
+\section{Architecture and Endpoints}
+\label{app:proto1-arch}
+
+To verify basic deployment functionality and content negotiation, the
+application exposes a headless \ac{REST} \ac{API} utilizing two independent
+\ac{JAX-RS} \texttt{Application} subclasses. This design deliberately separates
+a legacy plain-text route from a versioned \ac{JSON} route:
+
+\begin{itemize}
+	\item \textbf{\texttt{HelloApplication} (\texttt{/api}):} Registers a
+		simple \texttt{HelloResource} returning a \texttt{text/plain} fixed
+		string (\texttt{"Hello, World!"}).
+
+	\item \textbf{\texttt{JsonApplication} (\texttt{/api/v2}):} Registers a
+		\texttt{JsonResource} returning \texttt{application/json}. It serializes
+		a minimal \texttt{User} \ac{POJO} containing an auto-generated UUID, a
+		name, and an age.
+\end{itemize}
+
+Because the scope of this prototype was restricted to infrastructure validation,
+cross-cutting concerns such as security, input validation, and \ac{CDI}-managed
+services were intentionally left unimplemented.
+
+\section{Persistence Readiness}
+\label{app:proto1-persistence}
+
+While the application does not actively execute database queries, the scaffolding
+for persistence is fully established to validate the environment setup. A
+\texttt{persistence.xml} file exists defining a default persistence unit,
+and a PostgreSQL 16 instance (\texttt{testdb}) is provisioned locally via Docker
+Compose alongside the Payara server. The domain model (the \texttt{User}
+class) remains a plain Java object rather than a \ac{JPA} \texttt{@Entity},
+leaving the final persistence wiring as a future roadmap item for the
+architecture.
+
+\section{Testing Framework}
+\label{app:proto1-testing}
+
+The most critical deliverable of this prototype is the integration testing harness.
+The project utilizes Arquillian configured for a Payara Managed container, combined
+with JUnit 5.
+
+The testing lifecycle is anchored by an \texttt{AbstractBaseIT} class. This
+base class uses ShrinkWrap to programmatically construct a micro-\ac{WAR} (\texttt{test-api.war})
+from the application's source packages. It handles the setup and teardown of
+a \ac{JAX-RS} \texttt{Client} per test and injects the dynamic deployment base
+URL via the \texttt{@ArquillianResource} annotation. Specific integration tests,
+such as \texttt{JsonApplicationIT}, inherit from this base class to issue
+actual \ac{HTTP} requests against the running container and assert successful
+\texttt{200 OK} \ac{JSON} responses.
+
+\section{CI/CD Pipeline}
+\label{app:proto1-pipeline}
+
+The application's lifecycle is automated via a \texttt{.gitlab-ci.yml} pipeline
+executing on a self-managed runner. The pipeline successfully validated the
+two-stage execution model later adopted by the broader project:
+
+\begin{enumerate}
+	\item \textbf{Build Stage:} Executes \texttt{mvn clean package -DskipTests}
+		within a Temurin JDK Docker image, caching dependencies in the global
+		\texttt{.m2} repository, and publishes the resulting \ac{WAR} as a pipeline
+		artifact.
+
+	\item \textbf{Test Stage:} Boots the Payara service container, waits for readiness,
+		and executes the Failsafe integration tests via \texttt{mvn verify}.
+		The results are captured as JUnit \ac{XML} artifacts and ingested into GitLab's
+		native test tracking interface.
+\end{enumerate}
+
+By successfully executing this pipeline, the prototype confirmed that the
+laboratory's self-managed runners could reliably compile Jakarta EE
+applications, orchestrate containerized application servers, and execute
+robust integration tests over \ac{HTTP}.
