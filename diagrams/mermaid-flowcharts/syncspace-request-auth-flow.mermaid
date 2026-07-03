@@ -1,0 +1,32 @@
+---
+config:
+  layout: fixed
+---
+flowchart TB
+    client["HTTP client"] --> hdr{"Authorization:<br>Bearer token present?"}
+    hdr -- no --> no401["401 Unauthorized"]
+    hdr -- yes --> sig{"MP-JWT: signature<br>+ expiry valid?"}
+    sig -- no --> bad401["401 Unauthorized<br><i>invalid / expired</i>"]
+    sig -- yes --> groups@{ label: "Extract 'groups' claim<br><i>USER / ADMIN</i>" }
+    groups --> role{"@RolesAllowed<br>match?"}
+    role -- "no (e.g. USER→admin route)" --> no403["403 Forbidden"]
+    role -- yes --> handler["RoomResource method<br><i>getAllRooms / getRoomById / createRoom</i>"]
+    handler --> ok["200 / 201<br><code>{ room(s) }</code>"]
+    ok --> cliback["HTTP client<br><i>receives room(s)</i>"]
+
+    groups@{ shape: rect}
+     client:::stage
+     hdr:::stage
+     no401:::error
+     sig:::mapper
+     bad401:::error
+     groups:::mapper
+     role:::stage
+     no403:::error
+     handler:::stage
+     ok:::outbox
+     cliback:::stage
+    classDef stage fill:#e6f0fa,stroke:#333,stroke-width:2px,color:#000
+    classDef error fill:#ffe6e6,stroke:#333,stroke-width:2px,color:#000
+    classDef mapper fill:#f4ebf4,stroke:#333,stroke-width:2px,color:#000
+    classDef outbox fill:#e6f2e6,stroke:#333,stroke-width:2px,color:#000

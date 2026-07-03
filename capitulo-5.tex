@@ -1,383 +1,355 @@
 \chapter{Use Case: EPOS API}
 \label{chap:caso-epos}
 
-This chapter applies the framework of Chapter~\ref{chap:metodo-arq}
-to the production \ac{API}, \texttt{api\_v4.0}. The \ac{EPOS}
-itself~\cite{epos} is a pan-European research infrastructure in
-solid Earth science, organised into Thematic Core Services for
-seismology, geomagnetic observations, \ac{GNSS} data and
-products~\cite{eposGnss}, and so on; the \ac{SEGAL} laboratory of
-\ac{UBI} contributes to the \ac{GNSS} service by operating a node
-that hosts station metadata and \ac{RINEX}~\cite{rinex} observation
-files, and \texttt{api\_v4.0} is the public interface of that node.
-Three properties of the domain shape the test framework: the
-entities are relatively static (stable baselines are easy to obtain),
-the typical client request returns a long list of records (the
-comparison algorithm must scale to long diffs), and the same
-information is exposed in several serialization formats (the surface
+This chapter applies the framework of Chapter~\ref{chap:metodo-arq} to the
+production \ac{API}, \texttt{api\_v4.0}. The \ac{EPOS} itself~\cite{epos} is
+a pan-European research infrastructure in solid Earth science, organised
+into Thematic Core Services for seismology, geomagnetic observations, \ac{GNSS}
+data and products~\cite{eposGnss}, and so on; the \ac{SEGAL} laboratory of
+\ac{UBI} contributes to the \ac{GNSS} service by operating a node that
+hosts station metadata and \ac{RINEX}~\cite{rinex} observation files, and
+\texttt{api\_v4.0} is the public interface of that node. Three properties
+of the domain shape the test framework: the entities are relatively static (stable
+baselines are easy to obtain), the typical client request returns a long
+list of records (the comparison algorithm must scale to long diffs), and the
+same information is exposed in several serialization formats (the surface
 area to test multiplies but the underlying logic does not).
 
 \section{Architecture of \texttt{api\_v4.0}}
 \label{sec:apiv4-arch}
 
-The application is a Maven \ac{WAR} project targeting Java SE 21 and
-Jakarta EE 11, deployed onto Payara Server 6 with
-\texttt{finalName=ROOT} so that it serves the root context. Its
-source tree is organised into four top-level packages that form a
-classical layered architecture (Figure~\ref{fig:apiv4-layers}):
-\texttt{Glass} provides the \ac{REST} layer (\ac{JAX-RS} resources
-\texttt{StationEndpoints}, \texttt{FilesEndpoints},
-\texttt{ListEndpoints} and \texttt{Start}, plus parsers, format
-writers and the validation/shape helpers); \texttt{Geometry} and the
-helper classes \texttt{Validate.java} and \texttt{Shape.java} form a
-thin business layer; \texttt{DB\_Tables} holds the forty \ac{JPA}
-entities that model the relational schema (stations, networks,
-agencies, file types, observation summaries, embargoes); and
-\texttt{Config} (\texttt{Loader.java}) is the cross-cutting concern
-that handles bootstrap.
+The application is a Maven \ac{WAR} project targeting Java SE 21 and Jakarta
+EE 11, deployed onto Payara Server 6 with \texttt{finalName=ROOT} so that it
+serves the root context. Its source tree is organised into four top-level
+packages that form a classical layered architecture (Figure~\ref{fig:apiv4-layers}):
+\texttt{Glass} provides the \ac{REST} layer (\ac{JAX-RS} resources \texttt{StationEndpoints},
+\texttt{FilesEndpoints}, \texttt{ListEndpoints} and \texttt{Start}, plus
+parsers, format writers and the validation/shape helpers); \texttt{Geometry}
+and the helper classes \texttt{Validate.java} and \texttt{Shape.java} form
+a thin business layer; \texttt{DB\_Tables} holds the forty \ac{JPA} entities
+that model the relational schema (stations, networks, agencies, file types,
+observation summaries, embargoes); and \texttt{Config} (\texttt{Loader.java})
+is the cross-cutting concern that handles bootstrap.
 
-Solid arrows
-denote ordinary call/data flow; dashed arrows denote configuration
-and infrastructure binding established at deployment time.
+Solid arrows denote ordinary call/data flow; dashed arrows denote
+configuration and infrastructure binding established at deployment time.
 
 \begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      every node/.style={font=\small},
-      node distance=4mm,
-      layer/.style={draw, rounded corners=2pt, align=center, thick,
-                    minimum width=92mm, minimum height=12mm},
-      cc/.style={draw, dashed, rounded corners=2pt, align=center,
-                 minimum width=28mm, minimum height=10mm,
-                 font=\footnotesize},
-      arrow/.style={-{Stealth[length=2mm]}, thick}
-    ]
-    \node[layer, fill=dkblue!10] (rest)
-      {\textbf{REST layer}, package \texttt{Glass} \\
-       \footnotesize Start, StationEndpoints, FilesEndpoints, ListEndpoints, Format writers};
-    \node[layer, fill=mauve!10, below=of rest] (biz)
-      {\textbf{Business / validation layer} \\
-       \footnotesize \texttt{Validate.java}, \texttt{Shape.java}, package \texttt{Geometry} (\texttt{NativePolygonCheck})};
-    \node[layer, fill=dkgreen!10, below=of biz] (jpa)
-      {\textbf{Persistence layer}, package \texttt{DB\_Tables} \\
-       \footnotesize 40 JPA entities (Station, RinexFile, Network, Agency, \ldots)};
-    \node[layer, fill=dark!10, below=of jpa] (db)
-      {\textbf{Database}, PostgreSQL \texttt{192.168.168.30:5432/DB\_3.0\_J} \\
-       \footnotesize over the SEGAL internal network / \ac{VPN}};
+	\centering
+	\resizebox{\linewidth}{!}{%
+	\begin{tikzpicture}[
+		every node/.style={font=\small},
+		node distance=4mm,
+		layer/.style={draw, rounded corners=2pt, align=center, thick, minimum width=92mm, minimum height=12mm},
+		cc/.style={draw, dashed, rounded corners=2pt, align=center, minimum width=28mm, minimum height=10mm, font=\footnotesize},
+		arrow/.style={-{Stealth[length=2mm]}, thick}
+	]
+		\node[layer, fill=dkblue!10]
+			(rest)
+			{\textbf{REST layer}, package \texttt{Glass} \\ \footnotesize Start, StationEndpoints, FilesEndpoints, ListEndpoints, Format writers};
+		\node[layer, fill=mauve!10, below=of rest]
+			(biz)
+			{\textbf{Business / validation layer} \\ \footnotesize \texttt{Validate.java}, \texttt{Shape.java}, package \texttt{Geometry} (\texttt{NativePolygonCheck})};
+		\node[layer, fill=dkgreen!10, below=of biz]
+			(jpa)
+			{\textbf{Persistence layer}, package \texttt{DB\_Tables} \\ \footnotesize 40 JPA entities (Station, RinexFile, Network, Agency, \ldots)};
+		\node[layer, fill=dark!10, below=of jpa]
+			(db)
+			{\textbf{Database}, PostgreSQL \texttt{192.168.168.30:5432/DB\_3.0\_J} \\ \footnotesize over the SEGAL internal network / \ac{VPN}};
 
-    \node[cc, right=6mm of biz, yshift=8mm] (cfg)
-      {\textbf{Config} \\\texttt{Loader.java} \\ env / file / default};
-    \node[cc, right=6mm of biz, yshift=-8mm] (pu)
-      {Persistence unit \\\texttt{MeuPU} \\ HikariCP pool};
+		\node[cc, right=6mm of biz, yshift=8mm]
+			(cfg)
+			{\textbf{Config} \\\texttt{Loader.java} \\ env / file / default};
+		\node[cc, right=6mm of biz, yshift=-8mm]
+			(pu)
+			{Persistence unit \\\texttt{MeuPU} \\ HikariCP pool};
 
-    \draw[arrow] (rest) -- (biz);
-    \draw[arrow] (biz)  -- (jpa);
-    \draw[arrow] (jpa)  -- (db);
-    \draw[arrow, dashed] (cfg) -- (db);
-    \draw[arrow, dashed] (pu)  -- (jpa);
-  \end{tikzpicture}%
-  }
-  \caption{Layered architecture of \texttt{EPOS V4}.}
-  \label{fig:apiv4-layers}
+		\draw[arrow] (rest) -- (biz);
+		\draw[arrow] (biz) -- (jpa);
+		\draw[arrow] (jpa) -- (db);
+		\draw[arrow, dashed] (cfg) -- (db);
+		\draw[arrow, dashed] (pu) -- (jpa);
+	\end{tikzpicture}%
+	}
+	\caption{Layered architecture of \texttt{EPOS V4}.}
+	\label{fig:apiv4-layers}
 \end{figure}
 
 \subsection{Endpoints and Output Formats}
 
-The \ac{REST} surface is declared in four classes inside the
-\texttt{Glass} package. \texttt{Start.java} carries the
-\texttt{@ApplicationPath("/api")} annotation and registers a
-\texttt{PingResource} for the trivial \texttt{/api/ping} liveness
-check. The three substantive resources are
-\texttt{StationEndpoints} (\texttt{/api/stations}, seven endpoints
-for station metadata indexed by identifier, location, agency,
-network, equipment or coordinates), \texttt{FilesEndpoints}
-(\texttt{/api/files}, four endpoints for \ac{RINEX} file metadata
-filtered by agency/antenna/bounding box/date, by marker, the
-high-rate variant, and an aggregated combination), and
-\texttt{ListEndpoints} (\texttt{/api/list}, a parametric endpoint
-returning the valid values of a given filter). Every endpoint
-accepts a \texttt{\{format\}} path parameter and emits \ac{JSON},
-\ac{XML}, \ac{CSV} or (for the file endpoints) a downloadable shell
-script; the same \ac{OpenAPI} 3.1.0 document is served at
-\texttt{/swagger.html} through a Swagger \ac{UI} hosted inside the
-\ac{WAR}.
+The \ac{REST} surface is declared in four classes inside the \texttt{Glass}
+package. \texttt{Start.java} carries the \texttt{@ApplicationPath("/api")} annotation
+and registers a \texttt{PingResource} for the trivial \texttt{/api/ping} liveness
+check. The three substantive resources are \texttt{StationEndpoints} (\texttt{/api/stations},
+seven endpoints for station metadata indexed by identifier, location,
+agency, network, equipment or coordinates), \texttt{FilesEndpoints} (\texttt{/api/files},
+four endpoints for \ac{RINEX} file metadata filtered by agency/antenna/bounding
+box/date, by marker, the high-rate variant, and an aggregated combination),
+and \texttt{ListEndpoints} (\texttt{/api/list}, a parametric endpoint
+returning the valid values of a given filter). Every endpoint accepts a
+\texttt{\{format\}} path parameter and emits \ac{JSON}, \ac{XML}, \ac{CSV}
+or (for the file endpoints) a downloadable shell script; the same \ac{OpenAPI}
+3.1.0 document is served at \texttt{/swagger.html} through a Swagger \ac{UI}
+hosted inside the \ac{WAR}.
 
 \subsection{Persistence}
 
-The persistence unit, declared in
-\texttt{src/\allowbreak main/\allowbreak resources/\allowbreak META-INF/\allowbreak persistence.xml}, is named
+The persistence unit, declared in \texttt{src/\allowbreak main/\allowbreak
+resources/\allowbreak META-INF/\allowbreak persistence.xml}, is named
 \texttt{MeuPU} (inherited from the legacy code). It is configured as
-\texttt{RESOURCE\_LOCAL}, with Hibernate as the \ac{JPA} provider
-and a connection pool managed by HikariCP\@. Database connection
-parameters, host, port, database name, user, password, are
-resolved at startup by \texttt{Config/Loader.java}, with the
-following precedence: environment variables, then a
-\texttt{Config.config} file at the root of the deployment, then
-hard-coded defaults pointing at the laboratory's database
-(\texttt{192.168.168.30:5432}).
+\texttt{RESOURCE\_LOCAL}, with Hibernate as the \ac{JPA} provider and a connection
+pool managed by HikariCP\@. Database connection parameters, host, port,
+database name, user, password, are resolved at startup by \texttt{Config/Loader.java},
+with the following precedence: environment variables, then a \texttt{Config.config}
+file at the root of the deployment, then hard-coded defaults pointing at the
+laboratory's database (\texttt{192.168.168.30:5432}).
 
-The laboratory maintains two database fixtures with the same schema
-but different volumes of data:
+The laboratory maintains two database fixtures with the same schema but
+different volumes of data:
 
 \begin{itemize}
-  \item \texttt{DB\_3.0\_J} hosts a small but representative production
-        subset, on the order of ten stations, eighty-six networks,
-        two hundred and thirty agencies and roughly one hundred and
-        forty-six thousand \texttt{rinex\_file} rows at the time of
-        writing. This is the fixture used by the correctness diff
-        runs, because it is small enough to allow per-case comparison
-        of full response bodies without overwhelming the report.
-  \item \texttt{DB\_3.0\_F} hosts the full dataset and is used by the
-        volume-oriented diff runs, where the goal is not byte-for-byte
-        equality but the detection of changes that would only be
-        apparent at scale, for example, an inadvertent
-        \texttt{N+1} query introduced by a refactor, or a query plan
-        regression visible only on a large table.
+	\item \texttt{DB\_3.0\_J} hosts a small but representative production
+		subset, on the order of ten stations, eighty-six networks, two hundred and
+		thirty agencies and roughly one hundred and forty-six thousand \texttt{rinex\_file}
+		rows at the time of writing. This is the fixture used by the correctness
+		diff runs, because it is small enough to allow per-case comparison of
+		full response bodies without overwhelming the report.
+
+	\item \texttt{DB\_3.0\_F} hosts the full dataset and is used by the
+		volume-oriented diff runs, where the goal is not byte-for-byte equality but
+		the detection of changes that would only be apparent at scale, for
+		example, an inadvertent \texttt{N+1} query introduced by a refactor, or a
+		query plan regression visible only on a large table.
 \end{itemize}
 
-The precedence rules of \texttt{Loader.java} are what allow the
-\texttt{http-diff-job} to switch the running \acp{WAR} between the two
-fixtures without rebuilding the artifact: the job sets the
-appropriate environment variables in its \texttt{variables:} block
-and the application picks them up at boot.
+The precedence rules of \texttt{Loader.java} are what allow the \texttt{http-diff-job}
+to switch the running \acp{WAR} between the two fixtures without rebuilding
+the artifact: the job sets the appropriate environment variables in its \texttt{variables:}
+block and the application picks them up at boot.
 
-The shape of the schema is discussed in
-Section~\ref{sec:epos-db}; a simplified view of the central entities
-is given in Figure~\ref{fig:datamodel}.
+The shape of the schema is discussed in Section~\ref{sec:epos-db}; a simplified
+view of the central entities is given in Figure~\ref{fig:datamodel}.
 
-Representative columns as they appear in the live PostgreSQL schema.
-Green entities carry domain data; purple entities are
-controlled-vocabulary lookups (note that \texttt{country.iso\_code}
-is the natural primary key, not a surrogate \texttt{id});
-grey entities are junction tables that materialise the many-to-many
-relationships of the model. Arrows point from the ``one'' side to
-the ``many'' side of the relationship.
+Representative columns as they appear in the live PostgreSQL schema. Green
+entities carry domain data; purple entities are controlled-vocabulary lookups
+(note that \texttt{country.iso\_code} is the natural primary key, not a
+surrogate \texttt{id}); grey entities are junction tables that materialise the
+many-to-many relationships of the model. Arrows point from the ``one'' side
+to the ``many'' side of the relationship.
 
 \begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      every node/.style={font=\footnotesize},
-      entity/.style={draw, rounded corners=2pt, align=center, thick,
-                     minimum width=24mm, minimum height=11mm,
-                     fill=dkgreen!10},
-      lookup/.style={entity, fill=mauve!10},
-      junc/.style={entity, fill=lgray, minimum width=22mm},
-      arrow/.style={-{Stealth[length=2mm]}, thick},
-      rel/.style={font=\scriptsize, text=dark}
-    ]
-    \node[entity] (station)
-      {\textbf{station} \\\scriptsize id, marker[9], lat, lon, x/y/z,\\\scriptsize country\_code, station\_type};
-    \node[junc, left=10mm of station]   (sn) {\textbf{station\_network} \\\scriptsize include\_date};
-    \node[entity, left=10mm of sn]      (network) {\textbf{network} \\\scriptsize id, name, network\_type, doi};
-    \node[junc, left=10mm of network]   (an) {\textbf{agency\_network} \\\scriptsize role};
-    \node[lookup, left=10mm of an]      (agency)  {\textbf{agency} \\\scriptsize id, name, abbreviation,\\\scriptsize ror};
-    \node[lookup, above=8mm of station] (country) {\textbf{country} \\\scriptsize iso\_code (PK), name};
-    \node[entity, right=12mm of station](rinex)   {\textbf{rinex\_file} \\\scriptsize id, name, file\_size,\\\scriptsize reference\_date, md5checksum};
-    \node[entity, below=8mm of rinex]   (highrate){\textbf{highrate\_rinex\_file}};
-    \node[lookup, right=12mm of rinex]  (ftype)   {\textbf{file\_type} \\\scriptsize format, sampling\_window};
-    \node[junc, below=8mm of station]   (nodest)  {\textbf{node\_station}};
-    \node[entity, below=8mm of nodest]  (node)    {\textbf{node} / \textbf{data\_center}};
+	\centering
+	\resizebox{\linewidth}{!}{%
+	\begin{tikzpicture}[
+		every node/.style={font=\footnotesize},
+		entity/.style={draw, rounded corners=2pt, align=center, thick, minimum width=24mm, minimum height=11mm, fill=dkgreen!10},
+		lookup/.style={entity, fill=mauve!10},
+		junc/.style={entity, fill=lgray, minimum width=22mm},
+		arrow/.style={-{Stealth[length=2mm]}, thick},
+		rel/.style={font=\scriptsize, text=dark}
+	]
+		\node[entity]
+			(station)
+			{\textbf{station} \\\scriptsize id, marker[9], lat, lon, x/y/z,\\\scriptsize country\_code, station\_type};
+		\node[junc, left=10mm of station]
+			(sn)
+			{\textbf{station\_network} \\\scriptsize include\_date};
+		\node[entity, left=10mm of sn]
+			(network)
+			{\textbf{network} \\\scriptsize id, name, network\_type, doi};
+		\node[junc, left=10mm of network]
+			(an)
+			{\textbf{agency\_network} \\\scriptsize role};
+		\node[lookup, left=10mm of an]
+			(agency)
+			{\textbf{agency} \\\scriptsize id, name, abbreviation,\\\scriptsize ror};
+		\node[lookup, above=8mm of station]
+			(country)
+			{\textbf{country} \\\scriptsize iso\_code (PK), name};
+		\node[entity, right=12mm of station]
+			(rinex)
+			{\textbf{rinex\_file} \\\scriptsize id, name, file\_size,\\\scriptsize reference\_date, md5checksum};
+		\node[entity, below=8mm of rinex]
+			(highrate)
+			{\textbf{highrate\_rinex\_file}};
+		\node[lookup, right=12mm of rinex]
+			(ftype)
+			{\textbf{file\_type} \\\scriptsize format, sampling\_window};
+		\node[junc, below=8mm of station] (nodest) {\textbf{node\_station}};
+		\node[entity, below=8mm of nodest]
+			(node)
+			{\textbf{node} / \textbf{data\_center}};
 
-    \draw[arrow] (agency)  -- node[rel,above]{1..*} (an);
-    \draw[arrow] (network) -- node[rel,above]{1..*} (an);
-    \draw[arrow] (station) -- node[rel,above]{1..*} (sn);
-    \draw[arrow] (network) -- node[rel,above]{1..*} (sn);
-    \draw[arrow] (country) -- node[rel,right]{1..*} (station);
-    \draw[arrow] (station) -- node[rel,above]{1..*} (rinex);
-    \draw[arrow] (station) -- node[rel,above,sloped]{1..*} (highrate);
-    \draw[arrow] (ftype)   -- node[rel,above]{1..*} (rinex);
-    \draw[arrow] (ftype)   -- node[rel,below,sloped]{1..*} (highrate);
-    \draw[arrow] (station) -- node[rel,right]{1..*} (nodest);
-    \draw[arrow] (nodest)  -- node[rel,right]{*..1} (node);
-  \end{tikzpicture}%
-  }
-  \caption{Simplified view of the core \ac{EPOS} data model}
-  \label{fig:datamodel}
+		\draw[arrow] (agency) -- node[rel, above] {1..*} (an);
+		\draw[arrow] (network) -- node[rel, above] {1..*} (an);
+		\draw[arrow] (station) -- node[rel, above] {1..*} (sn);
+		\draw[arrow] (network) -- node[rel, above] {1..*} (sn);
+		\draw[arrow] (country) -- node[rel, right] {1..*} (station);
+		\draw[arrow] (station) -- node[rel, above] {1..*} (rinex);
+		\draw[arrow] (station) -- node[rel, above, sloped] {1..*} (highrate);
+		\draw[arrow] (ftype) -- node[rel, above] {1..*} (rinex);
+		\draw[arrow] (ftype) -- node[rel, below, sloped] {1..*} (highrate);
+		\draw[arrow] (station) -- node[rel, right] {1..*} (nodest);
+		\draw[arrow] (nodest) -- node[rel, right] {*..1} (node);
+	\end{tikzpicture}%
+	}
+	\caption{Simplified view of the core \ac{EPOS} data model}
+	\label{fig:datamodel}
 \end{figure}
 
-\section{The \ac{CI}/\ac{CD} Pipeline}
+\section{The CI/CD Pipeline}
 \label{sec:pipeline}
 
-The pipeline of \texttt{api\_v4.0} extends the patterns validated on
-the first prototype with an additional job in a new \texttt{diff}
-stage. The diff job compares the current build against \emph{two}
-baselines, in what amounts to a three-way comparison: the immediate
-parent commit \texttt{HEAD\textasciitilde 1} (which catches
-regressions introduced by the commit currently being pushed) and a
-\emph{fixed} reference commit identified by a SHA stored in the
-\texttt{DIFF\_FIXED\_BASELINE} GitLab \ac{CI}/\ac{CD} variable
-(which catches the slow drift that accumulates over many commits
-along a long-running refactor branch). The key parts of the
-\texttt{.gitlab-ci.yml} are shown, condensed, in
-Listing~\ref{lst:apiv4-ci}.
+The pipeline of \texttt{api\_v4.0} extends the patterns validated on the first
+prototype with an additional job in a new \texttt{diff} stage. The diff job compares
+the current build against \emph{two} baselines, in what amounts to a three-way
+comparison: the immediate parent commit \texttt{HEAD\textasciitilde 1} (which
+catches regressions introduced by the commit currently being pushed) and a \emph{fixed}
+reference commit identified by a SHA stored in the \texttt{DIFF\_FIXED\_BASELINE}
+GitLab \ac{CI}/\ac{CD} variable (which catches the slow drift that
+accumulates over many commits along a long-running refactor branch). The
+key parts of the \texttt{.gitlab-ci.yml} are shown, condensed, in Listing~\ref{app:glass-ci-cd}.
 
-\begin{lstlisting}[language=yaml,caption={Condensed view of the production \texttt{.gitlab-ci.yml}, three stages and three jobs.},label=lst:apiv4-ci]
-default:
-  image: maven:3.9.6-eclipse-temurin-21
-  tags: [ ubi-runner-.31 ]
-cache: { key: global-maven-cache, paths: [ .m2/repository ] }
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  GIT_DEPTH: "20"
-stages: [ build, test, diff ]
+Three details of the listing are worth highlighting. The \emph{recent} baseline
+is \texttt{HEAD\textasciitilde 1}, which keeps the per-commit comparison focused
+on the change just introduced; the \emph{fixed} baseline is a commit \ac{ID}
+stored in \texttt{DIFF\_FIXED\_BASELINE} (typically pointing at the last
+commit known to have shipped to the \ac{EPOS} portal) and acts as a long-term
+reference against which the cumulative drift of the branch is measured. Each
+baseline build is materialised through \texttt{git worktree} rather than
+\texttt{git checkout}, so the working copy is never disturbed and the
+harness can freely compare files from both checkouts in parallel. Finally,
+each baseline is optional and treated independently: if \texttt{HEAD\textasciitilde
+1} does not exist (first commit of the repository) or \texttt{DIFF\_FIXED\_BASELINE}
+is unset (start of a refactor branch), the corresponding sub-run is skipped.
+A pipeline can therefore have zero, one or two diff sub-runs depending on
+the situation, and never fails because a baseline is simply unavailable.
 
-build-job:
-  stage: build
-  script: [ mvn clean package -DskipTests ]
-  artifacts: { paths: [ target/*.war ] }
-
-integration-test-job:
-  stage: test
-  script: [ mvn verify ]
-  artifacts:
-    when: always
-    reports: { junit: [ "target/failsafe-reports/TEST-*.xml" ] }
-
-http-diff-job:
-  stage: diff
-  needs: [ { job: build-job, artifacts: true } ]
-  variables:
-    DATABASE_URL: "postgres://postgres:postgres@192.168.168.30:5432/DB_3.0_J"
-    JAKARTA_SCHEMA_ACTION: "none"
-    DIFF_FIXED_BASELINE: ""
-  script:
-    - |
-      # build baselines if available, then let HttpDiff orchestrate
-      # spawning Payara Micros on ports 8080/8081/8082.
-      [ -n "$(git rev-parse --verify HEAD~1 2>/dev/null)" ] && \
-          export BASELINE_RECENT_WAR=$(build recent HEAD~1)
-      [ -n "$DIFF_FIXED_BASELINE" ] && \
-          export BASELINE_FIXED_WAR=$(build fixed "$DIFF_FIXED_BASELINE")
-      mvn test -Dtest=HttpDiff -DfailIfNoTests=false
-  artifacts:
-    when: always
-    paths:
-      - target/http-diff-report/
-    reports:
-      junit:
-        - "target/surefire-reports/TEST-Diff.HttpDiff.xml"
-    expire_in: 4 weeks
-\end{lstlisting}
-
-Three details of the listing are worth highlighting. The
-\emph{recent} baseline is \texttt{HEAD\textasciitilde 1}, which keeps
-the per-commit comparison focused on the change just introduced; the
-\emph{fixed} baseline is a commit \ac{ID} stored in
-\texttt{DIFF\_FIXED\_BASELINE} (typically pointing at the last commit
-known to have shipped to the \ac{EPOS} portal) and acts as a
-long-term reference against which the cumulative drift of the branch
-is measured. Each baseline build is materialised through
-\texttt{git worktree} rather than \texttt{git checkout}, so the
-working copy is never disturbed and the harness can freely compare
-files from both checkouts in parallel. Finally, each baseline is
-optional and treated independently: if \texttt{HEAD\textasciitilde 1}
-does not exist (first commit of the repository) or
-\texttt{DIFF\_FIXED\_BASELINE} is unset (start of a refactor branch),
-the corresponding sub-run is skipped. A pipeline can therefore have
-zero, one or two diff sub-runs depending on the situation, and never
-fails because a baseline is simply unavailable.
-
-\section{The \ac{HTTP}-Level Diff: \texttt{HttpDiff.java}}
+\section{The HTTP-Level Diff: \texttt{HttpDiff.java}}
 \label{sec:httpdiff}
 
-\texttt{HttpDiff.java} is the harness that
-exercises the \ac{API} end-to-end. Its execution proceeds in four
-phases, summarised graphically in Figure~\ref{fig:httpdiff-phases}.
-The \ac{HTTP} harness runs once and internally boots
-\emph{all} the available \acp{WAR} in parallel (the \texttt{HEAD}
-\ac{WAR}, the recent baseline if any, and the fixed baseline if
-any). It then issues every test case against every running instance
-and emits one diff report per baseline.
+\texttt{HttpDiff.java} is the harness that exercises the \ac{API} end-to-end.
+Its execution proceeds in four phases, summarised graphically in Figure~\ref{fig:httpdiff-phases}.
+The \ac{HTTP} harness runs once and internally boots \emph{all} the available
+\acp{WAR} in parallel (the \texttt{HEAD} \ac{WAR}, the recent baseline if
+any, and the fixed baseline if any). It then issues every test case against every
+running instance and emits one diff report per baseline.
 
-The harness boots one
-Payara Micro per available \ac{WAR}, the \texttt{HEAD} build and
-whichever of the recent/fixed baselines were provided, waits
-for all of them to be ready, fires every test case against every
-instance in parallel, then performs a three-way comparison and
-emits one diff report per baseline.
+The harness boots one Payara Micro per available \ac{WAR}, the \texttt{HEAD}
+build and whichever of the recent/fixed baselines were provided, waits for all
+of them to be ready, fires every test case against every instance in
+parallel, then performs a three-way comparison and emits one diff report per
+baseline.
 
 \begin{figure}[h]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-      every node/.style={font=\footnotesize},
-      proc/.style={draw, rounded corners=2pt, align=center, thick,
-                   minimum width=26mm, minimum height=10mm,
-                   fill=dkblue!10},
-      micro/.style={proc, fill=mauve!10, minimum width=30mm},
-      head/.style={proc, fill=dkgreen!10, minimum width=30mm},
-      stage/.style={font=\small\bfseries, text=dark},
-      barrow/.style={-{Stealth[length=2mm]}, thick},
-      darrow/.style={-{Stealth[length=2mm]}, thick, dashed}
-    ]
-    \node[proc] (harness) {\textbf{HttpDiff.java} \\ \footnotesize (JUnit 5)};
-    \node[head,  right=18mm of harness] (p80) {\textbf{payara-micro :8080} \\ \footnotesize HEAD WAR};
-    \node[micro, right=8mm  of p80]     (p81) {\textbf{payara-micro :8081} \\ \footnotesize recent baseline};
-    \node[micro, right=8mm  of p81]     (p82) {\textbf{payara-micro :8082} \\ \footnotesize fixed baseline};
-    \node[proc, fill=dark!10, right=12mm of p82] (pg) {\textbf{PostgreSQL} \\ \footnotesize 192.168.168.30};
+	\centering
+	\resizebox{\linewidth}{!}{%
+	\begin{tikzpicture}[
+		every node/.style={font=\footnotesize},
+		proc/.style={draw, rounded corners=2pt, align=center, thick, minimum width=26mm, minimum height=10mm, fill=dkblue!10},
+		micro/.style={proc, fill=mauve!10, minimum width=30mm},
+		head/.style={proc, fill=dkgreen!10, minimum width=30mm},
+		stage/.style={font=\small\bfseries, text=dark},
+		barrow/.style={-{Stealth[length=2mm]}, thick},
+		darrow/.style={-{Stealth[length=2mm]}, thick, dashed}
+	]
+		\node[proc]
+			(harness)
+			{\textbf{HttpDiff.java} \\ \footnotesize (JUnit 5)};
+		\node[head, right=18mm of harness]
+			(p80)
+			{\textbf{payara-micro :8080} \\ \footnotesize HEAD WAR};
+		\node[micro, right=8mm of p80]
+			(p81)
+			{\textbf{payara-micro :8081} \\ \footnotesize recent baseline};
+		\node[micro, right=8mm of p81]
+			(p82)
+			{\textbf{payara-micro :8082} \\ \footnotesize fixed baseline};
+		\node[proc, fill=dark!10, right=12mm of p82]
+			(pg)
+			{\textbf{PostgreSQL} \\ \footnotesize 192.168.168.30};
 
-    \node[stage, below=4mm of harness] (s1) {Phase 1, Boot};
-    \draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p80.south);
-    \draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p81.south);
-    \draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p82.south);
+		\node[stage, below=4mm of harness] (s1) {Phase 1, Boot};
+		\draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p80.south);
+		\draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p81.south);
+		\draw[barrow] ($(harness.south)+(0,-12mm)$) -| (p82.south);
 
-    \node[stage, below=20mm of s1] (s2) {Phase 2, Verify};
-    \draw[barrow] ($(harness.south)+(0,-30mm)$) -- ++(1.8,0)
-        node[midway,above,font=\scriptsize]{GET /api/ping} -| (p80);
-    \draw[barrow] ($(harness.south)+(0,-34mm)$) -- ++(4.6,0)
-        node[midway,above,font=\scriptsize]{GET /api/ping} -| (p81);
-    \draw[barrow] ($(harness.south)+(0,-38mm)$) -- ++(7.4,0)
-        node[midway,above,font=\scriptsize]{GET /api/ping} -| (p82);
+		\node[stage, below=20mm of s1] (s2) {Phase 2, Verify};
+		\draw[barrow]
+			($(harness.south)+(0,-30mm)$) -- ++(1.8,0)
+			node[midway, above, font=\scriptsize] {GET /api/ping}
+			-|
+			(p80);
+		\draw[barrow]
+			($(harness.south)+(0,-34mm)$) -- ++(4.6,0)
+			node[midway, above, font=\scriptsize] {GET /api/ping}
+			-|
+			(p81);
+		\draw[barrow]
+			($(harness.south)+(0,-38mm)$) -- ++(7.4,0)
+			node[midway, above, font=\scriptsize] {GET /api/ping}
+			-|
+			(p82);
 
-    \node[stage, below=24mm of s2] (s3) {Phase 3, Replay \& 3-way diff};
-    \draw[barrow] ($(harness.south)+(0,-56mm)$) -- ++(1.8,0)
-        node[midway,above,font=\scriptsize]{case[i]} -| (p80);
-    \draw[barrow] ($(harness.south)+(0,-60mm)$) -- ++(4.6,0)
-        node[midway,above,font=\scriptsize]{case[i]} -| (p81);
-    \draw[barrow] ($(harness.south)+(0,-64mm)$) -- ++(7.4,0)
-        node[midway,above,font=\scriptsize]{case[i]} -| (p82);
-    \draw[darrow] ($(p80.south)+(0,-12mm)$) -- ($(pg.south)+(0,-12mm)$)
-        node[midway,below,font=\scriptsize]{all three query the same DB};
+		\node[stage, below=24mm of s2] (s3) {Phase 3, Replay \& 3-way diff};
+		\draw[barrow]
+			($(harness.south)+(0,-56mm)$) -- ++(1.8,0)
+			node[midway, above, font=\scriptsize] {case[i]}
+			-|
+			(p80);
+		\draw[barrow]
+			($(harness.south)+(0,-60mm)$) -- ++(4.6,0)
+			node[midway, above, font=\scriptsize] {case[i]}
+			-|
+			(p81);
+		\draw[barrow]
+			($(harness.south)+(0,-64mm)$) -- ++(7.4,0)
+			node[midway, above, font=\scriptsize] {case[i]}
+			-|
+			(p82);
+		\draw[darrow]
+			($(p80.south)+(0,-12mm)$) -- ($(pg.south)+(0,-12mm)$)
+			node[midway, below, font=\scriptsize] {all three query the same DB};
 
-    \node[proc, fill=dkgreen!10, below=70mm of harness, minimum width=132mm]
-        (diff) {\textbf{Diff} HEAD vs recent \(\rightarrow\) \texttt{http-diff-report/recent/} \quad
-                \textbf{Diff} HEAD vs fixed \(\rightarrow\) \texttt{http-diff-report/fixed/}};
+		\node[
+			proc,
+			fill=dkgreen!10,
+			below=70mm of harness,
+			minimum width=132mm
+		]
+			(diff)
+			{\textbf{Diff} HEAD vs recent $\rightarrow$ \texttt{http-diff-report/recent/} \quad \textbf{Diff} HEAD vs fixed $\rightarrow$ \texttt{http-diff-report/fixed/}};
 
-    \node[stage, below=4mm of diff] (s4) {Phase 4, Teardown + Report};
-    \draw[barrow] ($(harness.south)+(0,-92mm)$) -- ++(10.0,0)
-        node[midway,above,font=\scriptsize]{SIGTERM all payara-micro};
-  \end{tikzpicture}%
-  }
-  \caption{Phases of \texttt{HttpDiff.java}.}
-  \label{fig:httpdiff-phases}
+		\node[stage, below=4mm of diff] (s4) {Phase 4, Teardown + Report};
+		\draw[barrow]
+			($(harness.south)+(0,-92mm)$) -- ++(10.0,0)
+			node[midway, above, font=\scriptsize] {SIGTERM all payara-micro};
+	\end{tikzpicture}%
+	}
+	\caption{Phases of \texttt{HttpDiff.java}.}
+	\label{fig:httpdiff-phases}
 \end{figure}
 
-The figure already covers the gist; a few implementation details are
-worth recording. The test cases live in
-\texttt{src/\allowbreak test/\allowbreak resources/\allowbreak http-diff-cases.json}
-as a \ac{JSON} array of request descriptors (method, path, headers,
-optional body); This guards against spurious failures from
-requests landing on still-deploying containers. Bodies are compared
-as normalised strings (sorted \ac{JSON} keys, trimmed whitespace)
-and the headers that vary by definition (\texttt{Date},
-\texttt{Server}, \texttt{Content-Length}) are ignored. The two
-comparisons (HEAD vs recent, HEAD vs fixed) are kept in separate
-report directories so that a per-commit regression and an
+The figure already covers the gist; a few implementation details are worth recording.
+The test cases live in \texttt{src/\allowbreak test/\allowbreak resources/\allowbreak
+http-diff-cases.json} as a \ac{JSON} array of request descriptors (method,
+path, headers, optional body); This guards against spurious failures from
+requests landing on still-deploying containers. Bodies are compared as normalised
+strings (sorted \ac{JSON} keys, trimmed whitespace) and the headers that vary
+by definition (\texttt{Date}, \texttt{Server}, \texttt{Content-Length}) are
+ignored. The two comparisons (HEAD vs recent, HEAD vs fixed) are kept in
+separate report directories so that a per-commit regression and an
 accumulated drift remain distinguishable in the artifact tree.
 
 \section{Reports and Findings}
 \label{sec:reports}
 
-Each pipeline run publishes the integration-test reports, the
-diff reports (\texttt{recent/} and \texttt{fixed/} subdirectories of
-\texttt{target/http-diff-report/}) and the JUnit XML files
-consumed by GitLab. Integration test results expire after one week;
-the diff reports are kept for four because they are the historical
-record of behavioural change across the refactor. During development
-the harness surfaced real regressions hidden inside seemingly
-cosmetic refactors that no line-by-line review of the diff would
-plausibly have caught by eye. The next chapter draws the main conclusions of the project and
-outlines the items that, by choice or by constraint, were left out
-of its scope.
+Each pipeline run publishes the integration-test reports, the diff reports
+(\texttt{recent/} and \texttt{fixed/} subdirectories of \texttt{target/http-diff-report/})
+and the JUnit XML files consumed by GitLab. Integration test results expire
+after one week; the diff reports are kept for four because they are the historical
+record of behavioural change across the refactor. During development the
+harness surfaced real regressions hidden inside seemingly cosmetic
+refactors that no line-by-line review of the diff would plausibly have
+caught by eye. The next chapter draws the main conclusions of the project and
+outlines the items that, by choice or by constraint, were left out of its scope.

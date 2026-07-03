@@ -1,0 +1,26 @@
+flowchart TB
+    client["HTTP client<br><i>Bearer JWT</i>"] --> guard["MP-JWT guard<br><i>validates signature + exp</i>"]
+    guard --> resource["<b>BookingResource</b><br><i>@Valid AutoBookingRequest</i>"]
+    resource --> svc["<b>BookingService.createAutoBooking()</b><br><i>@Transactional</i>"]
+    svc --> query["RoomRepository<br>findByTypeAndMaxCapacity ≥ attendees"]
+    query --> user["getCurrentUser()<br><i>jwt.getSubject() → UserRepository</i>"]
+    user --> filter{"stream: first room where<br>isRoomAvailable(start,end)?"}
+    filter -- none free --> none@{ label: "<b>BusinessValidationException</b><br>409 · 'No suitable rooms available'" }
+    filter -- found --> insert["new Booking(room,user,...)<br>BookingRepository.insert()"]
+    insert --> created["201 Created<br><code>{ booking }</code>"]
+
+    none@{ shape: rect}
+     client:::stage
+     guard:::mapper
+     resource:::stage
+     svc:::stage
+     query:::stage
+     user:::mapper
+     filter:::stage
+     none:::error
+     insert:::outbox
+     created:::outbox
+    classDef stage fill:#e6f0fa,stroke:#333,stroke-width:2px,color:#000
+    classDef error fill:#ffe6e6,stroke:#333,stroke-width:2px,color:#000
+    classDef mapper fill:#f4ebf4,stroke:#333,stroke-width:2px,color:#000
+    classDef outbox fill:#e6f2e6,stroke:#333,stroke-width:2px,color:#000

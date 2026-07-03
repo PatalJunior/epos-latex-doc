@@ -1,0 +1,66 @@
+\chapter{Code Snippet: GLASS CI/CD}
+
+\label{app:glass-ci-cd}
+
+\begin{lstlisting}[language=yaml ,caption={Condensed view of the production \texttt{.gitlab-ci.yml}, three stages and three jobs.},label=lst:apiv4-ci]
+http-diff-job:
+  stage: diff
+  needs:
+    - job: build-job
+      artifacts: true
+  variables:
+    DATABASE_URL: "postgres://postgres:postgres@192.168.168.30:5432/DB_3.0_F"
+    JAKARTA_SCHEMA_ACTION: "none"
+    # Pinned reference commit for the current-vs-fixed comparison.
+    FIXED_SHA: "b1809ec"
+  script:
+    - |
+      BASELINE_SHA=$(git rev-parse --verify HEAD~1 2>/dev/null || echo "")
+      if [ -z "$BASELINE_SHA" ]; then
+        echo "HEAD has no parent commit - nothing to diff against. Skipping."
+        mkdir -p target/http-diff-report
+        echo '{"skipped": true, "reason": "no parent commit"}' > target/http-diff-report/summary.json
+        exit 0
+      fi
+
+      build_war() {
+        local ref="$1" dir="$2"
+        git worktree remove --force "$dir" 2>/dev/null || true
+        git worktree prune
+        rm -rf "$dir"
+        git worktree add "$dir" "$ref"
+        ( cd "$dir" && mvn -q -o package -DskipTests )
+        BUILT_WAR="$dir/target/ROOT.war"
+        test -f "$BUILT_WAR" || (echo "WAR not found at $BUILT_WAR for ref $ref" && ls -R "$dir/target" && exit 1)
+      }
+
+      echo "Last (HEAD~1) = $BASELINE_SHA"
+      build_war "$BASELINE_SHA" /tmp/http-last-build
+      export BASELINE_WAR="$BUILT_WAR"
+      echo "LAST WAR    = $BASELINE_WAR"
+
+      if [ -n "$FIXED_SHA" ]; then
+        if ! git rev-parse --verify "${FIXED_SHA}^{commit}" >/dev/null 2>&1; then
+          echo "FIXED_SHA=$FIXED_SHA is not reachable in this clone (GIT_DEPTH=$GIT_DEPTH). Increase GIT_DEPTH or pick a nearer commit." >&2
+          exit 1
+        fi
+        echo "Fixed        = $FIXED_SHA"
+        build_war "$FIXED_SHA" /tmp/http-fixed-build
+        export FIXED_WAR="$BUILT_WAR"
+        echo "FIXED WAR   = $FIXED_WAR"
+      else
+        echo "FIXED_SHA unset - running in 2-way mode (current-vs-last only)."
+      fi
+
+      echo "CURRENT WAR = $CI_PROJECT_DIR/target/ROOT.war"
+      mvn test -Dtest=HttpDiff -DfailIfNoTests=false
+  artifacts:
+    when: always
+    paths:
+      - target/http-diff-report/
+      - target/surefire-reports/
+    reports:
+      junit:
+        - "target/surefire-reports/TEST-*.xml"
+    expire_in: 4 weeks
+\end{lstlisting}

@@ -36,76 +36,67 @@ can read and re-use.
 \section{Prototype Applications}
 \label{sec:prototypes}
 
-The first prototype, \texttt{java-ee-app}, validated the \ac{CI}/\ac{CD} infrastructure
-end-to-end before any of the production code base was touched: it is a
-minimal Maven \ac{WAR} exposing two trivial \ac{JAX-RS} endpoints, with a \texttt{.gitlab-ci.yml}
-that builds the artifact and runs Arquillian integration tests against two
+The prototype phase was divided into two distinct applications, each designed
+to isolate and solve a specific set of problems before merging the solutions
+into the production \ac{API}.
+
+\subsection{Prototype 1: Infrastructure Validation (\texttt{java-ee-app})}
+\label{subsec:proto1}
+
+The first prototype validated the \ac{CI}/\ac{CD} infrastructure end-to-end before
+any of the production code base was touched. It is a minimal Maven \ac{WAR} exposing
+two trivial \ac{JAX-RS} endpoints, with a \texttt{.gitlab-ci.yml} that
+builds the artifact and runs Arquillian integration tests against two
 managed Payara Server containers declared as \emph{services} in the job.
-Three patterns from that pipeline were carried over verbatim to the
-production one: the pinned base image with the \texttt{ubi-runner} tag, the global
-Maven repository cache, and the \texttt{reports: junit:} stanza that makes GitLab
-understand assertion failures as failed pipeline steps.
 
-The second prototype, \texttt{syncspace-jakarta-app}, focused on the
-opposite concern: a complete Jakarta EE 11 application with no \ac{CI}
-pipeline, exercising the specifications listed in Section~\ref{sec:java} on a
-small room-booking domain (entities \texttt{User}, \texttt{Room}, \texttt{Booking})
-protected by MicroProfile \ac{JWT}~\cite{microprofile}. \ac{JAX-RS}~\cite{jaxrs}
-declares the resources, \ac{CDI} wires the services, \ac{JPA}~\cite{jpa} maps
-the entities, Bean Validation enforces a custom \texttt{@ValidDateRange} constraint,
-and a focused set of four \texttt{ExceptionMapper}s (\texttt{Business\-Validation\-Mapper},
-\texttt{Validation\-Exception\-Mapper}, \texttt{Json\-Processing\-Exception\-Mapper},
-\texttt{Global\-Exception\-Mapper}) translates domain and framework exceptions
-into structured \ac{JSON} errors without leaking stack traces. The end-to-end
-exception flow is summarised in Figure~\ref{fig:errormapper}.
+Three patterns from that pipeline were carried over verbatim to the production
+one: the pinned base image with the \texttt{ubi-runner} tag, the global
+Maven repository cache, and the \texttt{reports: junit:} stanza that makes
+GitLab understand assertion failures as failed pipeline steps.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\textwidth, height=14cm, keepaspectratio]{
-		diagrams/syncspace-diagram.png
-	}
-	\caption{The \ac{CDI} + \ac{JAX-RS} exception-handling flow \ac{JSON} error
-	body.}
-	\label{fig:errormapper}
-\end{figure}
+For a detailed breakdown of the pipeline configuration, the containerized testing
+environment, and the complete infrastructure setup, please refer to Appendix~\ref{app:infra-validation}.
 
-Two patterns from \texttt{syncspace-jakarta-app} were adopted by the production
-refactor: the use of a small set of focused \texttt{ExceptionMapper}s (which
-keeps \ac{HTTP} status codes meaningful and gives the differential harness
-a stable signal to assert on) and the use of \texttt{record}-based \acp{POJO}
-for request and response bodies (which simplifies diffing). The remaining
-features, in particular the full \ac{JWT} flow, were retained in the prototype
-as a self-contained reference example for future students.
+\subsection{Prototype 2: The SyncSpace Application (\texttt{syncspace-jakarta-app})}
+\label{subsec:proto2}
 
+The second prototype explored application architecture rather than pipeline
+infrastructure. Built as a room-booking service, SyncSpace serves as a
+complete, standalone Jakarta EE 11 reference application designed to exercise
+the modern specifications discussed in Section~\ref{sec:java}.
+
+While the prototype implements a complete domain model and MicroProfile \ac{JWT}
+security, its primary contribution to this project lies in two architectural
+patterns that were subsequently adopted by the production \ac{API}
+refactoring:
+\begin{itemize}
+	\item \textbf{Immutable Data Structures:} Utilizing Java \texttt{record} types
+		for all request and response \acp{POJO} to simplify serialization and
+		state management.
+
+	\item \textbf{Centralized Error Handling:} A focused hierarchy of \ac{JAX-RS}
+		\texttt{ExceptionMapper}s that intercepts all system and domain faults,
+		translating them into structured, predictable \ac{JSON} errors. This uniformity
+		is critical, as it guarantees the differential testing harness always
+		receives a stable, diffable payload rather than an unpredictable stack trace.
+\end{itemize}
+
+The remainder of the application's features were retained in the prototype
+repository as a self-contained educational resource for future students in
+the laboratory. For a comprehensive technical breakdown of the SyncSpace architecture,
+including its security flow, data access, and exception-handling diagrams, please
+refer to Appendix~\ref{app:syncspace}.
 \section{Architecture of the Differential Testing Framework}
 \label{sec:arch}
 
-The architecture of the final testing framework, applied to the production \ac{API},
-is summarised in Figure~\ref{fig:arch}. It is made of three concentric
-layers: the GitLab pipeline, the harness processes, and the application instances
-themselves.
+Figure~\ref{fig:arch} illustrates the testing framework's three-layered architecture:
+the GitLab pipeline, the harness processes, and the application instances.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 	\centering
-	\includegraphics[width=\textwidth, height=14cm, keepaspectratio]{
+	\includegraphics[width=\textwidth, height=11cm, keepaspectratio]{
 		diagrams/ci-cd.png
 	}
 	\caption{Overall architecture of the differential testing framework.}
 	\label{fig:arch}
 \end{figure}
-
-As illustrated, solid arrows denote execution flow, while dashed arrows
-indicate artifact and data access. A developer push triggers a three-stage pipeline
-on the internal runner (\texttt{ubi-runner-.31}):
-
-First, \texttt{build-job} compiles the candidate \texttt{HEAD} \ac{WAR}. Second,
-\texttt{integration-test-job} executes the standard JUnit suite. Finally, the
-core \texttt{http-diff-job} performs a three-way comparison. It uses Git worktrees
-to reconstruct both the immediate parent and a fixed reference baseline,
-boots all three \acp{WAR} simultaneously on independent Payara Micro ports,
-and replays \texttt{http-diff-cases.json} against a shared database fixture.
-The resulting diff reports are then collected by GitLab as test artifacts.
-
-Having refined this architecture through earlier prototypes---which traded
-execution speed for a stricter separation of concerns---the next chapter
-details the framework's application to the production \ac{API}.

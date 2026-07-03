@@ -1,6 +1,6 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{Contents}{iii}{chapter*.3}%
-\contentsline {chapter}{List of Figures}{v}{chapter*.7}%
+\contentsline {chapter}{List of Figures}{v}{chapter*.4}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Context}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Motivation}{2}{section.1.2}%
@@ -28,16 +28,27 @@
 \contentsline {section}{\numberline {4.1}The Legacy API}{15}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Iterative Methodology}{15}{section.4.2}%
 \contentsline {section}{\numberline {4.3}Prototype Applications}{16}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Architecture of the Differential Testing Framework}{18}{section.4.4}%
-\contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{21}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Architecture of \texttt {api\_v4.0}}{21}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Endpoints and Output Formats}{22}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Persistence}{22}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}The \ac {CI}/\ac {CD} Pipeline}{24}{section.5.2}%
-\contentsline {section}{\numberline {5.3}The \ac {HTTP}-Level Diff: \texttt {HttpDiff.java}}{25}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Reports and Findings}{26}{section.5.4}%
-\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{27}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Main Conclusions}{27}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Work}{28}{section.6.2}%
-\contentsline {appendix}{\chapternumberline {A}Raw Survey Data}{29}{appendix.A}%
-\contentsline {chapter}{Bibliography}{31}{chapter*.47}%
+\contentsline {subsection}{\numberline {4.3.1}Prototype 1: Infrastructure Validation (\texttt {java-ee-app})}{16}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Prototype 2: The SyncSpace Application (\texttt {syncspace-jakarta-app})}{16}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}Architecture of the Differential Testing Framework}{17}{section.4.4}%
+\contentsline {chapter}{\chapternumberline {5}Use Case: EPOS API}{19}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Architecture of \texttt {api\_v4.0}}{19}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Endpoints and Output Formats}{20}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Persistence}{20}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}The CI/CD Pipeline}{22}{section.5.2}%
+\contentsline {section}{\numberline {5.3}The HTTP-Level Diff: \texttt {HttpDiff.java}}{22}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Reports and Findings}{23}{section.5.4}%
+\contentsline {chapter}{\chapternumberline {6}Conclusions and Future Work}{25}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Main Conclusions}{25}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{26}{section.6.2}%
+\contentsline {appendix}{\chapternumberline {A}Prototype 1: Infra Validation}{27}{appendix.A}%
+\contentsline {appendix}{\chapternumberline {B}Prototype 2: SyncSpace Architecture Details}{29}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Technology Stack}{29}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Architecture and Domain Model}{30}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Authentication and Security}{30}{section.B.3}%
+\contentsline {section}{\numberline {B.4}Booking Logic and Data Access}{32}{section.B.4}%
+\contentsline {section}{\numberline {B.5}API Surface}{33}{section.B.5}%
+\contentsline {section}{\numberline {B.6}Validation and Centralized Error Handling}{34}{section.B.6}%
+\contentsline {section}{\numberline {B.7}Design Highlights}{35}{section.B.7}%
+\contentsline {appendix}{\chapternumberline {C}Code Snippet: GLASS CI/CD}{37}{appendix.C}%
+\contentsline {chapter}{Bibliography}{39}{chapter*.44}%

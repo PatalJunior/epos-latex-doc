@@ -10,12 +10,14 @@ A level-1 auxiliary file: capitulo-3.aux
 A level-1 auxiliary file: capitulo-4.aux
 A level-1 auxiliary file: capitulo-5.aux
 A level-1 auxiliary file: conc-trab-futuro.aux
-A level-1 auxiliary file: apendice1.aux
+A level-1 auxiliary file: infra-validation.aux
+A level-1 auxiliary file: syncspace-flow.aux
+A level-1 auxiliary file: glass-ci-cd.aux
 The style file: unsrt.bst
 Database file #1: bibliografia.bib
 You've used 28 entries,
             1791 wiz_defined-function locations,
-            578 strings with 7406 characters,
+            580 strings with 7446 characters,
 and the built_in function-call counts, 3650 in all, are:
 = -- 293
 > -- 116

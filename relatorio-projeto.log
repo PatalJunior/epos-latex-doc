@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.26)  2 JUL 2026 23:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.26)  3 JUL 2026 03:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1153,4 +1153,622 @@ LaTeX Font Info:    Redeclaring math accent \ddot on input line 263.
 LaTeX Font Info:    Redeclaring math accent \tilde on input line 264.
 LaTeX Font Info:    Redeclaring math accent \bar on input line 265.
 LaTeX Font Info:    Redeclaring math accent \breve on input line 266.
-LaTeX Font Info:    Redeclaring ma
+LaTeX Font Info:    Redeclaring math accent \check on input line 267.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 268.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 269.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 270.
+\symUfutm=\mathgroup6
+) (/usr/share/texmf-dist/tex/latex/psnfss/helvet.sty
+Package: helvet 2020/03/25 PSNFSS-v9.3 (WaS) 
+) (./relatorio-projeto.aux (./capa.aux) (./agradecimentos.aux) (./acronimos.aux) (./introducao.aux) (./capitulo-2.aux) (./capitulo-3.aux) (./capitulo-4.aux) (./capitulo-5.aux) (./conc-trab-futuro.aux) (./infra-validation.aux) (./syncspace-flow.aux) (./glass-ci-cd.aux))
+\openout1 = `relatorio-projeto.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 124.
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for FML/futm/m/it on input line 124.
+LaTeX Font Info:    Trying to load font information for FML+futm on input line 124.
+ (/usr/share/texmf-dist/tex/latex/fourier/fmlfutm.fd
+File: fmlfutm.fd 2004/10/30 Fontinst v1.926 font definitions for FML/futm.
+)
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for FMS/futm/m/n on input line 124.
+LaTeX Font Info:    Trying to load font information for FMS+futm on input line 124.
+ (/usr/share/texmf-dist/tex/latex/fourier/fmsfutm.fd
+File: fmsfutm.fd 2004/10/30 Fontinst v1.926 font definitions for FMS/futm.
+)
+LaTeX Font Info:    ... okay on input line 124.
+LaTeX Font Info:    Checking defaults for FMX/futm/m/n on input line 124.
+LaTeX Font Info:    Trying to load font information for FMX+futm on input line 124.
+ (/usr/share/texmf-dist/tex/latex/fourier/fmxfutm.fd
+File: fmxfutm.fd futm-extension
+)
+LaTeX Font Info:    ... okay on input line 124.
+
+
+Class memoir Warning: \addtodef is marked deprecated and will be
+(memoir)              removed in 2026, use instead \patchcmd,
+(memoir)              \pretocmd or \apptocmd from the etoolbox package
+(memoir)              (which is autoloaded by the class) on input line 124.
+
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count400
+\scratchdimen=\dimen331
+\scratchbox=\box103
+\nofMPsegments=\count401
+\nofMParguments=\count402
+\everyMPshowfont=\toks48
+\MPscratchCnt=\count403
+\MPscratchDim=\dimen332
+\MPnumerator=\count404
+\makeMPintoPDFobject=\count405
+\everyMPtoPDFconversion=\toks49
+) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+ (/usr/share/texmf-dist/tex/latex/grfext/grfext.sty
+Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 504.
+ (/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
+))
+\c@lstlisting=\count406
+Package hyperref Info: Link coloring OFF on input line 124.
+ (./relatorio-projeto.out) (./relatorio-projeto.out)
+\@outlinefile=\write5
+\openout5 = `relatorio-projeto.out'.
+
+\openout2 = `capa.aux'.
+
+ (./capa.tex
+<ubi-fe-di.png, id=220, 111.0549pt x 107.6823pt>
+File: ubi-fe-di.png Graphic file (type png)
+<use ubi-fe-di.png>
+Package pdftex.def Info: ubi-fe-di.png  used on input line 20.
+(pdftex.def)             Requested size: 191.0pt x 185.21156pt.
+LaTeX Font Info:    Trying to load font information for TS1+futs on input line 26.
+ (/usr/share/texmf-dist/tex/latex/fourier/ts1futs.fd
+File: ts1futs.fd 2003/09/14 Fontinst v1.801 font definitions for TS1/futs.
+)) [-1
+
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc} <./ubi-fe-di.png>] [0
+
+
+
+
+]
+\openout2 = `agradecimentos.aux'.
+
+ (./agradecimentos.tex
+LaTeX Font Info:    Trying to load font information for T1+phv on input line 1.
+ (/usr/share/texmf-dist/tex/latex/psnfss/t1phv.fd
+File: t1phv.fd 2020/03/25 scalable font definitions for T1/phv.
+)
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 22.88956pt on input line 1.
+LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+(Font)              scaled to size 22.88956pt on input line 1.
+LaTeX Font Info:    Font shape `T1/phv/b/it' in size <24.88> not available
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 1.
+LaTeX Font Info:    Font shape `T1/phv/b/sl' will be
+(Font)              scaled to size 22.88956pt on input line 1.
+) [1
+
+
+
+] [2
+
+
+
+
+] (./relatorio-projeto.toc
+LaTeX Font Info:    Trying to load font information for FML+futmi on input line 2.
+ (/usr/share/texmf-dist/tex/latex/fourier/fmlfutmi.fd
+File: fmlfutmi.fd 2004/10/30 Fontinst v1.926 font definitions for FML/futmi.
+)
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 11.03998pt on input line 2.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 8.27998pt on input line 2.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 6.43999pt on input line 2.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 11.03998pt on input line 2.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 8.27998pt on input line 2.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 6.43999pt on input line 2.
+ [3]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 31.
+ (/usr/share/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Overfull \hbox (51.27196pt too wide) in paragraph at lines 32--32
+ [][] [][]\T1/futs/m/n/12 Prototype 2: The Sync-Space Ap-pli-ca-tion (\T1/lmtt/m/n/12 syncspace-jakarta-app\T1/futs/m/n/12 )[] []  
+ []
+
+) [4{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}] (./relatorio-projeto.lof
+Package acronym Info: Label `acro:EPOS' newly defined as it shall be overridden
+although it is yet undefined on input line 9.
+
+Underfull \hbox (badness 4353) in paragraph at lines 9--9
+ [][] [][]\T1/futs/m/n/12 Simplified view of the core [][][]European Plate Ob-serv-ing Sys- 
+ []
+
+Package acronym Info: Label `acro:JWT' newly defined as it shall be overridden
+although it is yet undefined on input line 15.
+Package acronym Info: Label `acro:CDI' newly defined as it shall be overridden
+although it is yet undefined on input line 17.
+Package acronym Info: Label `acro:JAX-RS' newly defined as it shall be overridden
+although it is yet undefined on input line 17.
+) [5
+
+
+] [6
+
+
+] (./relatorio-projeto.lol) [7
+
+] [8
+
+
+]
+\openout2 = `acronimos.aux'.
+
+ (./acronimos.tex [9
+
+
+
+pdfTeX warning (ext4): destination with the same identifier (name{JSON-LD}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.57   \acro{VPN}{Virtual Private Network}
+                                          ]) [10]
+\openout2 = `introducao.aux'.
+
+ (./introducao.tex
+Chapter 1.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 13.24796pt on input line 1.
+LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+(Font)              scaled to size 13.24796pt on input line 1.
+LaTeX Font Info:    Font shape `T1/phv/b/it' in size <14.4> not available
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 1.
+LaTeX Font Info:    Font shape `T1/phv/b/sl' will be
+(Font)              scaled to size 13.24796pt on input line 1.
+Package acronym Info: Label `acro:UBI' newly defined as it shall be overridden
+although it is yet undefined on input line 8.
+Package acronym Info: Label `acro:SEGAL' newly defined as it shall be overridden
+although it is yet undefined on input line 9.
+Package acronym Info: Label `acro:VPN' newly defined as it shall be overridden
+although it is yet undefined on input line 13.
+Package acronym Info: Label `acro:GNSS' newly defined as it shall be overridden
+although it is yet undefined on input line 16.
+Package acronym Info: Label `acro:EPOS' overridden on input line 16.
+Package acronym Info: Label `acro:REST' newly defined as it shall be overridden
+although it is yet undefined on input line 19.
+Package acronym Info: Label `acro:API' newly defined as it shall be overridden
+although it is yet undefined on input line 19.
+Package acronym Info: Label `acro:RINEX' newly defined as it shall be overridden
+although it is yet undefined on input line 20.
+
+Underfull \vbox (badness 2932) has occurred while \output is active []
+
+ [1
+
+
+
+
+
+
+
+]
+Package acronym Info: Label `acro:JSON' newly defined as it shall be overridden
+although it is yet undefined on input line 48.
+Package acronym Info: Label `acro:XML' newly defined as it shall be overridden
+although it is yet undefined on input line 48.
+Package acronym Info: Label `acro:CSV' newly defined as it shall be overridden
+although it is yet undefined on input line 48.
+Package acronym Info: Label `acro:CI' newly defined as it shall be overridden
+although it is yet undefined on input line 58.
+Package acronym Info: Label `acro:CD' newly defined as it shall be overridden
+although it is yet undefined on input line 58.
+Package acronym Info: Label `acro:HTTP' newly defined as it shall be overridden
+although it is yet undefined on input line 92.
+ [2]
+Package acronym Info: Label `acro:WAR' newly defined as it shall be overridden
+although it is yet undefined on input line 97.
+) [3] [4
+
+
+
+
+]
+\openout2 = `capitulo-2.aux'.
+
+ (./capitulo-2.tex
+Chapter 2.
+[5
+
+
+] [6]
+Package acronym Info: Label `acro:YAML' newly defined as it shall be overridden
+although it is yet undefined on input line 115.
+
+Underfull \hbox (badness 6842) in paragraph at lines 120--130
+[]\T1/futs/b/n/12 GitLab [][]/[][] \T1/futs/m/n/12 [[]] pro-vides pipeline au-toma-tion seam-lessly in-te-
+ []
+
+
+Underfull \hbox (badness 3439) in paragraph at lines 120--130
+\T1/lmtt/m/n/12 .gitlab-ci.yml \T1/futs/m/n/12 file, and jobs are ex-e-cuted by sep-a-rate run-ner pro-
+ []
+
+[7]) [8]
+\openout2 = `capitulo-3.aux'.
+
+ (./capitulo-3.tex
+Chapter 3.
+Package acronym Info: Label `acro:URL' newly defined as it shall be overridden
+although it is yet undefined on input line 26.
+Package acronym Info: Label `acro:JSON-LD' newly defined as it shall be overridden
+although it is yet undefined on input line 29.
+Package acronym Info: Label `acro:GeoJSON' newly defined as it shall be overridden
+although it is yet undefined on input line 29.
+[9
+
+
+
+
+
+
+]
+Package acronym Info: Label `acro:OpenAPI' newly defined as it shall be overridden
+although it is yet undefined on input line 44.
+Package acronym Info: Label `acro:UI' newly defined as it shall be overridden
+although it is yet undefined on input line 46.
+Package acronym Info: Label `acro:POJO' newly defined as it shall be overridden
+although it is yet undefined on input line 64.
+Package acronym Info: Label `acro:JAX-RS' overridden on input line 72.
+Package acronym Info: Label `acro:CDI' overridden on input line 73.
+Package acronym Info: Label `acro:JPA' newly defined as it shall be overridden
+although it is yet undefined on input line 75.
+ [10]
+Package acronym Info: Label `acro:JWT' overridden on input line 83.
+Package acronym Info: Label `acro:SQL' newly defined as it shall be overridden
+although it is yet undefined on input line 111.
+ [11]
+Package acronym Info: Label `acro:JAR' newly defined as it shall be overridden
+although it is yet undefined on input line 129.
+Package acronym Info: Label `acro:VM' newly defined as it shall be overridden
+although it is yet undefined on input line 145.
+
+Underfull \hbox (badness 3219) in paragraph at lines 143--152
+[]\T1/futs/b/n/12 GitLab \T1/futs/m/n/12 [[]] han-dles both source con-trol and [][]/[][] or-ches-tra-tion.
+ []
+
+
+Underfull \hbox (badness 3049) in paragraph at lines 143--152
+\T1/lmtt/m/n/12 3.9.6-eclipse-temurin-21 \T1/futs/m/n/12 im-age to guar-an-tee a clean, re-pro-ducible
+ []
+
+[12]) [13] [14
+
+
+
+
+]
+\openout2 = `capitulo-4.aux'.
+
+ (./capitulo-4.tex
+Chapter 4.
+[15
+
+
+]
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 43.
+
+Overfull \hbox (36.95882pt too wide) in paragraph at lines 77--82
+[]\T1/futs/b/n/12 Centralized Er-ror Han-dling: \T1/futs/m/n/12 A fo-cused hi-er-ar-chy of [][] \T1/lmtt/m/n/12 ExceptionMapper\T1/futs/m/n/12 s
+ []
+
+[16]
+<diagrams/ci-cd.png, id=799, 2947.01pt x 4620.26125pt>
+File: diagrams/ci-cd.png Graphic file (type png)
+<use diagrams/ci-cd.png>
+Package pdftex.def Info: diagrams/ci-cd.png  used on input line 99.
+(pdftex.def)             Requested size: 199.61159pt x 312.94691pt.
+) [17 <./diagrams/ci-cd.png>] [18
+
+
+
+
+]
+\openout2 = `capitulo-5.aux'.
+
+ (./capitulo-5.tex
+Chapter 5.
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 18.
+[19
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 97--106
+\T1/futs/m/n/12 The per-sis-tence unit, de-clared in \T1/lmtt/m/n/12 src/main/resources/META-INF/
+ []
+
+
+Underfull \hbox (badness 2617) in paragraph at lines 97--106
+\T1/futs/m/n/12 is con-fig-ured as \T1/lmtt/m/n/12 RESOURCE_LOCAL\T1/futs/m/n/12 , with Hi-ber-nate as the [][] provider
+ []
+
+
+Underfull \hbox (badness 2799) in paragraph at lines 97--106
+\T1/futs/m/n/12 ram-e-ters, host, port, database name, user, pass-word, are re-solved at
+ []
+
+
+Underfull \hbox (badness 3623) in paragraph at lines 97--106
+\T1/futs/m/n/12 ment, then hard-coded de-faults point-ing at the lab-o-ra-tory's database
+ []
+
+[20]
+
+LaTeX Warning: Reference `sec:epos-db' on page 21 undefined on input line 130.
+
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 212.
+[21]
+Package acronym Info: Label `acro:ID' newly defined as it shall be overridden
+although it is yet undefined on input line 215.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 9.19998pt on input line 328.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 328.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 5.51999pt on input line 328.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 9.19998pt on input line 328.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 328.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 5.51999pt on input line 328.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 4995) in paragraph at lines 333--343
+[]\T1/futs/m/n/12 The fig-ure al-ready cov-ers the gist; a few im-ple-men-ta-tion de-tails
+ []
+
+
+Underfull \hbox (badness 5787) in paragraph at lines 333--343
+\T1/futs/m/n/12 are worth record-ing. The test cases live in \T1/lmtt/m/n/12 src/test/resources/
+ []
+
+[22]) [23] [24
+
+
+
+
+]
+\openout2 = `conc-trab-futuro.aux'.
+
+ (./conc-trab-futuro.tex
+Chapter 6.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [25
+
+
+]) [26]
+\openout2 = `infra-validation.aux'.
+
+ (./infra-validation.tex
+Appendix A.
+) [27
+
+
+
+
+
+
+]
+\openout2 = `syncspace-flow.aux'.
+
+ (./syncspace-flow.tex [28
+
+
+
+
+]
+Appendix B.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [29]
+Underfull \hbox (badness 4391) in paragraph at lines 53--55
+[]\T1/futs/b/n/12 Room\T1/futs/m/n/12 : De-fines phys-i-cal spaces with a spe-cific \T1/lmtt/m/n/12 RoomType \T1/futs/m/n/12 (e.g.,
+ []
+
+<diagrams/syncspace-token-issuance.png, id=929, 4889.26625pt x 5206.45125pt>
+File: diagrams/syncspace-token-issuance.png Graphic file (type png)
+<use diagrams/syncspace-token-issuance.png>
+Package pdftex.def Info: diagrams/syncspace-token-issuance.png  used on input line 73.
+(pdftex.def)             Requested size: 267.15727pt x 284.48877pt.
+[30]
+<diagrams/syncspace-request-auth-flow.png, id=936, 2540.49126pt x 5181.3575pt>
+File: diagrams/syncspace-request-auth-flow.png Graphic file (type png)
+<use diagrams/syncspace-request-auth-flow.png>
+Package pdftex.def Info: diagrams/syncspace-request-auth-flow.png  used on input line 87.
+(pdftex.def)             Requested size: 139.47548pt x 284.46165pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31 <./diagrams/syncspace-token-issuance.png>]
+Underfull \hbox (badness 5802) in paragraph at lines 95--100
+\T1/futs/m/n/12 Data ac-cess is man-aged by declar-a-tive Jakarta Data in-ter-faces (e.g.,
+ []
+
+<diagrams/syncspace-auto-booking-flow.png, id=946, 2601.72pt x 6467.16125pt>
+File: diagrams/syncspace-auto-booking-flow.png Graphic file (type png)
+<use diagrams/syncspace-auto-booking-flow.png>
+Package pdftex.def Info: diagrams/syncspace-auto-booking-flow.png  used on input line 112.
+(pdftex.def)             Requested size: 114.45221pt x 284.49677pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [32 <./diagrams/syncspace-request-auth-flow.png>]
+Underfull \hbox (badness 2368) in paragraph at lines 144--148
+\T1/futs/m/n/12 Request pay-loads are val-i-dated us-ing stan-dard Jakarta Bean Val-i-da-tion
+ []
+
+
+Underfull \hbox (badness 7397) in paragraph at lines 144--148
+\T1/futs/m/n/12 (\T1/lmtt/m/n/12 @NotNull\T1/futs/m/n/12 , \T1/lmtt/m/n/12 @Positive\T1/futs/m/n/12 , \T1/lmtt/m/n/12 @Future\T1/futs/m/n/12 ). A cus-tom class-level con-straint,
+ []
+
+
+Underfull \vbox (badness 1975) has occurred while \output is active []
+
+ [33 <./diagrams/syncspace-auto-booking-flow.png>]
+<diagrams/syncspace-diagram.png, id=966, 3932.6925pt x 4603.1975pt>
+File: diagrams/syncspace-diagram.png Graphic file (type png)
+<use diagrams/syncspace-diagram.png>
+Package pdftex.def Info: diagrams/syncspace-diagram.png  used on input line 157.
+(pdftex.def)             Requested size: 243.03232pt x 284.46814pt.
+
+Overfull \hbox (53.44559pt too wide) in paragraph at lines 162--168
+[]\T1/futs/m/n/12 The hi-er-ar-chy han-dles spe-cific do-main ex-cep-tions (\T1/lmtt/m/n/12 BusinessValidationException
+ []
+
+
+Overfull \hbox (42.06772pt too wide) in paragraph at lines 162--168
+\T1/futs/m/n/12 for ca-pac-ity or avail-abil-ity logic), in-put vi-o-la-tions (\T1/lmtt/m/n/12 ConstraintViolationException\T1/futs/m/n/12 ),
+ []
+
+
+Underfull \hbox (badness 2961) in paragraph at lines 162--168
+\T1/futs/m/n/12 mal-formed pay-loads (\T1/lmtt/m/n/12 JsonProcessingException\T1/futs/m/n/12 ), and falls back to a
+ []
+
+
+Underfull \vbox (badness 2368) has occurred while \output is active []
+
+ [34 <./diagrams/syncspace-diagram.png>]
+Underfull \hbox (badness 2035) in paragraph at lines 185--188
+\T1/futs/m/n/12 ob-server guar-an-tees that de-vel-op-ers and au-to-mated tests op-er-ate
+ []
+
+) [35]
+\openout2 = `glass-ci-cd.aux'.
+
+ (./glass-ci-cd.tex [36
+
+
+
+
+]
+Appendix C.
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 5.
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 6.
+[37]) [38] (./relatorio-projeto.bbl
+Underfull \hbox (badness 3088) in paragraph at lines 19--22
+[]\T1/futs/m/n/12 Eclipse Foun-da-tion.  Jakarta EE 11 Plat-form Spec-i-fi-ca-tion, 2024.
+ []
+
+
+Underfull \hbox (badness 2096) in paragraph at lines 19--22
+\T1/futs/m/n/12 [On-line] []$\T1/lmtt/m/n/12 https : / / jakarta . ee / specifications / platform / 11/$[]\T1/futs/m/n/12 . Ac-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--63
+[]\T1/futs/m/n/12 Twitter En-gi-neer-ing.  Diffy --- Au-to-mat-i-cally catch
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--63
+\T1/futs/m/n/12 bugs in service-oriented ar-chi-tec-tures, 2015.  [On-line]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--63
+[]$\T1/lmtt/m/n/12 https : / / blog . twitter . com / engineering / en _ us / a / 2015 /
+ []
+
+[39
+
+
+
+
+
+
+]
+Underfull \hbox (badness 4328) in paragraph at lines 117--120
+\T1/lmtt/m/n/12 / / jakarta . ee / specifications / persistence / 3 . 2/$[]\T1/futs/m/n/12 . Ac-cessed June
+ []
+
+[40]) [41]
+\tf@toc=\write6
+\openout6 = `relatorio-projeto.toc'.
+
+\tf@lof=\write7
+\openout7 = `relatorio-projeto.lof'.
+
+\tf@lol=\write8
+\openout8 = `relatorio-projeto.lol'.
+
+ (./relatorio-projeto.aux (./capa.aux) (./agradecimentos.aux) (./acronimos.aux) (./introducao.aux) (./capitulo-2.aux) (./capitulo-3.aux) (./capitulo-4.aux) (./capitulo-5.aux) (./conc-trab-futuro.aux) (./infra-validation.aux) (./syncspace-flow.aux) (./glass-ci-cd.aux))
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2020/03/25>
+ ***********
+
+
+LaTeX Warning: There were undefined references.
+
+Package rerunfilecheck Info: File `relatorio-projeto.out' has not changed.
+(rerunfilecheck)             Checksum: D92F88AB1241DFBFEBF45737C7EE4D40;9224.
+ ) 
+Here is how much of TeX's memory you used:
+ 32015 strings out of 469515
+ 587735 string characters out of 5470807
+ 1280956 words of memory out of 5000000
+ 59752 multiletter control sequences out of 15000+600000
+ 749616 words of font info for 150 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 85i,12n,104p,885b,2173s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtti10.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putbi8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putri8a.pfb></usr/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8a.pfb>
+Output written on relatorio-projeto.pdf (53 pages, 2092622 bytes).
+PDF statistics:
+ 1221 PDF objects out of 1440 (max. 8388607)
+ 1117 compressed objects within 12 object streams
+ 277 named destinations out of 1000 (max. 500000)
+ 467 words of extra memory for PDF output out of 10000 (max. 10000000)
+
