@@ -2,7 +2,7 @@
 
 \bibitem{epos}
 {EPOS ERIC}.
-\newblock {European Plate Observing System -- EPOS}, 2024.
+\newblock {European Plate Observing System --- EPOS}, 2024.
 \newblock [Online] \url{https://www.epos-eu.org/}. Accessed June 2026.
 
 \bibitem{eposGnss}
@@ -10,9 +10,14 @@
 \newblock {EPOS GNSS Data Gateway}, 2024.
 \newblock [Online] \url{https://gnss-epos.eu/}. Accessed June 2026.
 
+\bibitem{cocco2022epos}
+Massimo Cocco, Carmela Freda, Kuvvet Atakan, Daniele Bailo, Kauzar~Saleh Contell, Otto Lange, and Jan Michalek.
+\newblock The epos research infrastructure: a federated approach to integrate solid earth science data and services.
+\newblock {\em Annals of Geophysics}, 65(2):DM208, 2022.
+
 \bibitem{rinex}
 Werner Gurtner and Lou Estey.
-\newblock {RINEX -- The Receiver Independent Exchange Format, Version 3.05}, 2020.
+\newblock {RINEX --- The Receiver Independent Exchange Format, Version 3.05}, 2020.
 \newblock International GNSS Service (IGS), RINEX Working Group.
 
 \bibitem{jakartaee}
@@ -58,7 +63,7 @@ C{\'e}dric Beust.
 
 \bibitem{diffyTwitter}
 {Twitter Engineering}.
-\newblock {Diffy -- Automatically catch bugs in service-oriented architectures}, 2015.
+\newblock {Diffy --- Automatically catch bugs in service-oriented architectures}, 2015.
 \newblock [Online] \url{https://blog.twitter.com/engineering/en_us/a/2015/diffy-testing-services-without-writing-tests}. Accessed June 2026.
 
 \bibitem{git}
@@ -69,7 +74,7 @@ C{\'e}dric Beust.
 
 \bibitem{jenkins}
 {Jenkins Project}.
-\newblock {Jenkins -- The leading open source automation server}, 2024.
+\newblock {Jenkins --- The leading open source automation server}, 2024.
 \newblock [Online] \url{https://www.jenkins.io/}. Accessed June 2026.
 
 \bibitem{githubActions}
@@ -89,7 +94,7 @@ C{\'e}dric Beust.
 
 \bibitem{gitlabSelfManaged}
 {GitLab Inc.}
-\newblock {GitLab Self-Managed -- Install and configure}, 2024.
+\newblock {GitLab Self-Managed --- Install and configure}, 2024.
 \newblock [Online] \url{https://about.gitlab.com/install/}. Accessed June 2026.
 
 \bibitem{openapi}
@@ -142,5 +147,10 @@ Oracle Corporation.
 {Docker, Inc.}
 \newblock {Docker Documentation}, 2024.
 \newblock [Online] \url{https://docs.docker.com/}. Accessed June 2026.
+
+\bibitem{fernandes2022new}
+Rui Fernandes, Carine Bruyninx, Paul Crocker, Jean-Luc Menut, Anne Socquet, Mathilde Vergnolle, Antonio Avallone, Machiel Bos, Sergio Bruni, Rui Cardoso, et~al.
+\newblock A new european service to share gnss data and products.
+\newblock {\em Annals of Geophysics}, 65(3):DM317, 2022.
 
 \end{thebibliography}

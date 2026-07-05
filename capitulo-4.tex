@@ -97,11 +97,14 @@ repository as a self-contained educational resource for future members in
 the laboratory. For a comprehensive technical breakdown of the SyncSpace architecture,
 including its security flow, data access, and exception-handling diagrams, please
 refer to Appendix~\ref{app:syncspace}.
+
 \section{Architecture of the Differential Testing Framework}
 \label{sec:arch}
 
-Figure~\ref{fig:arch} illustrates the testing framework's three-layered architecture:
-the GitLab pipeline, the harness processes, and the application instances.
+Figure~\ref{fig:arch} illustrates the testing framework's three-layered
+architecture: the GitLab pipeline, the harness processes, and the application
+instances. This stratification deliberately isolates the testing logic from
+the application environments.
 
 \begin{figure}[htbp]
 	\centering
@@ -111,3 +114,23 @@ the GitLab pipeline, the harness processes, and the application instances.
 	\caption{Overall architecture of the differential testing framework.}
 	\label{fig:arch}
 \end{figure}
+
+At the top level, the \textbf{GitLab Pipeline Control} (via the self-managed
+\texttt{ubi-runner}) orchestrates the workspace. It retrieves artifacts from
+the \texttt{build} and \texttt{test} stages, manages the job's lifecycle, boots
+the lower layers, and captures their final exit codes.
+
+The middle layer is the \textbf{Differential Harness}. Implemented as a
+standalone Java application (\texttt{HttpDiff.java}) independent of frameworks
+like JUnit, it directs the testing phase exclusively via \ac{HTTP}. It
+parses \texttt{http-diff-cases.json} for target \ac{URI} paths and
+parameters, dispatches the requests, and performs a strict 3-way payload
+comparison on the responses.
+
+The foundational layer houses the \textbf{Application and Persistence
+Instances}. To enable comparative testing, the runner dynamically spins up three
+isolated Payara Micro \ac{JVM} processes on dedicated ports, each hosting a specific
+\ac{WAR} version. Crucially, all three instances query the exact same
+PostgreSQL database (\ac{SEGAL}). By fixing the data state, any deviation in
+the returned \ac{JSON} or \ac{XML} payloads is conclusively proven to stem from
+logic regressions within the \ac{API} codebase.

@@ -2,13 +2,13 @@
 \label{chap:caso-epos}
 
 This chapter applies the framework of Chapter~\ref{chap:metodo-arq} to the
-production \ac{API}, \texttt{GLASS V3}. The \ac{EPOS} itself~\cite{epos} is a
-pan-European research infrastructure in solid Earth science, organised into
-Thematic Core Services for seismology, geomagnetic observations, \ac{GNSS} data
-and products~\cite{eposGnss}, and so on. The \ac{SEGAL} laboratory of \ac{UBI}
-contributes to the \ac{GNSS} service by operating a node that hosts station
-metadata and \ac{RINEX}~\cite{rinex} observation files. \texttt{GLASS V3} serves
-as the public interface of that node.
+production \ac{API}, \texttt{GLASS V3}. The \ac{EPOS} itself~\cite{fernandes2022new}
+is a pan-European research infrastructure in solid Earth science, organised
+into Thematic Core Services for seismology, geomagnetic observations, \ac{GNSS}
+data and products~\cite{eposGnss}, and so on. The \ac{SEGAL} laboratory of
+\ac{UBI} contributes to the \ac{GNSS} service by operating a node that
+hosts station metadata and \ac{RINEX}~\cite{rinex} observation files.
+\texttt{GLASS V3} serves as the public interface of that node.
 
 Three properties of this domain shape the testing framework: the entities
 are relatively static (making stable baselines easy to obtain), typical client
@@ -36,7 +36,7 @@ is format-agnostic: queries return raw entities, and the requested format (\ac{J
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=\textwidth, height=11cm, keepaspectratio]{
+	\includegraphics[width=\textwidth, height=9cm, keepaspectratio]{
 		diagrams/epos-layered-architecture.png
 	}
 	\caption{Layered architecture of \texttt{EPOS V4}. Solid arrows denote
@@ -171,7 +171,7 @@ and streams the status and output back to GitLab.
 	\centering
 	\includegraphics[
 		width=\textwidth,
-		height=0.75\textheight,
+		height=0.65\textheight,
 		keepaspectratio
 	]{diagrams/gitlab-runner.png}
 	\caption{Sequence diagram of registration, polling, and execution flow.}
@@ -389,7 +389,7 @@ the following reporting structure:
 		the failed instance.
 \end{itemize}
 
-\begin{lstlisting}[caption={Extract of \texttt{summary.json} showing a run with 38 total cases and 1 regression warning.}, label={lst:summary-json}, language=json]
+\begin{lstlisting}[caption={Extract of \texttt{summary.json} showing a run with 38 total cases and 1 regression warning.}, label={lst:summary-json}]
 {
   "totalCases": 38,
   "fixedEnabled": true,

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.26)  5 JUL 2026 19:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.26)  5 JUL 2026 20:46
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1381,20 +1381,20 @@ Underfull \vbox (badness 2932) has occurred while \output is active []
 
 
 ]
-Package acronym Info: Label `acro:JSON' overridden on input line 48.
+Package acronym Info: Label `acro:JSON' overridden on input line 47.
 Package acronym Info: Label `acro:XML' newly defined as it shall be overridden
-although it is yet undefined on input line 48.
+although it is yet undefined on input line 47.
 Package acronym Info: Label `acro:CSV' newly defined as it shall be overridden
-although it is yet undefined on input line 48.
+although it is yet undefined on input line 47.
 Package acronym Info: Label `acro:CI' newly defined as it shall be overridden
-although it is yet undefined on input line 58.
+although it is yet undefined on input line 57.
 Package acronym Info: Label `acro:CD' newly defined as it shall be overridden
-although it is yet undefined on input line 58.
+although it is yet undefined on input line 57.
 Package acronym Info: Label `acro:HTTP' newly defined as it shall be overridden
-although it is yet undefined on input line 92.
+although it is yet undefined on input line 91.
  [2]
 Package acronym Info: Label `acro:WAR' newly defined as it shall be overridden
-although it is yet undefined on input line 97.
+although it is yet undefined on input line 96.
 ) [3] [4
 
 
@@ -1495,11 +1495,20 @@ Underfull \hbox (badness 3240) in paragraph at lines 87--93
 \T1/lmtt/m/n/12 ExceptionMapper\T1/futs/m/n/12 s that in-ter-cepts all sys-tem and do-main faults,
  []
 
-<diagrams/ci-cd.png, id=878, 2947.01pt x 4620.26125pt>
+<diagrams/ci-cd.png, id=884, 2947.01pt x 4620.26125pt>
 File: diagrams/ci-cd.png Graphic file (type png)
 <use diagrams/ci-cd.png>
-Package pdftex.def Info: diagrams/ci-cd.png  used on input line 110.
+Package pdftex.def Info: diagrams/ci-cd.png  used on input line 113.
 (pdftex.def)             Requested size: 199.61159pt x 312.94691pt.
+Package acronym Info: Label `acro:URI' newly defined as it shall be overridden
+although it is yet undefined on input line 126.
+
+Underfull \hbox (badness 6001) in paragraph at lines 123--129
+\T1/futs/m/n/12 dalone Java ap-pli-ca-tion (\T1/lmtt/m/n/12 HttpDiff.java\T1/futs/m/n/12 ) in-de-pen-dent of frame-works
+ []
+
+Package acronym Info: Label `acro:JVM' newly defined as it shall be overridden
+although it is yet undefined on input line 132.
 ) [17] [18 <./diagrams/ci-cd.png>]
 \openout2 = `capitulo-5.aux'.
 
@@ -1515,11 +1524,11 @@ LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <17.28> not available
 
 
 ]
-<diagrams/epos-layered-architecture.png, id=912, 2921.91624pt x 3551.2675pt>
+<diagrams/epos-layered-architecture.png, id=927, 2921.91624pt x 3551.2675pt>
 File: diagrams/epos-layered-architecture.png Graphic file (type png)
 <use diagrams/epos-layered-architecture.png>
 Package pdftex.def Info: diagrams/epos-layered-architecture.png  used on input line 41.
-(pdftex.def)             Requested size: 257.47719pt x 312.93518pt.
+(pdftex.def)             Requested size: 210.66315pt x 256.03787pt.
 
 Overfull \hbox (9.74203pt too wide) in paragraph at lines 50--56
 \T1/futs/m/n/12 (\T1/lmtt/m/n/12 /api/stations\T1/futs/m/n/12 ) and \T1/lmtt/m/n/12 FilesEndpoints \T1/futs/m/n/12 (\T1/lmtt/m/n/12 /api/files\T1/futs/m/n/12 ). Fi-nally, \T1/lmtt/m/n/12 ListEndpoints
@@ -1531,9 +1540,6 @@ Underfull \hbox (badness 5203) in paragraph at lines 57--62
  []
 
 [20 <./diagrams/epos-layered-architecture.png>]
-Package acronym Info: Label `acro:URI' newly defined as it shall be overridden
-although it is yet undefined on input line 76.
-
 Underfull \hbox (badness 10000) in paragraph at lines 79--80
 []|\T1/lmtt/m/n/12 /api/stations/stationid/{stationID}/
  []
@@ -1561,7 +1567,7 @@ Overfull \hbox (36.5035pt too wide) in paragraph at lines 75--86
 Package acronym Info: Label `acro:IETF' newly defined as it shall be overridden
 although it is yet undefined on input line 106.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 111.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 112.
 [21]
 Package acronym Info: Label `acro:DDL' newly defined as it shall be overridden
 although it is yet undefined on input line 134.
@@ -1575,21 +1581,21 @@ Overfull \hbox (7.44186pt too wide) in paragraph at lines 137--141
 \T1/futs/m/n/12 ture heav-ily em-ploys batch fetch-ing (\T1/lmtt/m/n/12 hibernate.default_batch_fetch_size
  []
 
-<diagrams/epos-schema.png, id=946, 2459.1875pt x 2304.61pt>
+<diagrams/epos-schema.png, id=961, 2081.7775pt x 1684.2925pt>
 File: diagrams/epos-schema.png Graphic file (type png)
 <use diagrams/epos-schema.png>
 Package pdftex.def Info: diagrams/epos-schema.png  used on input line 146.
-(pdftex.def)             Requested size: 382.97128pt x 358.8988pt.
+(pdftex.def)             Requested size: 382.99454pt x 309.86732pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [22] [23 <./diagrams/epos-schema.png>]
-<diagrams/gitlab-runner.png, id=961, 4983.61874pt x 3799.19376pt>
+ [22]
+<diagrams/gitlab-runner.png, id=971, 4983.61874pt x 3799.19376pt>
 File: diagrams/gitlab-runner.png Graphic file (type png)
 <use diagrams/gitlab-runner.png>
 Package pdftex.def Info: diagrams/gitlab-runner.png  used on input line 176.
 (pdftex.def)             Requested size: 382.95659pt x 291.94173pt.
- [24 <./diagrams/gitlab-runner.png>]
+ [23 <./diagrams/epos-schema.png>] [24 <./diagrams/gitlab-runner.png>]
 Underfull \hbox (badness 2012) in paragraph at lines 213--218
 []\T1/futs/b/n/12 Temporal Logic: \T1/futs/m/n/12 Date pa-ram-e-ters are val-i-dated not just for for-
  []
@@ -1614,7 +1620,7 @@ Underfull \hbox (badness 2237) in paragraph at lines 247--250
 []\T1/futs/b/n/12 Fixed Base-line (\T1/lmtt/b/n/12 DIFF_FIXED_BASELINE\T1/futs/b/n/12 ): \T1/futs/m/n/12 A pinned, sta-ble an-chor
  []
 
-<diagrams/http-level-diff.png, id=978, 5999.41376pt x 7523.10625pt>
+<diagrams/http-level-diff.png, id=993, 5999.41376pt x 7523.10625pt>
 File: diagrams/http-level-diff.png Graphic file (type png)
 <use diagrams/http-level-diff.png>
 Package pdftex.def Info: diagrams/http-level-diff.png  used on input line 276.
@@ -1684,13 +1690,13 @@ Underfull \hbox (badness 4391) in paragraph at lines 53--55
 []\T1/futs/b/n/12 Room\T1/futs/m/n/12 : De-fines phys-i-cal spaces with a spe-cific \T1/lmtt/m/n/12 RoomType \T1/futs/m/n/12 (e.g.,
  []
 
-<diagrams/syncspace-token-issuance.png, id=1159, 4889.26625pt x 5206.45125pt>
+<diagrams/syncspace-token-issuance.png, id=1174, 4889.26625pt x 5206.45125pt>
 File: diagrams/syncspace-token-issuance.png Graphic file (type png)
 <use diagrams/syncspace-token-issuance.png>
 Package pdftex.def Info: diagrams/syncspace-token-issuance.png  used on input line 73.
 (pdftex.def)             Requested size: 267.15727pt x 284.48877pt.
 [42]
-<diagrams/syncspace-request-auth-flow.png, id=1166, 2540.49126pt x 5181.3575pt>
+<diagrams/syncspace-request-auth-flow.png, id=1181, 2540.49126pt x 5181.3575pt>
 File: diagrams/syncspace-request-auth-flow.png Graphic file (type png)
 <use diagrams/syncspace-request-auth-flow.png>
 Package pdftex.def Info: diagrams/syncspace-request-auth-flow.png  used on input line 87.
@@ -1703,7 +1709,7 @@ Underfull \hbox (badness 5802) in paragraph at lines 95--100
 \T1/futs/m/n/12 Data ac-cess is man-aged by declar-a-tive Jakarta Data in-ter-faces (e.g.,
  []
 
-<diagrams/syncspace-auto-booking-flow.png, id=1176, 2601.72pt x 6467.16125pt>
+<diagrams/syncspace-auto-booking-flow.png, id=1191, 2601.72pt x 6467.16125pt>
 File: diagrams/syncspace-auto-booking-flow.png Graphic file (type png)
 <use diagrams/syncspace-auto-booking-flow.png>
 Package pdftex.def Info: diagrams/syncspace-auto-booking-flow.png  used on input line 112.
@@ -1725,7 +1731,7 @@ Underfull \hbox (badness 7397) in paragraph at lines 144--148
 Underfull \vbox (badness 1975) has occurred while \output is active []
 
  [45 <./diagrams/syncspace-auto-booking-flow.png>]
-<diagrams/syncspace-diagram.png, id=1196, 3932.6925pt x 4603.1975pt>
+<diagrams/syncspace-diagram.png, id=1211, 3932.6925pt x 4603.1975pt>
 File: diagrams/syncspace-diagram.png Graphic file (type png)
 <use diagrams/syncspace-diagram.png>
 Package pdftex.def Info: diagrams/syncspace-diagram.png  used on input line 157.
@@ -1766,28 +1772,18 @@ Appendix C.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 6.
 [49]) [50] (./relatorio-projeto.bbl
-Underfull \hbox (badness 3088) in paragraph at lines 19--22
+Underfull \hbox (badness 7963) in paragraph at lines 14--17
+[]\T1/futs/m/n/12 Massimo Cocco, Carmela Freda, Kuvvet Atakan, Daniele Bailo,
+ []
+
+
+Underfull \hbox (badness 3088) in paragraph at lines 24--27
 []\T1/futs/m/n/12 Eclipse Foun-da-tion.  Jakarta EE 11 Plat-form Spec-i-fi-ca-tion, 2024.
  []
 
 
-Underfull \hbox (badness 2096) in paragraph at lines 19--22
+Underfull \hbox (badness 2096) in paragraph at lines 24--27
 \T1/futs/m/n/12 [On-line] []$\T1/lmtt/m/n/12 https : / / jakarta . ee / specifications / platform / 11/$[]\T1/futs/m/n/12 . Ac-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 60--63
-[]\T1/futs/m/n/12 Twitter En-gi-neer-ing.  Diffy -- Au-to-mat-i-cally catch bugs
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 60--63
-\T1/futs/m/n/12 in service-oriented ar-chi-tec-tures, 2015.  [On-line] []$\T1/lmtt/m/n/12 https :
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 60--63
-\T1/lmtt/m/n/12 / / blog . twitter . com / engineering / en _ us / a / 2015 /
  []
 
 [51
@@ -1798,7 +1794,22 @@ Underfull \hbox (badness 10000) in paragraph at lines 60--63
 
 
 ]
-Underfull \hbox (badness 4328) in paragraph at lines 117--120
+Underfull \hbox (badness 10000) in paragraph at lines 65--68
+[]\T1/futs/m/n/12 Twitter En-gi-neer-ing.  Diffy --- Au-to-mat-i-cally catch
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 65--68
+\T1/futs/m/n/12 bugs in service-oriented ar-chi-tec-tures, 2015.  [On-line]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 65--68
+[]$\T1/lmtt/m/n/12 https : / / blog . twitter . com / engineering / en _ us / a / 2015 /
+ []
+
+
+Underfull \hbox (badness 4328) in paragraph at lines 122--125
 \T1/lmtt/m/n/12 / / jakarta . ee / specifications / persistence / 3 . 2/$[]\T1/futs/m/n/12 . Ac-cessed June
  []
 
@@ -1818,21 +1829,21 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2020/03/25>
  ***********
 Package rerunfilecheck Info: File `relatorio-projeto.out' has not changed.
-(rerunfilecheck)             Checksum: C979B6E01824B8494F3527E5050EE33B;11135.
+(rerunfilecheck)             Checksum: 4A8EF5AA4BF50E51ED2F51873E799C78;11135.
  ) 
 Here is how much of TeX's memory you used:
- 31907 strings out of 469515
- 585642 string characters out of 5470807
- 1283111 words of memory out of 5000000
- 59583 multiletter control sequences out of 15000+600000
- 722509 words of font info for 122 fonts, out of 8000000 for 9000
+ 31901 strings out of 469515
+ 585718 string characters out of 5470807
+ 1283187 words of memory out of 5000000
+ 59575 multiletter control sequences out of 15000+600000
+ 717541 words of font info for 118 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  85i,12n,94p,885b,2170s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtti10.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putbi8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putri8a.pfb></usr/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8a.pfb>
-Output written on relatorio-projeto.pdf (65 pages, 4074135 bytes).
+Output written on relatorio-projeto.pdf (65 pages, 4053128 bytes).
 PDF statistics:
- 1465 PDF objects out of 1728 (max. 8388607)
- 1337 compressed objects within 14 object streams
- 345 named destinations out of 1000 (max. 500000)
+ 1480 PDF objects out of 1728 (max. 8388607)
+ 1352 compressed objects within 14 object streams
+ 349 named destinations out of 1000 (max. 500000)
  567 words of extra memory for PDF output out of 10000 (max. 10000000)
 

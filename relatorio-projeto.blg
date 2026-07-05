@@ -15,44 +15,44 @@ A level-1 auxiliary file: syncspace-flow.aux
 A level-1 auxiliary file: glass-ci-cd.aux
 The style file: unsrt.bst
 Database file #1: bibliografia.bib
-You've used 28 entries,
+You've used 30 entries,
             1791 wiz_defined-function locations,
-            580 strings with 7446 characters,
-and the built_in function-call counts, 3650 in all, are:
-= -- 293
-> -- 116
+            592 strings with 8047 characters,
+and the built_in function-call counts, 4249 in all, are:
+= -- 329
+> -- 174
 < -- 0
-+ -- 57
-- -- 29
-* -- 34
-:= -- 560
-add.period$ -- 87
-call.type$ -- 28
-change.case$ -- 27
++ -- 77
+- -- 47
+* -- 95
+:= -- 670
+add.period$ -- 93
+call.type$ -- 30
+change.case$ -- 29
 chr.to.int$ -- 0
-cite$ -- 28
-duplicate$ -- 145
-empty$ -- 506
-format.name$ -- 29
-if$ -- 860
+cite$ -- 30
+duplicate$ -- 163
+empty$ -- 550
+format.name$ -- 47
+if$ -- 980
 int.to.chr$ -- 0
-int.to.str$ -- 28
-missing$ -- 2
-newline$ -- 146
-num.names$ -- 28
-pop$ -- 191
+int.to.str$ -- 30
+missing$ -- 4
+newline$ -- 156
+num.names$ -- 30
+pop$ -- 193
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 81
+skip$ -- 87
 stack$ -- 0
-substring$ -- 0
-swap$ -- 28
+substring$ -- 30
+swap$ -- 30
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 28
-width$ -- 30
-write$ -- 288
+while$ -- 32
+width$ -- 32
+write$ -- 310
