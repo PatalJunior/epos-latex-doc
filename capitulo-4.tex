@@ -85,10 +85,11 @@ refactoring:
 		state management.
 
 	\item \textbf{Centralized Error Handling:} A focused hierarchy of \ac{JAX-RS}
-		\texttt{ExceptionMapper}s that intercepts all system and domain faults,
-		translating them into structured, predictable \ac{JSON} errors. This uniformity
-		is critical, as it guarantees the differential testing harness always
-		receives a stable, diffable payload rather than an unpredictable stack trace.
+		\texttt{\allowbreak{}ExceptionMapper}s that intercepts all system and domain
+		faults, translating them into structured, predictable \ac{JSON} errors. This
+		uniformity is critical, as it guarantees the differential testing
+		harness always receives a stable, diffable payload rather than an unpredictable
+		stack trace.
 \end{itemize}
 
 The remainder of the application's features were retained in the prototype

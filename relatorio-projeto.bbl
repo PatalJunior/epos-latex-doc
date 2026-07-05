@@ -2,7 +2,7 @@
 
 \bibitem{epos}
 {EPOS ERIC}.
-\newblock {European Plate Observing System --- EPOS}, 2024.
+\newblock {European Plate Observing System -- EPOS}, 2024.
 \newblock [Online] \url{https://www.epos-eu.org/}. Accessed June 2026.
 
 \bibitem{eposGnss}
@@ -12,7 +12,7 @@
 
 \bibitem{rinex}
 Werner Gurtner and Lou Estey.
-\newblock {RINEX --- The Receiver Independent Exchange Format, Version 3.05}, 2020.
+\newblock {RINEX -- The Receiver Independent Exchange Format, Version 3.05}, 2020.
 \newblock International GNSS Service (IGS), RINEX Working Group.
 
 \bibitem{jakartaee}
@@ -58,7 +58,7 @@ C{\'e}dric Beust.
 
 \bibitem{diffyTwitter}
 {Twitter Engineering}.
-\newblock {Diffy --- Automatically catch bugs in service-oriented architectures}, 2015.
+\newblock {Diffy -- Automatically catch bugs in service-oriented architectures}, 2015.
 \newblock [Online] \url{https://blog.twitter.com/engineering/en_us/a/2015/diffy-testing-services-without-writing-tests}. Accessed June 2026.
 
 \bibitem{git}
@@ -69,7 +69,7 @@ C{\'e}dric Beust.
 
 \bibitem{jenkins}
 {Jenkins Project}.
-\newblock {Jenkins --- The leading open source automation server}, 2024.
+\newblock {Jenkins -- The leading open source automation server}, 2024.
 \newblock [Online] \url{https://www.jenkins.io/}. Accessed June 2026.
 
 \bibitem{githubActions}
@@ -89,7 +89,7 @@ C{\'e}dric Beust.
 
 \bibitem{gitlabSelfManaged}
 {GitLab Inc.}
-\newblock {GitLab Self-Managed --- Install and configure}, 2024.
+\newblock {GitLab Self-Managed -- Install and configure}, 2024.
 \newblock [Online] \url{https://about.gitlab.com/install/}. Accessed June 2026.
 
 \bibitem{openapi}

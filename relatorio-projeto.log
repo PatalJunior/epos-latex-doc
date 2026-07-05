@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.26)  5 JUL 2026 19:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.26)  5 JUL 2026 19:56
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1486,14 +1486,19 @@ Chapter 4.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 43.
  [16]
-Overfull \hbox (36.95882pt too wide) in paragraph at lines 87--92
-[]\T1/futs/b/n/12 Centralized Er-ror Han-dling: \T1/futs/m/n/12 A fo-cused hi-er-ar-chy of [][] \T1/lmtt/m/n/12 ExceptionMapper\T1/futs/m/n/12 s
+Underfull \hbox (badness 7649) in paragraph at lines 87--93
+[]\T1/futs/b/n/12 Centralized Er-ror Han-dling: \T1/futs/m/n/12 A fo-cused hi-er-ar-chy of [][] 
+ []
+
+
+Underfull \hbox (badness 3240) in paragraph at lines 87--93
+\T1/lmtt/m/n/12 ExceptionMapper\T1/futs/m/n/12 s that in-ter-cepts all sys-tem and do-main faults,
  []
 
 <diagrams/ci-cd.png, id=878, 2947.01pt x 4620.26125pt>
 File: diagrams/ci-cd.png Graphic file (type png)
 <use diagrams/ci-cd.png>
-Package pdftex.def Info: diagrams/ci-cd.png  used on input line 109.
+Package pdftex.def Info: diagrams/ci-cd.png  used on input line 110.
 (pdftex.def)             Requested size: 199.61159pt x 312.94691pt.
 ) [17] [18 <./diagrams/ci-cd.png>]
 \openout2 = `capitulo-5.aux'.
@@ -1558,10 +1563,6 @@ although it is yet undefined on input line 106.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 111.
 [21]
-Overfull \hbox (22.24167pt too wide) in paragraph at lines 120--129
-\T1/futs/m/n/12 Persistence is man-aged by Hi-ber-nate over Post-greSQL, util-is-ing a \T1/lmtt/m/n/12 RESOURCE_LOCAL
- []
-
 Package acronym Info: Label `acro:DDL' newly defined as it shall be overridden
 although it is yet undefined on input line 134.
 
@@ -1623,12 +1624,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [26] [27 <./diagrams/http-level-diff.png>]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 288.
- [28]
-Overfull \hbox (125.23978pt too wide) in paragraph at lines 350--358
-\T1/futs/m/n/12 The \T1/lmtt/m/n/12 test \T1/futs/m/n/12 stage out-puts stan-dard JU-nit [][] re-ports (e.g., \T1/lmtt/m/n/12 TEST-Glass.Generics.ValidateTest.xml\T1/futs/m/n/12 ).
- []
-
-[29] [30]) [31] [32
+ [28] [29] [30]) [31] [32
 
 
 
@@ -1781,17 +1777,17 @@ Underfull \hbox (badness 2096) in paragraph at lines 19--22
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 60--63
-[]\T1/futs/m/n/12 Twitter En-gi-neer-ing.  Diffy --- Au-to-mat-i-cally catch
+[]\T1/futs/m/n/12 Twitter En-gi-neer-ing.  Diffy -- Au-to-mat-i-cally catch bugs
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 60--63
-\T1/futs/m/n/12 bugs in service-oriented ar-chi-tec-tures, 2015.  [On-line]
+\T1/futs/m/n/12 in service-oriented ar-chi-tec-tures, 2015.  [On-line] []$\T1/lmtt/m/n/12 https :
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 60--63
-[]$\T1/lmtt/m/n/12 https : / / blog . twitter . com / engineering / en _ us / a / 2015 /
+\T1/lmtt/m/n/12 / / blog . twitter . com / engineering / en _ us / a / 2015 /
  []
 
 [51
@@ -1833,10 +1829,10 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  85i,12n,94p,885b,2170s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtti10.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putbi8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></usr/share/texmf-dist/fonts/type1/adobe/utopia/putri8a.pfb></usr/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8a.pfb>
-Output written on relatorio-projeto.pdf (65 pages, 4074053 bytes).
+Output written on relatorio-projeto.pdf (65 pages, 4074135 bytes).
 PDF statistics:
- 1464 PDF objects out of 1728 (max. 8388607)
- 1336 compressed objects within 14 object streams
+ 1465 PDF objects out of 1728 (max. 8388607)
+ 1337 compressed objects within 14 object streams
  345 named destinations out of 1000 (max. 500000)
  567 words of extra memory for PDF output out of 10000 (max. 10000000)
 

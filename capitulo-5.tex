@@ -117,7 +117,7 @@ rather than building and returning an empty structured document.
 
 \subsection{Persistence}
 
-Persistence is managed by Hibernate over PostgreSQL, utilising a \texttt{RESOURCE\_LOCAL}
+Persistence is managed by Hibernate over PostgreSQL, utilising a \texttt{RESOURCE\allowbreak{}\_LOCAL}
 unit named \texttt{MeuPU}. The connection configuration is resolved
 dynamically at startup by \texttt{Config.Loader}, following a strict
 precedence: an explicit \texttt{DATABASE\_URL} environment variable
@@ -347,8 +347,8 @@ are uploaded to GitLab even if a job fails, as failing reports provide the
 most actionable diagnostic data for the developer.
 
 \subsection{Unit Testing Artifacts}
-The \texttt{test} stage outputs standard JUnit \ac{XML} reports (e.g., \texttt{TEST-Glass.Generics.ValidateTest.xml}).
-GitLab natively ingests these \ac{XML} files to populate it's Merge Request \ac{UI}
+The \texttt{test} stage outputs standard JUnit \ac{XML} reports (e.g., \texttt{TEST-Glass.\allowbreak{}Generics.\allowbreak{}ValidateTest.xml}).
+GitLab natively ingests these \ac{XML} files to populate its Merge Request \ac{UI}
 with test execution metrics. For instance, the core \texttt{ValidateTest} suite
 executes 40 discrete input-validation scenarios in approximately 50 milliseconds.
 Because these tests are strictly isolated from the database, the resulting reports
@@ -413,7 +413,7 @@ the following reporting structure:
 CASE: stations by location country json
 PATH: /api/stations/location/country/Portugal/short/json
 STATUS: Current=200, Last=200
---- DEVIATION (Current vs Last) ---
+-- DEVIATION (Current vs Last) --
 Current payload:
 [{"station_id":"ALCO00PRT","location":{"location_type":"country","instance":"Portugal"}}]
 
