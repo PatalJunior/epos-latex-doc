@@ -9,39 +9,31 @@ sequenceDiagram
 
     rect rgb(230, 240, 250)
         Note over H, DB: Phase 1: Boot
-        par Boot parallel instances
-            H->>P80: Spawn payara-micro
-        and
-            H->>P81: Spawn payara-micro
-        and
-            H->>P82: Spawn payara-micro
-        end
+        H->>P80: Spawn payara-micro
+        H->>P81: Spawn payara-micro
+        H->>P82: Spawn payara-micro
     end
 
     rect rgb(244, 235, 244)
         Note over H, DB: Phase 2: Verify Readiness
-        par Health checks
-            H->>P80: GET /api/ping
-        and
-            H->>P81: GET /api/ping
-        and
-            H->>P82: GET /api/ping
-        end
+        H->>P80: GET /api/ping
+        H->>P81: GET /api/ping
+        H->>P82: GET /api/ping
     end
 
     rect rgb(230, 242, 230)
         Note over H, DB: Phase 3: Replay & 3-Way Diff
         loop For each case[i] in http-diff-cases.json
-            par Parallel Request Replay
-                H->>P80: Execute case[i]
-                P80-->>DB: Query shared fixture
-            and
-                H->>P81: Execute case[i]
-                P81-->>DB: Query shared fixture
-            and
-                H->>P82: Execute case[i]
-                P82-->>DB: Query shared fixture
-            end
+            Note over H, DB: Sequential Request Replay
+            
+            H->>P80: Execute case[i]
+            P80-->>DB: Query shared fixture
+            
+            H->>P81: Execute case[i]
+            P81-->>DB: Query shared fixture
+            
+            H->>P82: Execute case[i]
+            P82-->>DB: Query shared fixture
         end
         Note over H: Perform 3-way payload diff:<br/>HEAD vs Recent & HEAD vs Fixed
     end
@@ -49,11 +41,7 @@ sequenceDiagram
     rect rgb(217, 217, 217)
         Note over H, DB: Phase 4: Teardown & Report
         H->>H: Write artifacts to http-diff-report/
-        par Clean shutdown
-            H->>P80: SIGTERM
-        and
-            H->>P81: SIGTERM
-        and
-            H->>P82: SIGTERM
-        end
+        H->>P80: SIGTERM
+        H->>P81: SIGTERM
+        H->>P82: SIGTERM
     end

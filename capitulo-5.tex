@@ -2,12 +2,12 @@
 \label{chap:caso-epos}
 
 This chapter applies the framework of Chapter~\ref{chap:metodo-arq} to the
-production \ac{API}, \texttt{GLASS V4}. The \ac{EPOS} itself~\cite{epos} is a
+production \ac{API}, \texttt{GLASS V3}. The \ac{EPOS} itself~\cite{epos} is a
 pan-European research infrastructure in solid Earth science, organised into
 Thematic Core Services for seismology, geomagnetic observations, \ac{GNSS} data
 and products~\cite{eposGnss}, and so on. The \ac{SEGAL} laboratory of \ac{UBI}
 contributes to the \ac{GNSS} service by operating a node that hosts station
-metadata and \ac{RINEX}~\cite{rinex} observation files. \texttt{GLASS V4} serves
+metadata and \ac{RINEX}~\cite{rinex} observation files. \texttt{GLASS V3} serves
 as the public interface of that node.
 
 Three properties of this domain shape the testing framework: the entities
@@ -45,6 +45,7 @@ is format-agnostic: queries return raw entities, and the requested format (\ac{J
 \end{figure}
 
 \subsection{Endpoints and Output Formats}
+\label{subsec:endpoints}
 
 The \ac{REST} surface consists of four primary resource families. \texttt{Start.java}
 registers a \texttt{PingResource} for liveness checks (executing a trivial \texttt{SELECT
@@ -53,30 +54,78 @@ registers a \texttt{PingResource} for liveness checks (executing a trivial \text
 \texttt{ListEndpoints} (\texttt{/api/list}) provides controlled
 vocabularies and lookups exclusively in \ac{JSON}.
 
-Endpoints follow a uniform grammatical structure driven by path parameters (e.g.,
-\texttt{/stations/<selector>/.../\{size\}/\{format\}}). Selectors include identifiers,
-locations, agencies, and coordinates. The \texttt{combination} endpoints
-offer the highest flexibility, allowing an open set of query parameters validated
-against a strict allow-list. For file endpoints, responses are paginated,
-carrying metadata headers such as \texttt{X-Total-Count}, \texttt{X-Page},
-and \texttt{X-Total-Pages}.
+Endpoints follow a uniform grammatical structure driven heavily by path parameters
+(e.g., \texttt{/stations/<selector>/.../\{size\}/\{format\}}). Selectors include
+identifiers, locations, agencies, and coordinates. The \texttt{combination}
+endpoints offer the highest flexibility, allowing an open set of query parameters
+validated against a strict allow-list.
 
-A single switch statement in each resource resolves the output format matrix.
-Stations can be serialized to \ac{JSON}, \ac{XML}, \ac{CSV}, GeoJSON, or JSON-LD.
-Files support \ac{JSON}, \ac{XML}, \ac{CSV}, and executable shell scripts. To
-prevent structural drift, formats like \ac{JSON}, GeoJSON, and JSON-LD share
-the same serialization logic, manipulated via boolean flags. Empty result sets
-actively short-circuit to a \texttt{200 OK} plain-text message rather than
-an empty document.
+For the file endpoints, responses are strictly paginated, carrying metadata headers
+such as \texttt{X-Total-Count}, \texttt{X-Page}, and \texttt{X-Total-Pages}.
+This pagination is heavily enforced due to the massive scale of the underlying
+dataset; attempting to query the full \ac{RINEX} file corpus without limits either
+results in severe latency or triggers a \texttt{500 Internal Server Error}
+as the application exhausts memory limits.
+
+Table~\ref{tab:core-endpoints} summarizes the routing structure of the \ac{API}.
+
+\begin{table}[H]
+	\centering
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabular}{lp{10cm}}
+		\toprule \textbf{Endpoint Family}    & \textbf{Example \ac{URI} Pattern}                                                            \\
+		\midrule \textbf{Health \& Liveness} & \texttt{/api/ping}                                                                           \\
+		\textbf{Vocabularies (Lists)}        & \texttt{/api/list/\{entity\_type\}}                                                          \\
+		\textbf{Station lookups}             & \texttt{/api/stations/stationid/\{stationID\}/\allowbreak\{size\}/\{format\}}                \\
+		\textbf{Location lookups}            & \texttt{/api/stations/location/\{locationType\}/\allowbreak\{instance\}/\{size\}/\{format\}} \\
+		\textbf{Equipment lookups}           & \texttt{/api/stations/equipment/\{itemType\}/\allowbreak\{instance\}/\{size\}/\{format\}}    \\
+		\textbf{Station combinations}        & \texttt{/api/stations/combination/\{size\}/\allowbreak\{format\}?network=...}                \\
+		\bottomrule
+	\end{tabular}
+	\caption{Summary of the core \ac{EPOS} endpoint families and their routing
+	structures.}
+	\label{tab:core-endpoints}
+\end{table}
+
+It is important to acknowledge that several endpoints—specifically those
+targeting equipment, coordinates, and locations—maintain a deliberately non-ideal
+architectural implementation. As seen in the table, these endpoints map
+complex search criteria into deep, rigid chains of \ac{URI} path segments
+rather than utilizing standard query parameters. While modern \ac{REST}
+principles strongly discourage placing optional or highly variable
+parameters directly into the routing path, these legacy structures must be preserved
+exactly as-is. Active \ac{EPOS} consumers, automated scripts, and federated portals
+are hard-coded to expect these specific paths; migrating to a standard
+query-string approach (e.g., \texttt{?itemType=antenna\&instance=TRM}) would
+constitute a breaking change for the ecosystem.
+\medskip
+Furthermore, the \texttt{/combination} endpoints currently stretch the
+limits of the \ac{HTTP} \texttt{GET} method by accepting a massive array of
+optional query parameters. The ideal, modern architectural implementation
+for this type of complex search would be to utilize the newly proposed \ac{HTTP}
+\texttt{QUERY} method (an active \ac{IETF} draft). The \texttt{QUERY} method
+provides a safe, idempotent way to retrieve data while allowing the client
+to send a structured \ac{JSON} payload body containing all the filtering logic,
+bypassing \ac{URI} length limits and maintaining clean routing without misusing
+the \texttt{POST} method.
+
+Finally, a single \texttt{switch} statement in each resource resolves the
+output format matrix. Stations can be serialized to \ac{JSON}, \ac{XML}, \ac{CSV}.
+Files support \ac{JSON}, \ac{XML}, and \ac{CSV}. To optimize bandwidth,
+empty result sets actively short-circuit to a \texttt{200 OK} plain-text message
+rather than building and returning an empty structured document.
 
 \subsection{Persistence}
 
 Persistence is managed by Hibernate over PostgreSQL, utilising a \texttt{RESOURCE\_LOCAL}
-unit named \texttt{MeuPU}. The connection configuration is resolved dynamically
-at startup by \texttt{Config.Loader}, following a strict precedence: an
-explicit \texttt{DATABASE\_URL} environment variable overrides individual host/port
-variables, which override local configuration files, which finally fall back
-to hard-coded defaults (\texttt{192.168.168.30:5432}).
+unit named \texttt{MeuPU}. The connection configuration is resolved
+dynamically at startup by \texttt{Config.Loader}, following a strict
+precedence: an explicit \texttt{DATABASE\_URL} environment variable
+overrides individual host/port variables, which override local configuration
+files, which finally fall back to hard-coded defaults (\texttt{192.168.168.30:5432}).
+This hard-coded fallback is strictly a temporary measure for the
+development phase and will be phased out in favor of a more robust
+configuration approach in the future.
 
 This environment-variable precedence is the linchpin of the differential
 harness: it enables the pipeline to point multiple historical builds at a single,
@@ -87,8 +136,8 @@ statements against live data.
 
 To mitigate performance bottlenecks across complex joins, the architecture heavily
 employs batch fetching (\texttt{hibernate.default\_batch\_fetch\_size = 512}).
-This collapses potentially hundreds of thousands of lazy-loading \texttt{N+1}
-queries into highly efficient \texttt{IN (...)} clauses.
+This collapses potentially hundreds of thousands of lazy-loading queries into
+highly efficient \texttt{IN (...)} clauses.
 
 \begin{figure}[H]
 	\centering
@@ -102,21 +151,21 @@ queries into highly efficient \texttt{IN (...)} clauses.
 \section{The CI/CD Pipeline Flow}
 \label{sec:pipeline}
 
-The continuous integration and deployment lifecycle is orchestrated by GitLab,
-but the actual compilation and testing workloads are offloaded to a self-managed
-internal runner (using the \texttt{ubi-runner} image). This runner is
-provisioned within the laboratory's infrastructure, granting it secure \ac{VPN}
-access to the reference PostgreSQL databases.
+The continuous integration and deployment lifecycle is orchestrated by
+GitLab, but the actual compilation and testing workloads are offloaded to a self-managed
+internal runner (using the \texttt{ubi-runner} image). This runner is provisioned
+within the laboratory's infrastructure, granting it secure \ac{VPN} access to
+the reference PostgreSQL databases.
 
-Before detailing the specific pipeline stages, it is important to understand
-the execution flow between the control plane and this runner, as
-illustrated in Figure~\ref{fig:gitlab-runner}. The runner process operates in
-a continuous polling loop. Once registered, it periodically requests jobs from
-the GitLab \ac{API}. When a developer pushes a new commit, GitLab queues
-the pipeline jobs; the runner claims them, pulls the job payload, and delegates
-the workload to its local executor. The executor then clones the repository,
-downloads any necessary artifacts from previous stages, runs the defined
-scripts, and streams the status and output back to GitLab.
+Before detailing the specific pipeline stages, it is important to
+understand the execution flow between the control plane and this runner, as illustrated
+in Figure~\ref{fig:gitlab-runner}. The runner process operates in a
+continuous polling loop. Once registered, it periodically requests jobs
+from the GitLab \ac{API}. When a developer pushes a new commit, GitLab queues
+the pipeline jobs; the runner claims them, pulls the job payload, and
+delegates the workload to its local executor. The executor then clones the repository,
+downloads any necessary artifacts from previous stages, runs the defined scripts,
+and streams the status and output back to GitLab.
 
 \begin{figure}[H]
 	\centering
@@ -129,10 +178,11 @@ scripts, and streams the status and output back to GitLab.
 	\label{fig:gitlab-runner}
 \end{figure}
 
-Mapped onto this execution architecture, our specific pipeline is divided into
-three sequential stages: \texttt{build}, \texttt{test}, and \texttt{diff}.
+Mapped onto this execution architecture, our specific pipeline is divided
+into three sequential stages: \texttt{build}, \texttt{test}, and \texttt{diff}.
 
 \subsection{Stage 1 \& 2: Build and Unit Testing}
+
 The \texttt{build} stage initiates the process. The executor compiles the candidate
 \texttt{HEAD} \ac{WAR} and publishes it back to GitLab as a pipeline artifact.
 Following this, the \texttt{test} stage downloads that artifact and
@@ -140,6 +190,49 @@ executes standard JUnit 5 logic tests. Crucially, these tests are entirely
 isolated from the database. A deliberate design choice was made to forgo traditional
 data-access integration tests; instead, behavioral database correctness is strictly
 deferred to the differential harness.
+
+By decoupling the unit tests from the persistence layer, the \texttt{test} stage
+becomes extremely fast and fiercely focused on the \ac{API}'s input
+validation boundary. The test suite, dominated by classes like \texttt{ValidateTest},
+rigorously exercises the "validate-then-query" paradigm. It ensures that malformed,
+malicious, or illogical requests are intercepted and rejected with a \texttt{400
+Bad Request} before a database connection is ever requested.
+
+The unit testing strategy focuses on several critical vectors of input
+sanitization:
+
+\begin{itemize}
+	\item \textbf{Boundary and Spatial Enforcement:} The \ac{API} processes complex
+		geographic queries. The test suite verifies that coordinate parsers
+		enforce strict mathematical boundaries (e.g., latitude confined between $-
+		90.0$ and $90.0$) and logical shape constraints. For instance, tests
+		actively assert that circles cannot have negative radii, rectangles cannot
+		have minimum bounds exceeding maximum bounds, and polygons must contain
+		at least three valid, non-intersecting coordinate pairs.
+
+	\item \textbf{Temporal Logic:} Date parameters are validated not just for
+		format, but for calendar reality and chronological order. The suite
+		actively asserts that impossible dates (like February 30th) throw
+		\texttt{IllegalArgumentException}, and that complex date ranges
+		strictly enforce start dates that chronologically precede end dates.
+
+	\item \textbf{Interdependent Query Parameters:} For the highly flexible
+		\texttt{combination} endpoints, validation rules are contextual. The test
+		suite proves that if a client provides an \texttt{equipmentType}, they must
+		also provide an \texttt{equipment\_instance}; similarly, location
+		identifiers are rejected if the broader location category is missing.
+
+	\item \textbf{Pagination and Resource Limits:} To protect the database
+		from denial-of-service through massive queries, pagination limits are strictly
+		enforced at the unit level, asserting that page sizes exceeding $1000$
+		records or dropping below zero are immediately rejected.
+\end{itemize}
+
+By verifying these constraints in pure, database-free Java logic, the pipeline
+guarantees that the downstream PostgreSQL instance is insulated from bad payloads.
+If a commit successfully passes this stage, the subsequent differential test
+can safely assume that any \texttt{500 Internal Server Error} it encounters
+is a genuine backend logic regression, not a symptom of unhandled input.
 
 \subsection{Stage 3: Differential Testing (\texttt{diff})}
 The final stage is the \texttt{http-diff-job}, which performs a strict three-way
@@ -209,7 +302,7 @@ specific scenarios across three distinct dimensions of the \ac{API}:
 		contention on the database when executed by three instances
 		simultaneously. These cases are explicitly granted a \texttt{timeoutSeconds}
 		boundary to prevent false failures while still guaranteeing byte-for-byte
-		correctness across \ac{JSON}, \ac{XML}, \ac{CSV}, and GeoJSON formats.
+		correctness across \ac{JSON}, \ac{XML}, \ac{CSV} formats.
 
 	\item \textbf{Targeted Lookups:} Precise queries (e.g., filtering by the \texttt{CASC00PRT}
 		marker or the \texttt{EUREF} network) verify that deeper \ac{SQL} joins and
@@ -236,39 +329,109 @@ model:
 		other succeeded.
 \end{itemize}
 
-Because three parallel instances place high contention on a single database,
-some heavy queries slow down. To prevent false failures, the harness
-implements per-case timeout boundaries (\texttt{timeoutSeconds}), allowing
-massive full-table list queries to process without globally lowering the
-performance bar for faster endpoints.
+Even though the harness queries the three instances sequentially rather than
+concurrently, massive full-table list queries inherently require
+significant database processing and payload serialization time. To prevent false
+failures on these heavy endpoints, the harness implements per-case timeout
+boundaries (\texttt{timeoutSeconds}). This allows complex queries to
+process fully without globally lowering the performance bar for faster, lightweight
+requests.
 
 \section{Reports and Findings}
 \label{sec:reports}
 
-Upon completion, the harness generates a self-contained report tree. The pipeline
-uses \texttt{when: always} to guarantee these artifacts are uploaded even
-if the job fails, as failing reports provide the most actionable diagnostic data.
+Upon completion of the pipeline, both the unit testing and differential testing
+stages generate self-contained report trees. The pipeline is explicitly
+configured with the \texttt{when: always} directive to guarantee these artifacts
+are uploaded to GitLab even if a job fails, as failing reports provide the
+most actionable diagnostic data for the developer.
+
+\subsection{Unit Testing Artifacts}
+The \texttt{test} stage outputs standard JUnit \ac{XML} reports (e.g., \texttt{TEST-Glass.Generics.ValidateTest.xml}).
+GitLab natively ingests these \ac{XML} files to populate it's Merge Request \ac{UI}
+with test execution metrics. For instance, the core \texttt{ValidateTest} suite
+executes 40 discrete input-validation scenarios in approximately 50 milliseconds.
+Because these tests are strictly isolated from the database, the resulting reports
+provide instantaneous, deterministic feedback on the structural integrity
+of the \ac{API}'s boundary logic before the heavier differential harness is even
+invoked.
+
+\subsection{Differential Harness Artifacts}
+The \texttt{http-diff-job} stage produces a custom artifact tree designed
+specifically for rapid triage. A real-world execution of the harness yielded
+the following reporting structure:
 
 \begin{itemize}
-	\item \texttt{summary.json}: The entry point, containing pairwise verdict
-		tallies and performance deltas (measuring if the current commit has become
-		slower).
+	\item \textbf{\texttt{summary.json}:} The high-level entry point
+		containing pairwise verdict tallies and performance deltas. As shown in Listing~\ref{lst:summary-json},
+		it provides an immediate health check. In this run, the harness
+		executed 38 test cases, yielding 37 perfect matches (\texttt{ok}) and
+		one behavioral deviation (\texttt{warn}).
 
-	\item \texttt{report.csv}: A row-by-row breakdown of all requests,
-		including HTTP statuses and latency metrics.
+	\item \textbf{\texttt{report.csv}:} A row-by-row matrix detailing the \ac{HTTP}
+		status codes and wall-clock latency for every endpoint across all three Payara
+		instances. This allows developers to track performance degradation at a
+		glance (e.g., observing if a refactored query suddenly increased response
+		times on the \texttt{/api/stations/location} endpoint).
 
-	\item \texttt{details.txt}: A truncated, human-readable snippet of the
-		differing payloads for non-OK requests, allowing developers to immediately
-		spot the deviation.
+	\item \textbf{\texttt{details.txt}:} The diagnostic core of the harness. For
+		any case flagged as a \texttt{WARN} or \texttt{FAIL}, this file
+		isolates the exact payload deviation. Listing~\ref{lst:details-txt} demonstrates
+		the framework's value perfectly: it caught a subtle regression where a
+		refactored query inadvertently changed the \ac{JSON} serialization of the
+		\texttt{location\_type} field from "Country" (capitalized) to "country"
+		(lowercase).
 
-	\item \texttt{payara-*.log}: The raw container logs for deep debugging.
+	\item \textbf{\texttt{payara-*.log}:} The raw standard-out logs for the
+		three isolated Payara Micro processes (\texttt{current}, \texttt{last}, and
+		\texttt{fixed}). These are essential for deep debugging when a \texttt{500
+		Internal Server Error} occurs, providing the full Java stack trace for
+		the failed instance.
 \end{itemize}
 
-Several operational realities shaped this reporting design. First, database
-coupling is load-bearing: if the \texttt{FIXED\_SHA} anchor predates a
-major schema change, it will query mismatched data, resulting in a wall of
-bogus diffs. Thus, anchors must always represent compatible database eras. Second,
-non-determinism does not equate to behavioral change. Early runs flagged \texttt{WARN}s
-due to the unpredictable iteration order of Java \texttt{HashSet}s in error messages;
-standardizing on sorted sets eliminated this cosmetic noise, yielding a highly
-stable signal.
+\begin{lstlisting}[caption={Extract of \texttt{summary.json} showing a run with 38 total cases and 1 regression warning.}, label={lst:summary-json}, language=json]
+{
+  "totalCases": 38,
+  "fixedEnabled": true,
+  "currentVsLast": {
+    "ok": 37,
+    "warn": 1,
+    "fail": 0
+  },
+  "currentVsFixed": {
+    "ok": 37,
+    "warn": 1,
+    "fail": 0
+  }
+}
+\end{lstlisting}
+
+\vspace*{8\baselineskip}
+
+\begin{lstlisting}[caption={Extract of \texttt{details.txt} showing the exact \ac{JSON} key capitalization deviation caught by the harness.}, label={lst:details-txt}]
+==================================================
+CASE: stations by location country json
+PATH: /api/stations/location/country/Portugal/short/json
+STATUS: Current=200, Last=200
+--- DEVIATION (Current vs Last) ---
+Current payload:
+[{"station_id":"ALCO00PRT","location":{"location_type":"country","instance":"Portugal"}}]
+
+Last payload:
+[{"station_id":"ALCO00PRT","location":{"location_type":"Country","instance":"Portugal"}}]
+==================================================
+\end{lstlisting}
+
+\subsection{Operational Realities}
+Several operational realities shaped this reporting design. First, database coupling
+is load-bearing: if the \texttt{DIFF\_FIXED\_BASELINE} anchor predates a major
+PostgreSQL schema migration, it will query mismatched data structures, resulting
+in a wall of bogus diffs. Thus, anchors must always be manually updated to represent
+compatible database eras.
+
+Second, non-determinism does not automatically equate to behavioral change. Early
+test runs flagged massive amounts of \texttt{WARN}s due to the unpredictable
+iteration order of Java \texttt{HashSet} objects when serializing \ac{JSON} arrays
+or generating error messages. Standardizing the \ac{API} codebase to rely on
+sorted sets and deterministic lists eliminated this cosmetic noise,
+yielding a highly stable, trustworthy \ac{CI} signal.

@@ -6,14 +6,14 @@
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Overall architecture of the differential testing framework.}}{18}{figure.4.1}%
 \addvspace {10pt}
 \contentsline {figure}{\numberline {5.1}{\ignorespaces Layered architecture of \texttt {EPOS V4}. Solid arrows denote call/data flow; dashed arrows denote infrastructure binding.}}{20}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Simplified view of the core \ac {EPOS} data model.}}{22}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Sequence diagram of registration, polling, and execution flow.}}{23}{figure.5.3}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Phases of \texttt {HttpDiff.java}. The harness orchestrates boot, verification, parallel replay, and teardown.}}{25}{figure.5.4}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Simplified view of the core \ac {EPOS} data model.}}{23}{figure.5.2}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Sequence diagram of registration, polling, and execution flow.}}{24}{figure.5.3}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Phases of \texttt {HttpDiff.java}. The harness orchestrates boot, verification, parallel replay, and teardown.}}{27}{figure.5.4}%
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {B.1}{\ignorespaces Token issuance and user registration flow.}}{39}{figure.B.1}%
-\contentsline {figure}{\numberline {B.2}{\ignorespaces Request authorization and \ac {JWT} validation flow.}}{40}{figure.B.2}%
-\contentsline {figure}{\numberline {B.3}{\ignorespaces Automatic booking assignment and validation flow.}}{41}{figure.B.3}%
-\contentsline {figure}{\numberline {B.4}{\ignorespaces The \ac {CDI} and \ac {JAX-RS} exception-handling flow.}}{42}{figure.B.4}%
+\contentsline {figure}{\numberline {B.1}{\ignorespaces Token issuance and user registration flow.}}{43}{figure.B.1}%
+\contentsline {figure}{\numberline {B.2}{\ignorespaces Request authorization and \ac {JWT} validation flow.}}{44}{figure.B.2}%
+\contentsline {figure}{\numberline {B.3}{\ignorespaces Automatic booking assignment and validation flow.}}{45}{figure.B.3}%
+\contentsline {figure}{\numberline {B.4}{\ignorespaces The \ac {CDI} and \ac {JAX-RS} exception-handling flow.}}{46}{figure.B.4}%
 \addvspace {10pt}
